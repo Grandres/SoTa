@@ -486,7 +486,7 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
             (*iter)->ForcedDespawn();
     }
 
-    /*void MountPlayers()
+    void MountPlayers()
     {
         if (m_pInstance)
         {
@@ -504,9 +504,9 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
                         }
                     }
         }
-    }*/
+    }
                     
-    /*void DismountPlayers()
+    void DismountPlayers()
     {
         // dismount players
         if (m_pInstance)
@@ -1068,8 +1068,8 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
             {
                 if (m_uiTimer<= uiDiff)
                 {
-                    //DismountPlayers();
-                    //MountPlayers();
+                    DismountPlayers();
+                    MountPlayers();
                     m_uiSubPhase = SUBPHASE_DESTROY_PLATFORM_4;
                     m_uiTimer = 10000;
                 }
