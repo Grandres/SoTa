@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: boss_xevozz
-SDAuthor: ckegg
-SD%Complete: 0
+SDAuthor: 
+SD%Complete: 
 SDComment: 
 SDCategory: The Violet Hold
 EndScriptData */

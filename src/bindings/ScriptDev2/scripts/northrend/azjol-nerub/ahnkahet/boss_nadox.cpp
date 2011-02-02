@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -41,12 +41,11 @@ enum
     SPELL_BROOD_RAGE              = 59465,
 
     SPELL_GUARDIAN_AURA           = 56151,
+    SPELL_GUARDIAN_AURA_TRIGGERED = 56153,
 
     // JustSummoned is not called for spell summoned creatures
     SPELL_SUMMON_SWARM_GUARDIAN   = 56120,
     SPELL_SUMMON_SWARMERS         = 56119,
-    SPELL_JUMP_FROM_EGG           = 56134,
-    SPELL_EGG_OPEN_VISUAL         = 56335,
 
     NPC_AHNKAHAR_GUARDIAN_EGG     = 30173,
     NPC_AHNKAHAR_SWARM_EGG        = 30172,
@@ -72,23 +71,17 @@ struct MANGOS_DLL_DECL mob_ahnkahar_eggAI : public ScriptedAI
     void AttackStart(Unit* pWho) {}
 
     void JustSummoned(Creature* pSummoned)
-    {      
-        pSummoned->CastSpell(pSummoned, SPELL_JUMP_FROM_EGG, false);
-        DoCastSpellIfCan(m_creature, SPELL_EGG_OPEN_VISUAL, CAST_INTERRUPT_PREVIOUS);
+    {
+        if (pSummoned->GetEntry() == NPC_AHNKAHAR_GUARDIAN)
+            DoScriptText(EMOTE_HATCH, m_creature);
 
-        if (m_pInstance && pSummoned->AI())
+        if (m_pInstance)
         {
-            if (Creature*  pElderNadox = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(NPC_ELDER_NADOX)))
+            if (Creature* pElderNadox = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(NPC_ELDER_NADOX)))
             {
-                if (Unit* pVictim = pElderNadox->getVictim())
-                {
-                    pSummoned->AI()->AttackStart(pVictim);
-                    if (pSummoned->GetEntry() == NPC_AHNKAHAR_GUARDIAN)
-                    {
-                        pSummoned->CastSpell(pSummoned, SPELL_GUARDIAN_AURA, false);
-                        DoScriptText(EMOTE_HATCH, m_creature);
-                    }
-                }
+                float fPosX, fPosY, fPosZ;
+                pElderNadox->GetPosition(fPosX, fPosY, fPosZ);
+                pSummoned->GetMotionMaster()->MovePoint(0, fPosX, fPosY, fPosZ);
             }
         }
     }
@@ -185,7 +178,7 @@ struct MANGOS_DLL_DECL boss_nadoxAI : public ScriptedAI
             if (Creature* pSwarmerEgg = SelectRandomCreatureOfEntryInRange(NPC_AHNKAHAR_SWARM_EGG, 75.0))
                 pSwarmerEgg->CastSpell(pSwarmerEgg, SPELL_SUMMON_SWARMERS, false);
 
-            m_uiSummonTimer = urand(5000, 10000);
+            m_uiSummonTimer = 10000;
         }
         else
             m_uiSummonTimer -= uiDiff;
@@ -230,7 +223,7 @@ CreatureAI* GetAI_boss_nadox(Creature* pCreature)
 
 void AddSC_boss_nadox()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "boss_nadox";

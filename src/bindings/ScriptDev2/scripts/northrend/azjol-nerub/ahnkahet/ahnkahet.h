@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
@@ -6,7 +6,7 @@
 #define DEF_AHNKAHET_H
 /* Encounters
  * Elder Nadox         = 1
- * Prince Taldaram     = 2
+ * Prince Taldram      = 2
  * Jedoga Shadowseeker = 3
  * Herald Volazj       = 4
  * Amanitar            = 5
@@ -26,10 +26,8 @@ enum
     GO_ANCIENT_DEVICE_R     = 193094,
     GO_VORTEX               = 193564,
 
-    NPC_TALADARAN           = 29308,
     NPC_ELDER_NADOX         = 29309,
-    NPC_JEDOGA_SHADOWSEEKER = 29310,
-    NPC_JEDOGA_CONTROLLER   = 30181
+    NPC_JEDOGA_SHADOWSEEKER = 29310
 };
 
 #endif

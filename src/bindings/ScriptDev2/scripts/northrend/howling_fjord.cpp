@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,16 +17,137 @@
 /* ScriptData
 SDName: Howling_Fjord
 SD%Complete: ?
-SDComment: Quest support: 11221, 11483
+SDComment: Quest support: 11221, 11483, 11300, 11464
 SDCategory: Howling Fjord
 EndScriptData */
+
+/* ContentData
+npc_daegarn
+npc_deathstalker_razael - TODO, can be moved to database
+npc_dark_ranger_lyana - TODO, can be moved to database
+npc_mcgoyver - TODO, can be moved to database
+npc_silvermoon_harry
+EndContentData */
 
 #include "precompiled.h"
 #include "escort_ai.h"
 
-/*#######################
-## Deathstalker Razael ##
-#######################*/
+/*######
+## npc_daegarn
+######*/
+
+enum
+{
+    QUEST_DEFEAT_AT_RING            = 11300,
+
+    NPC_FIRJUS                      = 24213,
+    NPC_JLARBORN                    = 24215,
+    NPC_YOROS                       = 24214,
+    NPC_OLUF                        = 23931,
+
+    NPC_PRISONER_1                  = 24253,                // looks the same but has different abilities
+    NPC_PRISONER_2                  = 24254,
+    NPC_PRISONER_3                  = 24255,
+};
+
+static float afSummon[] = {838.81f, -4678.06f, -94.182f};
+static float afCenter[] = {801.88f, -4721.87f, -96.143f};
+
+// TODO: make prisoners help (unclear if summoned or using npc's from surrounding cages (summon inside small cages?))
+struct MANGOS_DLL_DECL npc_daegarnAI : public ScriptedAI
+{
+    npc_daegarnAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    bool m_bEventInProgress;
+    uint64 m_uiPlayerGUID;
+
+    void Reset()
+    {
+        m_bEventInProgress = false;
+        m_uiPlayerGUID = 0;
+    }
+
+    void StartEvent(Player* pPlayer)
+    {
+        if (m_bEventInProgress)
+            return;
+
+        m_uiPlayerGUID = pPlayer->GetGUID();
+
+        SummonGladiator(NPC_FIRJUS);
+    }
+
+    void JustSummoned(Creature* pSummon)
+    {
+        if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerGUID))
+        {
+            if (pPlayer->isAlive())
+            {
+                pSummon->RemoveSplineFlag(SPLINEFLAG_WALKMODE);
+                pSummon->GetMotionMaster()->MovePoint(0, afCenter[0], afCenter[1], afCenter[2]);
+                return;
+            }
+        }
+
+        Reset();
+    }
+
+    void SummonGladiator(uint32 uiEntry)
+    {
+        m_creature->SummonCreature(uiEntry, afSummon[0], afSummon[1], afSummon[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30*IN_MILLISECONDS);
+    }
+
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId)
+    {
+        Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerGUID);
+
+        // could be group, so need additional here.
+        if (!pPlayer || !pPlayer->isAlive())
+        {
+            Reset();
+            return;
+        }
+
+        if (pSummoned->IsWithinDistInMap(pPlayer, 75.0f))   // ~the radius of the ring
+            pSummoned->AI()->AttackStart(pPlayer);
+    }
+
+    void SummonedCreatureDespawn(Creature* pSummoned)
+    {
+        uint32 uiEntry = 0;
+
+        // will eventually reset the event if something goes wrong
+        switch(pSummoned->GetEntry())
+        {
+            case NPC_FIRJUS:    uiEntry = NPC_JLARBORN; break;
+            case NPC_JLARBORN:  uiEntry = NPC_YOROS;    break;
+            case NPC_YOROS:     uiEntry = NPC_OLUF;     break;
+            case NPC_OLUF:      Reset();                return;
+        }
+
+        SummonGladiator(uiEntry);
+    }
+};
+
+bool QuestAcceptNPC_npc_daegarn(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+{
+    if (pQuest->GetQuestId() == QUEST_DEFEAT_AT_RING)
+    {
+        if (npc_daegarnAI* pDaegarnAI = dynamic_cast<npc_daegarnAI*>(pCreature->AI()))
+            pDaegarnAI->StartEvent(pPlayer);
+    }
+
+    return true;
+}
+
+CreatureAI* GetAI_npc_daegarn(Creature* pCreature)
+{
+    return new npc_daegarnAI(pCreature);
+}
+
+/*######
+## npc_deathstalker_razael - TODO, can be moved to database
+######*/
 
 #define GOSSIP_ITEM_DEATHSTALKER_RAZAEL "High Executor Anselm requests your report."
 
@@ -231,124 +352,9 @@ bool GossipSelect_npc_mcgoyver(Player* pPlayer, Creature* pCreature, uint32 uiSe
     return true;
 }
 
-enum
-{
-    QUEST_CARVER_AND_A_CROAKER      = 11476,
-    ITEM_SCALAWAG_FROG              = 35803
-};
-
-struct MANGOS_DLL_DECL mob_scalawag_frogAI : public ScriptedAI
-{
-    mob_scalawag_frogAI(Creature* pCreature) : ScriptedAI(pCreature) {Reset();}
-
-    void Reset() {}
-
-    void DamageTaken(Unit* pAttacker, uint32& uiDamage)
-    {
-        if (!pAttacker || pAttacker->GetTypeId() != TYPEID_PLAYER || ((Player*)pAttacker)->GetQuestStatus(QUEST_CARVER_AND_A_CROAKER) != QUEST_STATUS_INCOMPLETE)
-        {
-            ScriptedAI::DamageTaken(pAttacker, uiDamage);
-            return;
-        }
-        Player* pPlayer = ((Player*)pAttacker);
-        ItemPosCountVec dest;
-        uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_SCALAWAG_FROG, 1, false);
-        if (msg == EQUIP_ERR_OK)
-        {
-            uiDamage = 0;
-            pPlayer->StoreNewItem(dest, ITEM_SCALAWAG_FROG, 1, true);
-            m_creature->ForcedDespawn();
-        }
-    }
-};
-
-CreatureAI* GetAI_mob_scalawag_frog(Creature* pCreature)
-{
-    return new mob_scalawag_frogAI(pCreature);
-}
-
-enum Crowleg_Dan
-{
-    QUEST_CROWLEG_DAN       = 11479,
-    SPELL_TRASH_KICK        = 50306
-};
-
-#define GOSSIP_ITEM_CROWLEG_DAN "Umm... the frog says you're a traitor."
-
-struct MANGOS_DLL_DECL npc_crowleg_danAI : public ScriptedAI
-{
-    npc_crowleg_danAI(Creature* pCreature) : ScriptedAI(pCreature) {Reset();}
-
-    bool bTalked;
-    uint32 m_uiDelayTimer;
-    uint32 m_uiTrashKickTimer;
-    uint64 PlayerGUID;
-
-    void Reset() 
-    {
-        m_creature->setFaction(m_creature->GetCreatureInfo()->faction_A);
-        bTalked = false;
-        m_uiDelayTimer = 5000;
-        m_uiTrashKickTimer = urand(1000,4000);
-        PlayerGUID = 0;
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (bTalked)
-        {
-            if (m_uiDelayTimer <= uiDiff)
-            {
-                // dunno exact text and emote
-                // DoSciptText();
-                if (Player* pTarget = m_creature->GetMap()->GetPlayer(PlayerGUID))
-                {
-                    m_creature->setFaction(16);
-                    m_creature->AI()->AttackStart(pTarget);
-                    bTalked = false;
-                }else Reset();
-            }else m_uiDelayTimer -= uiDiff;
-        }
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_uiTrashKickTimer <= uiDiff)
-        {
-            DoCast(m_creature->getVictim(),SPELL_TRASH_KICK,false);
-            m_uiTrashKickTimer = urand(3000,6000);
-        }else m_uiTrashKickTimer -= uiDiff;
-        
-        DoMeleeAttackIfReady();
-    }
-};
-
-bool GossipHello_npc_crowleg_dan(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->GetQuestStatus(QUEST_CROWLEG_DAN) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_CROWLEG_DAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-    return true;
-}
-
-bool GossipSelect_npc_crowleg_dan(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
-    {
-        // dunno exact text
-        // DoScriptText();
-        ((npc_crowleg_danAI*)pCreature->AI())->bTalked = true;
-        ((npc_crowleg_danAI*)pCreature->AI())->PlayerGUID = pPlayer->GetGUID();
-        pPlayer->CLOSE_GOSSIP_MENU();
-    }
-    return true;
-}
-
-CreatureAI* GetAI_npc_crowleg_dan(Creature* pCreature)
-{
-    return new npc_crowleg_danAI(pCreature);
-}
+/*######
+## npc_silvermoon_harry
+######*/
 
 enum Sivermoon_Harry
 {
@@ -517,7 +523,137 @@ CreatureAI* GetAI_npc_silvermoon_harry(Creature* pCreature)
     return new npc_silvermoon_harryAI(pCreature);
 }
 
-// Quest: Jack Likes His Drink
+/*######
+## mob_scalawag_frog
+######*/
+
+enum
+{
+    QUEST_CARVER_AND_A_CROAKER      = 11476,
+    ITEM_SCALAWAG_FROG              = 35803
+};
+
+struct MANGOS_DLL_DECL mob_scalawag_frogAI : public ScriptedAI
+{
+    mob_scalawag_frogAI(Creature* pCreature) : ScriptedAI(pCreature) {Reset();}
+
+    void Reset() {}
+
+    void DamageTaken(Unit* pAttacker, uint32& uiDamage)
+    {
+        if (!pAttacker || pAttacker->GetTypeId() != TYPEID_PLAYER || ((Player*)pAttacker)->GetQuestStatus(QUEST_CARVER_AND_A_CROAKER) != QUEST_STATUS_INCOMPLETE)
+        {
+            ScriptedAI::DamageTaken(pAttacker, uiDamage);
+            return;
+        }
+        Player* pPlayer = ((Player*)pAttacker);
+        ItemPosCountVec dest;
+        uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_SCALAWAG_FROG, 1, false);
+        if (msg == EQUIP_ERR_OK)
+        {
+            uiDamage = 0;
+            pPlayer->StoreNewItem(dest, ITEM_SCALAWAG_FROG, 1, true);
+            m_creature->ForcedDespawn();
+        }
+    }
+};
+
+CreatureAI* GetAI_mob_scalawag_frog(Creature* pCreature)
+{
+    return new mob_scalawag_frogAI(pCreature);
+}
+
+/*######
+## quest_crowleg_den
+######*/
+
+enum Crowleg_Dan
+{
+    QUEST_CROWLEG_DAN       = 11479,
+    SPELL_TRASH_KICK        = 50306
+};
+
+#define GOSSIP_ITEM_CROWLEG_DAN "Umm... the frog says you're a traitor."
+
+struct MANGOS_DLL_DECL npc_crowleg_danAI : public ScriptedAI
+{
+    npc_crowleg_danAI(Creature* pCreature) : ScriptedAI(pCreature) {Reset();}
+
+    bool bTalked;
+    uint32 m_uiDelayTimer;
+    uint32 m_uiTrashKickTimer;
+    uint64 PlayerGUID;
+
+    void Reset() 
+    {
+        m_creature->setFaction(m_creature->GetCreatureInfo()->faction_A);
+        bTalked = false;
+        m_uiDelayTimer = 5000;
+        m_uiTrashKickTimer = urand(1000,4000);
+        PlayerGUID = 0;
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (bTalked)
+        {
+            if (m_uiDelayTimer <= uiDiff)
+            {
+                // dunno exact text and emote
+                // DoSciptText();
+                if (Player* pTarget = m_creature->GetMap()->GetPlayer(PlayerGUID))
+                {
+                    m_creature->setFaction(16);
+                    m_creature->AI()->AttackStart(pTarget);
+                    bTalked = false;
+                }else Reset();
+            }else m_uiDelayTimer -= uiDiff;
+        }
+
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (m_uiTrashKickTimer <= uiDiff)
+        {
+            DoCast(m_creature->getVictim(),SPELL_TRASH_KICK,false);
+            m_uiTrashKickTimer = urand(3000,6000);
+        }else m_uiTrashKickTimer -= uiDiff;
+        
+        DoMeleeAttackIfReady();
+    }
+};
+
+bool GossipHello_npc_crowleg_dan(Player* pPlayer, Creature* pCreature)
+{
+    if (pPlayer->GetQuestStatus(QUEST_CROWLEG_DAN) == QUEST_STATUS_INCOMPLETE)
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_CROWLEG_DAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+
+    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
+    return true;
+}
+
+bool GossipSelect_npc_crowleg_dan(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
+    {
+        // dunno exact text
+        // DoScriptText();
+        ((npc_crowleg_danAI*)pCreature->AI())->bTalked = true;
+        ((npc_crowleg_danAI*)pCreature->AI())->PlayerGUID = pPlayer->GetGUID();
+        pPlayer->CLOSE_GOSSIP_MENU();
+    }
+    return true;
+}
+
+CreatureAI* GetAI_npc_crowleg_dan(Creature* pCreature)
+{
+    return new npc_crowleg_danAI(pCreature);
+}
+
+/*######
+## quest_jack_likes_his_drink
+######*/
+
 enum
 {
     SAY_OLGA_0                  = -1999818, // whisper
@@ -850,7 +986,7 @@ CreatureAI* GetAI_npc_apothecary_hanes(Creature* pCreature)
     return new npc_apothecary_hanesAI(pCreature);
 }
 
-bool QuestAccept_npc_apothecary_hanes(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAcceptNPC_npc_apothecary_hanes(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_TRIAL_OF_FIRE)
     {
@@ -891,7 +1027,7 @@ enum
     PRISONER_TEXT_ID_3                = -1700003
 };
 
-bool GOHello_go_dragonflayer_cage(Player* pPlayer, GameObject* pGo)
+bool GOUse_go_dragonflayer_cage(Player* pPlayer, GameObject* pGo)
 {
     if (pPlayer->GetQuestStatus(QUEST_PRISONERS_OF_WYRMSKULL) == QUEST_STATUS_INCOMPLETE)
     {
@@ -952,66 +1088,78 @@ bool GOHello_go_dragonflayer_cage(Player* pPlayer, GameObject* pGo)
 
 void AddSC_howling_fjord()
 {
-    Script* newscript;
+    Script* pNewScript;
 
-    newscript = new Script;
-    newscript->Name = "npc_deathstalker_razael";
-    newscript->pGossipHello = &GossipHello_npc_deathstalker_razael;
-    newscript->pGossipSelect = &GossipSelect_npc_deathstalker_razael;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_daegarn";
+    pNewScript->GetAI = &GetAI_npc_daegarn;
+    pNewScript->pQuestAcceptNPC = &QuestAcceptNPC_npc_daegarn;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_dark_ranger_lyana";
-    newscript->pGossipHello = &GossipHello_npc_dark_ranger_lyana;
-    newscript->pGossipSelect = &GossipSelect_npc_dark_ranger_lyana;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_deathstalker_razael";
+    pNewScript->pGossipHello = &GossipHello_npc_deathstalker_razael;
+    pNewScript->pGossipSelect = &GossipSelect_npc_deathstalker_razael;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_mcgoyver";
-    newscript->pGossipHello = &GossipHello_npc_mcgoyver;
-    newscript->pGossipSelect = &GossipSelect_npc_mcgoyver;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_dark_ranger_lyana";
+    pNewScript->pGossipHello = &GossipHello_npc_dark_ranger_lyana;
+    pNewScript->pGossipSelect = &GossipSelect_npc_dark_ranger_lyana;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_scalawag_frog";
-    newscript->GetAI = &GetAI_mob_scalawag_frog;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_greer_orehammer";
+    pNewScript->pGossipHello = &GossipHello_npc_greer_orehammer;
+    pNewScript->pGossipSelect = &GossipSelect_npc_greer_orehammer;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_crowleg_dan";
-    newscript->GetAI = &GetAI_npc_crowleg_dan;
-    newscript->pGossipHello = &GossipHello_npc_crowleg_dan;
-    newscript->pGossipSelect = &GossipSelect_npc_crowleg_dan;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_mcgoyver";
+    pNewScript->pGossipHello = &GossipHello_npc_mcgoyver;
+    pNewScript->pGossipSelect = &GossipSelect_npc_mcgoyver;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_silvermoon_harry";
-    newscript->GetAI = &GetAI_npc_silvermoon_harry;
-    newscript->pGossipHello = &GossipHello_npc_silvermoon_harry;
-    newscript->pGossipSelect = &GossipSelect_npc_silvermoon_harry;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_silvermoon_harry";
+    pNewScript->GetAI = &GetAI_npc_silvermoon_harry;
+    pNewScript->pGossipHello = &GossipHello_npc_silvermoon_harry;
+    pNewScript->pGossipSelect = &GossipSelect_npc_silvermoon_harry;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_olga";
-    newscript->GetAI = &GetAI_npc_olga;
-    newscript->pGossipHello = &GossipHello_npc_olga;
-    newscript->pGossipSelect = &GossipSelect_npc_olga;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_scalawag_frog";
+    pNewScript->GetAI = &GetAI_mob_scalawag_frog;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_jack_adams";
-    newscript->pGossipHello = &GossipHello_npc_jack_adams;
-    newscript->pGossipSelect = &GossipSelect_npc_jack_adams;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_crowleg_dan";
+    pNewScript->GetAI = &GetAI_npc_crowleg_dan;
+    pNewScript->pGossipHello = &GossipHello_npc_crowleg_dan;
+    pNewScript->pGossipSelect = &GossipSelect_npc_crowleg_dan;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_apothecary_hanes";
-    newscript->GetAI = &GetAI_npc_apothecary_hanes;
-    newscript->pQuestAccept = &QuestAccept_npc_apothecary_hanes;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_olga";
+    pNewScript->GetAI = &GetAI_npc_olga;
+    pNewScript->pGossipHello = &GossipHello_npc_olga;
+    pNewScript->pGossipSelect = &GossipSelect_npc_olga;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "npc_jack_adams";
+    pNewScript->pGossipHello = &GossipHello_npc_jack_adams;
+    pNewScript->pGossipSelect = &GossipSelect_npc_jack_adams;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "npc_apothecary_hanes";
+    pNewScript->GetAI = &GetAI_npc_apothecary_hanes;
+    pNewScript->pQuestAcceptNPC = &QuestAcceptNPC_npc_apothecary_hanes;
+    pNewScript->RegisterSelf();
     
-    newscript = new Script;
-    newscript->Name = "go_dragonflayer_cage";
-    newscript->pGOHello = &GOHello_go_dragonflayer_cage;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "go_dragonflayer_cage";
+    pNewScript->pGOUse = &GOUse_go_dragonflayer_cage;
+    pNewScript->RegisterSelf();
 }

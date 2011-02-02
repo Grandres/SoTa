@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,15 +17,13 @@
 /* ScriptData
 SDName: Icecrown
 SD%Complete: 100
-SDComment: Quest support: 12807,13229,13221 Vendor support: 34885
-Probably support for Q 13221/13229 (I'm Not Dead Yet!) can be extended on Let's Get Out of Here
+SDComment: Quest support: 12807, Vendor support: 34885
 SDCategory: Icecrown
 EndScriptData */
 
 /* ContentData
 npc_arete
 npc_dame_evniki_kapsalis
-npc_father_kamaros
 EndContentData */
 
 #include "precompiled.h"
@@ -239,7 +237,7 @@ CreatureAI* GetAI_npc_father_kamaros(Creature* pCreature)
     return new npc_father_kamarosAI (pCreature);
 }
 
-bool QuestAccept_npc_father_kamaros(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAcceptNPC_npc_father_kamaros(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
 {
     switch(pQuest->GetQuestId())
     {
@@ -260,25 +258,94 @@ bool QuestAccept_npc_father_kamaros(Player* pPlayer, Creature* pCreature, const 
     return true;
 }
 
+/*######
+## mob_saronite_mine_slave (31397)
+######*/
+
+enum
+{
+    QUEST_SLAVES_TO_SARNOITE_A       = 13300, //Alliance version
+    SPELL_DESPAWN_SELF               = 43014,
+    NPC_SLAVES_TO_SARONITE_CREDIT    = 31866,
+    QUEST_SLAVES_TO_SARNOITE_H       = 13302,  //Horde version
+    SARONITE_SLAVE_TEXTID            = 14068,
+    SARONITE_SLAVE_TEXT1             = -1999000,
+    SARONITE_SLAVE_TEXT2             = -1999001,
+    SARONITE_SLAVE_TEXT3             = -1999002
+};
+
+#define GOSSIP_EVENT_FREE      "Go on, you're free. Get out of here!"
+
+bool GossipHello_mob_mine_slave(Player* pPlayer, Creature* pCreature)
+{
+    if (pCreature->isQuestGiver())
+        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
+
+    if ( (pPlayer->GetQuestStatus(QUEST_SLAVES_TO_SARNOITE_A) == QUEST_STATUS_INCOMPLETE) ||
+        (pPlayer->GetQuestStatus(QUEST_SLAVES_TO_SARNOITE_H) == QUEST_STATUS_INCOMPLETE) )
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_EVENT_FREE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+
+    pPlayer->SEND_GOSSIP_MENU(SARONITE_SLAVE_TEXTID, pCreature->GetGUID());
+    return true;
+}
+
+bool GossipSelect_mob_mine_slave(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    if (uiAction == GOSSIP_ACTION_INFO_DEF)
+    {
+        pPlayer->CLOSE_GOSSIP_MENU();
+
+        switch (urand(0, 10))
+        {
+            case 0:
+                switch(urand(1, 3))
+                {
+                    case 1: DoScriptText(SARONITE_SLAVE_TEXT1, pCreature); break;
+                    case 2: DoScriptText(SARONITE_SLAVE_TEXT2, pCreature); break;
+                    case 3: DoScriptText(SARONITE_SLAVE_TEXT3, pCreature); break;
+                }
+                pCreature->CastSpell(pCreature, SPELL_DESPAWN_SELF, true);
+                break;
+
+            case 1:
+                pCreature->setFaction(16);
+                pCreature->AI()->AttackStart(pPlayer);
+                break;
+
+            default:
+                pPlayer->KilledMonsterCredit(NPC_SLAVES_TO_SARONITE_CREDIT, pCreature->GetGUID());
+                pCreature->CastSpell(pCreature, SPELL_DESPAWN_SELF, true);
+                break;
+        }
+    }
+    return true;
+}
+
 void AddSC_icecrown()
 {
-    Script* pNewScript;
+    Script* newscript;
 
-    pNewScript = new Script;
-    pNewScript->Name = "npc_arete";
-    pNewScript->pGossipHello = &GossipHello_npc_arete;
-    pNewScript->pGossipSelect = &GossipSelect_npc_arete;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "npc_arete";
+    newscript->pGossipHello = &GossipHello_npc_arete;
+    newscript->pGossipSelect = &GossipSelect_npc_arete;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "npc_dame_evniki_kapsalis";
-    pNewScript->pGossipHello = &GossipHello_npc_dame_evniki_kapsalis;
-    pNewScript->pGossipSelect = &GossipSelect_npc_dame_evniki_kapsalis;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "npc_dame_evniki_kapsalis";
+    newscript->pGossipHello = &GossipHello_npc_dame_evniki_kapsalis;
+    newscript->pGossipSelect = &GossipSelect_npc_dame_evniki_kapsalis;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "npc_father_kamaros";
-    pNewScript->GetAI = &GetAI_npc_father_kamaros;
-    pNewScript->pQuestAccept = &QuestAccept_npc_father_kamaros;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "npc_father_kamaros";
+    newscript->GetAI = &GetAI_npc_father_kamaros;
+    newscript->pQuestAcceptNPC = &QuestAcceptNPC_npc_father_kamaros;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "mob_mine_slave";
+    newscript->pGossipHello =  &GossipHello_mob_mine_slave;
+    newscript->pGossipSelect = &GossipSelect_mob_mine_slave;
+    newscript->RegisterSelf();
 }

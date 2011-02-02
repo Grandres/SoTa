@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -223,7 +223,7 @@ enum
 
     NPC_SENTRY_BOT                      = 25753,
     SPELL_SUMMON_SENTRY_BOT             = 46068,
-
+    
     SPELL_GAVROK_RUNEBREAKER            = 47604,
     NPC_FREED_GIANT                     = 26783,
     NPC_WEAKENED_GIANT                  = 26872,
@@ -252,13 +252,13 @@ enum
     NPC_FREED_GREENGILL_SLAVE           = 25085,
     NPC_DARKSPINE_MYRMIDON              = 25060,
     NPC_DARKSPINE_SIREN                 = 25073,
-
+    
     // Quest "War Is Hell" 11270
     NPC_FALLEN_COMBATANT_1              = 24009,
     NPC_FALLEN_COMBATANT_2              = 24010,
     SPELL_FALLEN_COMBATAN_CREDIT        = 43297,
     SPELL_BURN_BODY                     = 42793,
-    
+
     // quest 14107
     SPELL_BLESSING_OF_PEACE             = 66719,
     NPC_FALLEN_HERO_SPIRIT              = 32149,
@@ -278,7 +278,20 @@ enum
     // quest 12813, by item 40587
     SPELL_DARKMENDER_TINCTURE           = 52741,
     SPELL_SUMMON_CORRUPTED_SCARLET      = 54415,
-    NPC_CORPSES_RISE_CREDIT_BUNNY       = 29398
+    NPC_CORPSES_RISE_CREDIT_BUNNY       = 29398,
+
+    // quest "Blowing Hodir's Horn"
+	NPC_RESTLESS_FROSTBORN_WARRIOR      = 30135,
+	NPC_NIFFELEM_FROST_GIANT            = 29974,
+	SPELL_BLOW_HODIR_HORN               = 55983,
+	NPC_KC_REST                         = 30138,
+	NPC_KC_FROST                        = 30139,
+
+    // quest The Restless Dead
+    NPC_REANIMATED_CRUSADER_F           = 30202,
+	NPC_REANIMATED_CRUSADER_G           = 31043,
+	SPELL_FREED_CRUSADER_SOUL           = 57808,
+	SPELL_SPRINKLE_HOLY_WATER           = 57806
 };
 
 bool EffectAuraDummy_spell_aura_dummy_npc(const Aura* pAura, bool bApply)
@@ -392,11 +405,11 @@ bool EffectAuraDummy_spell_aura_dummy_npc(const Aura* pAura, bool bApply)
             
             if (Unit* pCaster = pAura->GetCaster())
                 DoScriptText(SAY_SPECIMEN, pCaster);
-            
-            
-            if (pAura->GetTarget()->GetTypeId() == TYPEID_UNIT)
+
+            Unit* pTarget = pAura->GetTarget();
+            if (pTarget->GetTypeId() == TYPEID_UNIT)
             {
-                Creature* pCreature = (Creature*)pAura->GetTarget();
+                Creature* pCreature = (Creature*)pTarget;
 
                 if (pCreature->GetEntry() == NPC_NEXUS_DRAKE_HATCHLING)
                 {
@@ -408,18 +421,20 @@ bool EffectAuraDummy_spell_aura_dummy_npc(const Aura* pAura, bool bApply)
         }
         case SPELL_ENRAGE:
         {
-            if (pAura->GetTarget()->GetTypeId() != TYPEID_UNIT || !bApply)
+            if (!bApply || pAura->GetTarget()->GetTypeId() != TYPEID_UNIT)
                 return false;
 
-            if (Creature* pCreature = GetClosestCreatureWithEntry(pAura->GetTarget(), NPC_DARKSPINE_MYRMIDON, 25.0f))
+            Creature* pTarget = (Creature*)pAura->GetTarget();
+
+            if (Creature* pCreature = GetClosestCreatureWithEntry(pTarget, NPC_DARKSPINE_MYRMIDON, 25.0f))
             {
-                dynamic_cast<Creature*>(pAura->GetTarget())->AI()->AttackStart(pCreature);
+                pTarget->AI()->AttackStart(pCreature);
                 return true;
             }
 
-            if (Creature* pCreature = GetClosestCreatureWithEntry(pAura->GetTarget(), NPC_DARKSPINE_SIREN, 25.0f))
+            if (Creature* pCreature = GetClosestCreatureWithEntry(pTarget, NPC_DARKSPINE_SIREN, 25.0f))
             {
-                dynamic_cast<Creature*>(pAura->GetTarget())->AI()->AttackStart(pCreature);
+                pTarget->AI()->AttackStart(pCreature);
                 return true;
             }
 
@@ -458,6 +473,23 @@ bool EffectAuraDummy_spell_aura_dummy_npc(const Aura* pAura, bool bApply)
                 ((Creature*)pAura->GetTarget())->ForcedDespawn();
             }
             return true;
+        }
+        case SPELL_SPRINKLE_HOLY_WATER:
+        {
+	        Creature* pCreature = (Creature*)pAura->GetTarget();
+
+            if (!pCreature || pAura->GetEffIndex() != EFFECT_INDEX_0)
+                return false;
+
+            if (bApply)
+            {
+                if (pCreature->GetEntry() == NPC_REANIMATED_CRUSADER_F || pCreature->GetEntry() == NPC_REANIMATED_CRUSADER_G)
+                {
+                    if (Unit* pCaster = pAura->GetCaster())
+                        pCreature->CastSpell(pCaster, SPELL_FREED_CRUSADER_SOUL, true);
+                }
+                return true;
+            }
         }
     }
 
@@ -712,7 +744,7 @@ bool EffectDummyCreature_spell_dummy_npc(Unit* pCaster, uint32 uiSpellId, SpellE
         {
             if (uiEffIndex == EFFECT_INDEX_0)
             {
-                if (pCreatureTarget->isDead())
+                if (pCreatureTarget->IsCorpse())
                 {
                     uint32 newSpellId = 0;
 
@@ -772,8 +804,8 @@ bool EffectDummyCreature_spell_dummy_npc(Unit* pCaster, uint32 uiSpellId, SpellE
         {
             pCreatureTarget->CastSpell(pCaster, SPELL_GREENGILL_SLAVE_FREED, true);
 
-            if (pCreatureTarget->GetTypeId() == TYPEID_UNIT)
-                dynamic_cast<Creature*>(pCreatureTarget)->UpdateEntry(NPC_FREED_GREENGILL_SLAVE); // Freed Greengill Slave
+            // Freed Greengill Slave
+            pCreatureTarget->UpdateEntry(NPC_FREED_GREENGILL_SLAVE);
 
             pCreatureTarget->CastSpell(pCreatureTarget, SPELL_ENRAGE, true);
 
@@ -783,10 +815,22 @@ bool EffectDummyCreature_spell_dummy_npc(Unit* pCaster, uint32 uiSpellId, SpellE
         {
             if (pCreatureTarget->GetEntry() == NPC_FALLEN_COMBATANT_1 || pCreatureTarget->GetEntry() == NPC_FALLEN_COMBATANT_2)
                 pCreatureTarget->CastSpell(pCaster, SPELL_FALLEN_COMBATAN_CREDIT, true);
-
             return true;
         }
-
+        case SPELL_BLOW_HODIR_HORN:
+        {
+            if (uiEffIndex == EFFECT_INDEX_0)
+            {
+                if (pCaster->GetTypeId() == TYPEID_PLAYER)
+                {
+                    if (pCreatureTarget->GetEntry() == NPC_RESTLESS_FROSTBORN_WARRIOR)
+                        ((Player*)pCaster)->KilledMonsterCredit(NPC_KC_FROST, pCreatureTarget->GetGUID());
+		            else if (pCreatureTarget->GetEntry() == NPC_NIFFELEM_FROST_GIANT)
+                        ((Player*)pCaster)->KilledMonsterCredit(NPC_KC_REST, pCreatureTarget->GetGUID());
+                }
+            }
+            return true;
+        }
     }
 
     return false;
@@ -794,16 +838,16 @@ bool EffectDummyCreature_spell_dummy_npc(Unit* pCaster, uint32 uiSpellId, SpellE
 
 void AddSC_spell_scripts()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "spell_dummy_go";
-    newscript->pEffectDummyGameObj = &EffectDummyGameObj_spell_dummy_go;
+    newscript->pEffectDummyGO = &EffectDummyGameObj_spell_dummy_go;
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "spell_dummy_npc";
-    newscript->pEffectDummyCreature = &EffectDummyCreature_spell_dummy_npc;
+    newscript->pEffectDummyNPC = &EffectDummyCreature_spell_dummy_npc;
     newscript->pEffectAuraDummy = &EffectAuraDummy_spell_aura_dummy_npc;
     newscript->RegisterSelf();
 }

@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -51,13 +51,6 @@ EndScriptData */
 #define SPELL_INSIGNIFIGANCE     40618
 #define SPELL_BERSERK            45078
 #define SPELL_ENRAGE             27680
-
-/*class MANGOS_DLL_DECL Bloodboil : public Aura
-{
-    public:
-        Bloodboil(SpellEntry *spellInfo, SpellEffectIndex effIndex, int32 *bp, Unit *target, Unit *caster) : Aura(spellInfo, effIndex, bp, target, caster, NULL)
-            {}
-};*/
 
 struct MANGOS_DLL_DECL boss_gurtogg_bloodboilAI : public ScriptedAI
 {
@@ -165,23 +158,24 @@ struct MANGOS_DLL_DECL boss_gurtogg_bloodboilAI : public ScriptedAI
         targets.resize(5);
 
         //Aura each player in the targets list with Bloodboil. Aura code copied+pasted from Aura command in Level3.cpp
-        SpellEntry *spellInfo = (SpellEntry *)GetSpellStore()->LookupEntry(SPELL_BLOODBOIL);
+        /*SpellEntry const *spellInfo = GetSpellStore()->LookupEntry(SPELL_BLOODBOIL);
         if (spellInfo)
         {
             for(std::list<Unit *>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
             {
                 Unit* target = *itr;
                 if (!target) return;
-                for(uint8 i = 0; i< MAX_EFFECT_INDEX; ++i)
+                for(uint32 i = 0;i<3; ++i)
                 {
-                    uint8 eff = spellInfo->Effect[SpellEffectIndex(i)];
-                    if (eff >= TOTAL_SPELL_EFFECTS)
+                    uint8 eff = spellInfo->Effect[i];
+                    if (eff>=TOTAL_SPELL_EFFECTS)
                         continue;
 
-                    /*target->AddAura(new Bloodboil(spellInfo, SpellEffectIndex(i), NULL, target, target));*/
+                    Aura *Aur = new Aura(spellInfo, i, NULL, target);
+                    target->AddAura(Aur);
                 }
             }
-    }
+        }*/
     }
 
     void RevertThreatOnTarget(uint64 guid)
@@ -252,8 +246,8 @@ struct MANGOS_DLL_DECL boss_gurtogg_bloodboilAI : public ScriptedAI
             {
                 if (BloodboilCount < 5)                     // Only cast it five times.
                 {
-                    CastBloodboil(); // Causes issues on windows, so is commented out.
-                    //DoSpellCastIfCan(m_creature->getVictim(), SPELL_BLOODBOIL);
+                    //CastBloodboil(); // Causes issues on windows, so is commented out.
+                    DoCastSpellIfCan(m_creature->getVictim(), SPELL_BLOODBOIL);
                     ++BloodboilCount;
                     BloodboilTimer = 10000*BloodboilCount;
                 }

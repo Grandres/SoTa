@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -55,7 +55,7 @@ enum
 
     SPELL_BLASTNOVA             = 30616,
     SPELL_CLEAVE                = 30619,
-
+    SPELL_QUAKE_TRIGGER         = 30576,                    // must be cast with 30561 as the proc spell
     SPELL_QUAKE_KNOCKBACK       = 30571,
 
     SPELL_BLAZE_TRAP            = 30542,
@@ -406,8 +406,9 @@ struct MANGOS_DLL_DECL boss_magtheridonAI : public ScriptedAI
             // to avoid blastnova interruption
             if (!m_creature->IsNonMeleeSpellCasted(false))
             {
-                DoCast(m_creature,SPELL_QUAKE_KNOCKBACK);
-                m_uiQuake_Timer = 7000;
+                int32 i = SPELL_QUAKE_KNOCKBACK;
+                m_creature->CastCustomSpell(m_creature, SPELL_QUAKE_TRIGGER, &i, 0, 0, false);
+                m_uiQuake_Timer = 50000;
             }
         }
         else
@@ -638,7 +639,7 @@ struct MANGOS_DLL_DECL mob_hellfire_channelerAI : public ScriptedAI
 };
 
 //Manticron Cube
-bool GOHello_go_manticron_cube(Player* pPlayer, GameObject* pGo)
+bool GOUse_go_manticron_cube(Player* pPlayer, GameObject* pGo)
 {
     if (ScriptedInstance* pInstance = (ScriptedInstance*)pGo->GetInstanceData())
     {
@@ -696,7 +697,7 @@ void AddSC_boss_magtheridon()
 
     newscript = new Script;
     newscript->Name = "go_manticron_cube";
-    newscript->pGOHello = &GOHello_go_manticron_cube;
+    newscript->pGOUse = &GOUse_go_manticron_cube;
     newscript->RegisterSelf();
 
     newscript = new Script;

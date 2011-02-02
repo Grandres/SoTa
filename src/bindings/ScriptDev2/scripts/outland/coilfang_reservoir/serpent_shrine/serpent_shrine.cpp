@@ -39,7 +39,7 @@ void CheckFinalGen(ScriptedInstance* pInstance, Player* pPlayer, GameObject* pGo
                     pGoTemp->RemoveFlag(GAMEOBJECT_FLAGS,GO_FLAG_INTERACT_COND);
 }
 
-bool GOHello_go_serpentshrine_console(Player* pPlayer, GameObject* pGo)
+bool GOUse_go_serpentshrine_console(Player* pPlayer, GameObject* pGo)
 {
     ScriptedInstance* pInstance = ((ScriptedInstance*)pPlayer->GetInstanceData());
 
@@ -296,7 +296,7 @@ void AddSC_serpentshrine_cavern()
 
     newscript = new Script;
     newscript->Name = "go_serpentshrine_console";
-    newscript->pGOHello = &GOHello_go_serpentshrine_console;
+    newscript->pGOUse = &GOUse_go_serpentshrine_console;
     newscript->RegisterSelf();
 
     newscript = new Script;

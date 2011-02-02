@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -152,13 +152,15 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     newmember.wins_season       = 0;
     newmember.wins_week         = 0;
 
-    int32 conf_value = sWorld.getConfig(CONFIG_INT32_ARENA_STARTPERSONALRATING);
-    if (conf_value < 0)                                     // -1 = select by season id
+    int32 conf_value_personal = sWorld.getConfig(CONFIG_INT32_ARENA_STARTPERSONALRATING);
+    int32 conf_value_team = sWorld.getConfig(CONFIG_INT32_ARENA_STARTRATING);
+
+    if (conf_value_personal < 0)                                     // -1 = select by season id
     {
         if (sWorld.getConfig(CONFIG_UINT32_ARENA_SEASON_ID) >= 6)
         {
             if (m_stats.rating < 1000)
-                newmember.personal_rating = 0;
+                newmember.personal_rating = (conf_value_team < 0) ? 0 : uint32(conf_value_team);
             else
                 newmember.personal_rating = 1000;
         }
@@ -168,7 +170,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
         }
     }
     else
-        newmember.personal_rating = uint32(conf_value);
+        newmember.personal_rating = uint32(conf_value_personal);
 
     m_members.push_back(newmember);
 
@@ -547,8 +549,14 @@ uint32 ArenaTeam::GetPoints(uint32 MemberRating)
 
     uint32 rating = MemberRating + 150 < m_stats.rating ? MemberRating : m_stats.rating;
 
-    if(rating <= 1500)
+    if (rating <= 1500)
+    {
+        // As of Season 6 and later, all teams below 1500 rating will earn points as if they were a 1500 rated team
+        if (sWorld.getConfig(CONFIG_UINT32_ARENA_SEASON_ID) >= 6)
+            rating = 1500;
+
         points = (float)rating * 0.22f + 14.0f;
+    }
     else
         points = 1511.26f / (1.0f + 1639.28f * exp(-0.00412f * (float)rating));
 

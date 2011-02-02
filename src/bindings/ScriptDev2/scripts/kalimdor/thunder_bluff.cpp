@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -53,14 +53,12 @@ struct MANGOS_DLL_DECL npc_cairne_bloodhoofAI : public ScriptedAI
         MortalStrike_Timer = 10000;
         Thunderclap_Timer = 15000;
         Uppercut_Timer = 10000;
-        CalledHelp = false;
     }
 
     void UpdateAI(const uint32 diff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
         if ((m_creature->isInCombat() || m_creature->getVictim() || m_creature->SelectHostileTarget()) && !CalledHelp)
         {
             m_creature->CallForHelp(100);
@@ -107,6 +105,29 @@ CreatureAI* GetAI_npc_cairne_bloodhoof(Creature* pCreature)
     return new npc_cairne_bloodhoofAI(pCreature);
 }
 
+bool GossipHello_npc_cairne_bloodhoof(Player* pPlayer, Creature* pCreature)
+{
+    if (pCreature->isQuestGiver())
+        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
+
+    if (pPlayer->GetQuestStatus(925) == QUEST_STATUS_INCOMPLETE)
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I know this is rather silly but a young ward who is a bit shy would like your hoofprint.", GOSSIP_SENDER_MAIN, GOSSIP_SENDER_INFO);
+
+    pPlayer->SEND_GOSSIP_MENU(7013, pCreature->GetGUID());
+
+    return true;
+}
+
+bool GossipSelect_npc_cairne_bloodhoof(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    if (uiAction == GOSSIP_SENDER_INFO)
+    {
+        pPlayer->CastSpell(pPlayer, 23123, false);
+        pPlayer->SEND_GOSSIP_MENU(7014, pCreature->GetGUID());
+    }
+    return true;
+}
+
 void AddSC_thunder_bluff()
 {
     Script *newscript;
@@ -114,5 +135,7 @@ void AddSC_thunder_bluff()
     newscript = new Script;
     newscript->Name = "npc_cairne_bloodhoof";
     newscript->GetAI = &GetAI_npc_cairne_bloodhoof;
+    newscript->pGossipHello = &GossipHello_npc_cairne_bloodhoof;
+    newscript->pGossipSelect = &GossipSelect_npc_cairne_bloodhoof;
     newscript->RegisterSelf();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -476,9 +476,18 @@ void WorldSession::LogoutPlayer(bool Save)
         // the player may not be in the world when logging out
         // e.g if he got disconnected during a transfer to another map
         // calls to GetMap in this case may cause crashes
-        Map* _map = _player->GetMap();
-        _map->Remove(_player, true);
-        SetPlayer(NULL);                                    // deleted in Remove call
+        if (_player->IsInWorld())
+        {
+            Map* _map = _player->GetMap();
+            _map->Remove(_player, true);
+        }
+        else
+        {
+            _player->CleanupsBeforeDelete();
+            Map::DeleteFromWorld(_player);
+        }
+
+        SetPlayer(NULL);                                    // deleted in Remove/DeleteFromWorld call
 
         ///- Send the 'logout complete' packet to the client
         WorldPacket data( SMSG_LOGOUT_COMPLETE, 0 );

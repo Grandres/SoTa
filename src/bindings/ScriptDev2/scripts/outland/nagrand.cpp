@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,7 +17,7 @@
 /* ScriptData
 SDName: Nagrand
 SD%Complete: 90
-SDComment: Quest support: 9849, 9868, 9874, 9918, 9991, 10044, 10085, 10107, 10108, 10172, 10646, 9923, 9924, 9955, 9948. TextId's unknown for altruis_the_sufferer and greatmother_geyah (npc_text)
+SDComment: Quest support: 9849, 9868, 9874, 9918, 9991, 10044, 10085, 10107, 10108, 10172, 10646. TextId's unknown for altruis_the_sufferer and greatmother_geyah (npc_text)
 SDCategory: Nagrand
 EndScriptData */
 
@@ -60,9 +60,9 @@ struct MANGOS_DLL_DECL mob_shattered_rumblerAI : public ScriptedAI
             float y = m_creature->GetPositionY();
             float z = m_creature->GetPositionZ();
 
-            Hitter->SummonCreature(18181,x+(0.7 * (rand()%30)),y+(rand()%5),z,0,TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
-            Hitter->SummonCreature(18181,x+(rand()%5),y-(rand()%5),z,0,TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
-            Hitter->SummonCreature(18181,x-(rand()%5),y+(0.5 *(rand()%60)),z,0,TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
+            Hitter->SummonCreature(18181,x+(0.7 * (rand()%30)),y+(rand()%5),z,0,TEMPSUMMON_CORPSE_TIMED_DESPAWN,60000);
+            Hitter->SummonCreature(18181,x+(rand()%5),y-(rand()%5),z,0,TEMPSUMMON_CORPSE_TIMED_DESPAWN,60000);
+            Hitter->SummonCreature(18181,x-(rand()%5),y+(0.5 *(rand()%60)),z,0,TEMPSUMMON_CORPSE_TIMED_DESPAWN,60000);
             m_creature->SetDeathState(CORPSE);
             Spawn = true;
         }
@@ -724,7 +724,7 @@ enum
     SAY_THANKS_2                        = -1999891
 };
 
-bool GOHello_go_corkis_prison(Player* pPlayer, GameObject* pGo)
+bool GOUse_go_corkis_prison(Player* pPlayer, GameObject* pGo)
 {
     uint64 uiCorkiEntry;
     if (pPlayer->GetQuestStatus(QUEST_HELP) == QUEST_STATUS_INCOMPLETE || pPlayer->GetQuestStatus(QUEST_CORKIS_GONE) == QUEST_STATUS_INCOMPLETE || pPlayer->GetQuestStatus(QUEST_CHOWAR) == QUEST_STATUS_INCOMPLETE)
@@ -773,7 +773,7 @@ enum
     SAY_MAGHAR_THANKS_3                = -1000042,
 };
 
-bool GOHello_go_warmaul_prison(Player* pPlayer, GameObject* pGo) 
+bool GOUse_go_warmaul_prison(Player* pPlayer, GameObject* pGo) 
 {
     if (pPlayer->GetQuestStatus(QUEST_FINDING_THE_SURVIVORS) == QUEST_STATUS_INCOMPLETE)
     {
@@ -967,7 +967,7 @@ CreatureAI* GetAI_npc_kurenai_captive(Creature* pCreature)
 
 void AddSC_nagrand()
 {
-    Script *pNewScript;
+    Script* pNewScript;
 
     pNewScript = new Script;
     pNewScript->Name = "mob_shattered_rumbler";
@@ -990,7 +990,7 @@ void AddSC_nagrand()
     pNewScript->Name = "npc_altruis_the_sufferer";
     pNewScript->pGossipHello =  &GossipHello_npc_altruis_the_sufferer;
     pNewScript->pGossipSelect = &GossipSelect_npc_altruis_the_sufferer;
-    pNewScript->pQuestAccept =  &QuestAccept_npc_altruis_the_sufferer;
+    pNewScript->pQuestAcceptNPC =  &QuestAccept_npc_altruis_the_sufferer;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
@@ -1008,7 +1008,7 @@ void AddSC_nagrand()
     pNewScript = new Script;
     pNewScript->Name = "npc_maghar_captive";
     pNewScript->GetAI = &GetAI_npc_maghar_captive;
-    pNewScript->pQuestAccept = &QuestAccept_npc_maghar_captive;
+    pNewScript->pQuestAcceptNPC = &QuestAccept_npc_maghar_captive;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
@@ -1018,18 +1018,18 @@ void AddSC_nagrand()
     
     pNewScript = new Script;
     pNewScript->Name = "go_corkis_prison";
-    pNewScript->pGOHello = &GOHello_go_corkis_prison;
+    pNewScript->pGOUse = &GOUse_go_corkis_prison;
     pNewScript->RegisterSelf();
     
     pNewScript = new Script;
     pNewScript->Name = "go_warmaul_prison";
-    pNewScript->pGOHello = &GOHello_go_warmaul_prison;
+    pNewScript->pGOUse = &GOUse_go_warmaul_prison;
     pNewScript->RegisterSelf();
     
     pNewScript = new Script;
     pNewScript->Name = "npc_kurenai_captive";
     pNewScript->GetAI = &GetAI_npc_kurenai_captive;
-    pNewScript->pQuestAccept = &QuestAccept_npc_kurenai_captive;
+    pNewScript->pQuestAcceptNPC = &QuestAccept_npc_kurenai_captive;
     pNewScript->RegisterSelf();
 
 }

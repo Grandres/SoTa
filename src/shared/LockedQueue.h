@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2009-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -124,7 +124,7 @@ namespace ACE_Based
             {
                 this->_lock.release();
             }
-            
+
             ///! Checks if we're empty or not with locks held
             bool empty()
             {

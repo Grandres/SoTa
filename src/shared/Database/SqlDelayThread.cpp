@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,16 +20,14 @@
 #include "Database/SqlOperations.h"
 #include "DatabaseEnv.h"
 
-SqlDelayThread::SqlDelayThread(Database* db) : m_dbEngine(db), m_running(true)
+SqlDelayThread::SqlDelayThread(Database* db, SqlConnection* conn) : m_dbEngine(db), m_dbConnection(conn), m_running(true)
 {
 }
 
 SqlDelayThread::~SqlDelayThread()
 {
-    //empty SQL queue before exiting
-    SqlOperation* s = NULL;
-    while (m_sqlQueue.next(s))
-        delete s;
+    //process all requests which might have been queued while thread was stopping
+    ProcessRequests();
 }
 
 void SqlDelayThread::run()
@@ -40,7 +38,7 @@ void SqlDelayThread::run()
 
     const uint32 loopSleepms = 10;
 
-    const uint32 pingEveryLoop = m_dbEngine->GetPingIntervall()/loopSleepms;
+    const uint32 pingEveryLoop = m_dbEngine->GetPingIntervall() / loopSleepms;
 
     uint32 loopCounter = 0;
     while (m_running)
@@ -49,17 +47,12 @@ void SqlDelayThread::run()
         // empty the queue before exiting
         ACE_Based::Thread::Sleep(loopSleepms);
 
-        SqlOperation* s = NULL;
-        while (m_sqlQueue.next(s))
-        {
-            s->Execute(m_dbEngine);
-            delete s;
-        }
+        ProcessRequests();
 
         if((loopCounter++) >= pingEveryLoop)
         {
             loopCounter = 0;
-            delete m_dbEngine->Query("SELECT 1");
+            m_dbEngine->Ping();
         }
     }
 
@@ -71,4 +64,14 @@ void SqlDelayThread::run()
 void SqlDelayThread::Stop()
 {
     m_running = false;
+}
+
+void SqlDelayThread::ProcessRequests()
+{
+    SqlOperation* s = NULL;
+    while (m_sqlQueue.next(s))
+    {
+        s->Execute(m_dbConnection);
+        delete s;
+    }
 }

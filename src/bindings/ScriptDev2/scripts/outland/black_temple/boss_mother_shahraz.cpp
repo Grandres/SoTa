@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -42,8 +42,7 @@ EndScriptData */
 #define SPELL_BEAM_VILE         40860
 #define SPELL_BEAM_WICKED       40861
 #define SPELL_BEAM_SINFUL       40827
-#define SPELL_ATTRACTION        41001
-#define SPELL_ATTRACTION_BOOM   40871
+#define SPELL_ATTRACTION        40871
 #define SPELL_SILENCING_SHRIEK  40823
 #define SPELL_ENRAGE            23537
 #define SPELL_SABER_LASH        43267
@@ -90,7 +89,6 @@ struct MANGOS_DLL_DECL boss_shahrazAI : public ScriptedAI
     uint64 TargetGUID[3];
     uint32 BeamTimer;
     uint32 BeamCount;
-    uint32 SaberLashTimer;
     uint32 CurrentBeam;
     uint32 PrismaticShieldTimer;
     uint32 FatalAttractionTimer;
@@ -104,11 +102,10 @@ struct MANGOS_DLL_DECL boss_shahrazAI : public ScriptedAI
 
     void Reset()
     {
-        for(uint8 i = 0; i<3; i++)
+        for(uint8 i = 0; i<3; ++i)
             TargetGUID[i] = 0;
 
         BeamTimer = 60000;                                  // Timers may be incorrect
-        SaberLashTimer = 60000 + rand()%60 * 1000;
         BeamCount = 0;
         CurrentBeam = 0;                                    // 0 - Sinister, 1 - Vile, 2 - Wicked, 3 - Sinful
         PrismaticShieldTimer = 0;
@@ -151,26 +148,23 @@ struct MANGOS_DLL_DECL boss_shahrazAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
     }
 
-    void FatalAttraction()
+    void TeleportPlayers()
     {
-        uint32 random = urand(0, 3);
+        uint32 random = urand(0, 6);
         float X = TeleportPoint[random].x;
         float Y = TeleportPoint[random].y;
         float Z = TeleportPoint[random].z;
-    
-        Unit *player1 = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,1);
-        Unit *player2 = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,1);
-        Unit *player3 = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,1);
-        
-        if(player1 && player2 && player3 && player1->isAlive() && player2->isAlive() && player3->isAlive() && (player1->GetTypeId() == TYPEID_PLAYER) && (player2->GetTypeId() == TYPEID_PLAYER) && (player3->GetTypeId() == TYPEID_PLAYER))
-            {
-                DoTeleportPlayer(player1, X, Y, Z, player1->GetOrientation());
-                DoTeleportPlayer(player2, X, Y, Z, player2->GetOrientation());
-                DoTeleportPlayer(player3, X, Y, Z, player3->GetOrientation());
-            }
-        // Dunno what aramil meaned by this function    
-        //    if(player1->IsInRange())
 
+        for(uint8 i = 0; i < 3; ++i)
+        {
+            Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
+            if (pUnit && pUnit->isAlive() && (pUnit->GetTypeId() == TYPEID_PLAYER))
+            {
+                TargetGUID[i] = pUnit->GetGUID();
+                pUnit->CastSpell(pUnit, SPELL_TELEPORT_VISUAL, true);
+                DoTeleportPlayer(pUnit, X, Y, Z, pUnit->GetOrientation());
+            }
+        }
     }
 
     void UpdateAI(const uint32 diff)
@@ -209,7 +203,7 @@ struct MANGOS_DLL_DECL boss_shahrazAI : public ScriptedAI
                     DoCastSpellIfCan(target, SPELL_BEAM_SINFUL);
                     break;
             }
-            BeamCount++;
+            ++BeamCount;
             uint32 Beam = CurrentBeam;
 
             if (BeamCount > 3)
@@ -230,9 +224,41 @@ struct MANGOS_DLL_DECL boss_shahrazAI : public ScriptedAI
         // Select 3 random targets (can select same target more than once), teleport to a random location then make them cast explosions until they get away from each other.
         if (FatalAttractionTimer < diff)
         {
-            FatalAttraction();
-            FatalAttractionTimer = 30000;
+            ExplosionCount = 0;
+
+            TeleportPlayers();
+
+            DoScriptText(urand(0, 1) ? SAY_SPELL2 : SAY_SPELL3, m_creature);
+
+            FatalAttractionExplodeTimer = 2000;
+            FatalAttractionTimer = urand(40000, 70000);
         }else FatalAttractionTimer -= diff;
+
+        if (FatalAttractionExplodeTimer < diff)
+        {
+            // Just make them explode three times... they're supposed to keep exploding while they are in range, but it'll take too much code. I'll try to think of an efficient way for it later.
+            if (ExplosionCount < 3)
+            {
+                for(uint8 i = 0; i < 3; ++i)
+                {
+                    if (TargetGUID[i])
+                    {
+                        if (Player* pPlayer = m_creature->GetMap()->GetPlayer(TargetGUID[i]))
+                            pPlayer->CastSpell(pPlayer, SPELL_ATTRACTION, true);
+
+                        TargetGUID[i] = 0;
+                    }
+                }
+
+                ++ExplosionCount;
+                FatalAttractionExplodeTimer = 1000;
+            }
+            else
+            {
+                FatalAttractionExplodeTimer = FatalAttractionTimer + 2000;
+                ExplosionCount = 0;
+            }
+        }else FatalAttractionExplodeTimer -= diff;
 
         if (ShriekTimer < diff)
         {
@@ -240,13 +266,6 @@ struct MANGOS_DLL_DECL boss_shahrazAI : public ScriptedAI
             ShriekTimer = 30000;
         }else ShriekTimer -= diff;
 
-        if (SaberLashTimer < diff)
-        {
-            DoCast(m_creature->getVictim(), SPELL_SABER_LASH);
-            DoCast(m_creature->getVictim(), SPELL_SABER_LASH_IMM);
-            SaberLashTimer = 60000 + rand()%60 * 1000;
-        }else SaberLashTimer -= diff;
-        
         //Enrage
         if (!m_creature->HasAura(SPELL_BERSERK, EFFECT_INDEX_0))
         {

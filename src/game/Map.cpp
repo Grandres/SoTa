@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "World.h"
-#include "ScriptCalls.h"
+#include "ScriptMgr.h"
 #include "Group.h"
 #include "MapRefManager.h"
 #include "DBCEnums.h"
@@ -183,14 +183,6 @@ void Map::RemoveFromGrid(Creature* obj, NGridType *grid, Cell const& cell)
     }
 }
 
-template<class T>
-void Map::DeleteFromWorld(T* obj)
-{
-    // Note: In case resurrectable corpse and pet its removed from global lists in own destructor
-    delete obj;
-}
-
-template<>
 void Map::DeleteFromWorld(Player* pl)
 {
     sObjectAccessor.RemoveObject(pl);
@@ -276,7 +268,7 @@ bool Map::EnsureGridLoaded(const Cell &cell)
         //otherwise there is a possibility of infinity chain (grid loading will be called many times for the same grid)
         //possible scenario:
         //active object A(loaded with loader.LoadN call and added to the  map)
-        //summons some active object B, while B added to map grid loading called again and so on.. 
+        //summons some active object B, while B added to map grid loading called again and so on..
         setGridObjectDataLoaded(true,cell.GridX(), cell.GridY());
         ObjectGridLoader loader(*grid, this, cell);
         loader.LoadN();
@@ -659,9 +651,11 @@ Map::Remove(T *obj, bool remove)
     if( remove )
     {
         // if option set then object already saved at this moment
-        if(!sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATLY))
+        if(!sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATELY))
             obj->SaveRespawnTime();
-        DeleteFromWorld(obj);
+
+        // Note: In case resurrectable corpse and pet its removed from global lists in own destructor
+        delete obj;
     }
 }
 
@@ -1405,7 +1399,9 @@ bool InstanceMap::Add(Player *player)
                     player->BindToInstance(GetInstanceSave(), false);
                 else
                     // cannot jump to a different instance without resetting it
-                    MANGOS_ASSERT(playerBind->save == GetInstanceSave());
+                    //MANGOS_ASSERT(playerBind->save == GetInstanceSave());
+                    if (!player->isGameMaster()) // Allow GMs jump from instance to another
+                        player->RepopAtGraveyard();
 
             }
         }
@@ -1471,7 +1467,7 @@ void InstanceMap::CreateInstanceData(bool load)
     if (mInstance)
     {
         i_script_id = mInstance->script_id;
-        i_data = Script->CreateInstanceData(this);
+        i_data = sScriptMgr.CreateInstanceData(this);
     }
 
     if(!i_data)
@@ -2401,7 +2397,7 @@ void Map::ScriptsProcess()
                 Unit* spellSource = (Unit*)cmdSource;
 
                 //TODO: when GO cast implemented, code below must be updated accordingly to also allow GO spell cast
-                spellSource->CastSpell(spellTarget, step.script->castSpell.spellId, false);
+                spellSource->CastSpell(spellTarget, step.script->castSpell.spellId, (step.script->castSpell.flags & 0x04) != 0);
 
                 break;
             }
@@ -2718,7 +2714,7 @@ void Map::ScriptsProcess()
                     pOwner->SetDisplayId(step.script->morph.creatureOrModelEntry);
                 else
                 {
-                    CreatureInfo const* ci = GetCreatureTemplateStore(step.script->morph.creatureOrModelEntry);
+                    CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(step.script->morph.creatureOrModelEntry);
                     uint32 display_id = Creature::ChooseDisplayId(ci);
 
                     pOwner->SetDisplayId(display_id);
@@ -2775,7 +2771,7 @@ void Map::ScriptsProcess()
                     pOwner->Mount(step.script->mount.creatureOrModelEntry);
                 else
                 {
-                    CreatureInfo const* ci = GetCreatureTemplateStore(step.script->mount.creatureOrModelEntry);
+                    CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(step.script->mount.creatureOrModelEntry);
                     uint32 display_id = Creature::ChooseDisplayId(ci);
 
                     pOwner->Mount(display_id);

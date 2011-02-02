@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -15,19 +15,15 @@
  */
 
 /* ScriptData
-SDName: Zul'Drak
-SD%Complete: Q12512, Q12916
-SDComment:
-SDCategory: ZulDrak
+SDName: Zuldrak
+SD%Complete: 100
+SDComment: Quest support: 12934.
+SDCategory: Zuldrak
 EndScriptData */
 
 /* ContentData
 npc_gurgthock
-mob_crusader
-mob_crusader_trigger
-go_scourge_enclosure
-EndContentData 
-*/
+EndContentData */
 
 #include "precompiled.h"
 #include "follower_ai.h"
@@ -35,6 +31,7 @@ EndContentData
 /*######
 ## npc_gurgthock
 ######*/
+
 enum
 {
     QUEST_FROM_BEYOND = 12934,
@@ -89,7 +86,7 @@ bool QuestAccept_npc_gurgthock(Player* pPlayer, Creature* pCreature, const Quest
     }
     return true;
 }
- 
+
 CreatureAI* GetAI_npc_gurgthock(Creature* pCreature)
 {
     return new npc_gurgthockAI(pCreature);
@@ -326,34 +323,16 @@ CreatureAI* GetAI_mob_crusader_trigger(Creature* pCreature)
     return new mob_crusader_triggerAI(pCreature);
 }
 
-/*#####
-## go_scourge_enclosure
-#####*/
-
-enum
-{
-    QUEST_OUR_ONLY_HOPE = 12916,
-    NPC_GYMER = 29928
-
-};
-
-bool GOHello_scourge_enclosure(Player* pPlayer, GameObject* pGo)
-{
-    if (pPlayer->GetQuestStatus(QUEST_OUR_ONLY_HOPE) == QUEST_STATUS_INCOMPLETE)
-    {
-        if(Creature *pGymer = GetClosestCreatureWithEntry(pPlayer, NPC_GYMER, INTERACTION_DISTANCE))
-        {
-            pPlayer->KilledMonsterCredit(NPC_GYMER, pGymer->GetGUID());
-
-        }
-    }
-    return false;
-};
 
 void AddSC_zuldrak()
 {
     Script* pNewScript;
 
+    pNewScript = new Script;
+    pNewScript->Name = "npc_gurgthock";
+    pNewScript->GetAI = &GetAI_npc_gurgthock;
+    pNewScript->pQuestAcceptNPC = &QuestAccept_npc_gurgthock;
+    pNewScript->RegisterSelf();
 
     pNewScript = new Script;
     pNewScript->Name = "mob_crusader";
@@ -365,14 +344,4 @@ void AddSC_zuldrak()
     pNewScript->GetAI = &GetAI_mob_crusader_trigger;
     pNewScript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "npc_gurgthock";
-    pNewScript->GetAI = &GetAI_npc_gurgthock;
-    pNewScript->pQuestAccept = &QuestAccept_npc_gurgthock;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "go_scourge_enclosure";
-    pNewScript->pGOHello = &GOHello_scourge_enclosure;
-    pNewScript->RegisterSelf();
 }

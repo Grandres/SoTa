@@ -131,7 +131,14 @@ struct MANGOS_DLL_DECL boss_ignisAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
 
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_IGNIS, DONE);
+            // destroy constructs
+            for (std::list<uint64>::iterator i = m_pInstance->m_lIronConstructsGUIDs.begin(); i != m_pInstance->m_lIronConstructsGUIDs.end(); i++)
+                if (Creature *pTmp = m_pInstance->instance->GetCreature(*i))
+                    if (pTmp->isAlive())
+                        pTmp->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
+        }
     }
 
     void JustSummoned(Creature* pCreature)
@@ -168,8 +175,9 @@ struct MANGOS_DLL_DECL boss_ignisAI : public ScriptedAI
 
         if (m_uiSlagPotTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1), m_bIsRegularMode ? SPELL_CHARGE_SLAG_POT : SPELL_CHARGE_SLAG_POT_H) == CAST_OK)
-                m_uiSlagPotTimer = urand(15000, 25000);
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                if (DoCastSpellIfCan(pTarget, m_bIsRegularMode ? SPELL_CHARGE_SLAG_POT : SPELL_CHARGE_SLAG_POT_H) == CAST_OK)
+                    m_uiSlagPotTimer = urand(15000, 25000);
         }
         else m_uiSlagPotTimer -= uiDiff;
 
@@ -183,7 +191,7 @@ struct MANGOS_DLL_DECL boss_ignisAI : public ScriptedAI
         if (m_uiActivateConstructTimer <= uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_ACTIVATE_CONSTRUCT) == CAST_OK)
-                m_uiActivateConstructTimer = 15000;
+                m_uiActivateConstructTimer = m_bIsRegularMode ? 40000 : 30000;
         }
         else m_uiActivateConstructTimer -= uiDiff;
 
@@ -245,7 +253,7 @@ struct MANGOS_DLL_DECL mob_iron_constructAI : public ScriptedAI
                     m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     // Strength of the Creator stack decreasing hack
                     if (m_pInstance)
-                        if (Creature *pIgnis = m_pInstance->instance->GetCreature(m_pInstance->GetData64(TYPE_IGNIS)) )
+                        if (Creature *pIgnis = m_pInstance->instance->GetCreature(m_pInstance->GetData64(NPC_IGNIS)) )
                             if (SpellAuraHolder *pHolder = pIgnis->GetSpellAuraHolder(SPELL_STRENGTH_OF_THE_CREATOR) )
                                 pHolder->SetStackAmount(pHolder->GetStackAmount()-1);
                 }

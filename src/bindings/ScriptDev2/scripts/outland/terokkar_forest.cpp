@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -997,7 +997,7 @@ CreatureAI* GetAI_npc_mana_bomb_exp_trigger(Creature* pCreature)
 ## go_mana_bomb
 ######*/
 
-bool GOHello_go_mana_bomb(Player* pPlayer, GameObject* pGo)
+bool GOUse_go_mana_bomb(Player* pPlayer, GameObject* pGo)
 {
     if (Creature* pCreature = GetClosestCreatureWithEntry(pGo, NPC_MANA_BOMB_EXPL_TRIGGER, INTERACTION_DISTANCE))
     {
@@ -1038,149 +1038,6 @@ bool GossipSelect_npc_slim(Player* pPlayer, Creature* pCreature, uint32 uiSender
     return true;
 }
 
-/*##################
-## npc_isla_starmane
-####################
-
-ToDo:
-* find missing texts
-*/
-
-enum isla_starmane
-{
-    SPELL_ENTANGLING_ROOTS              = 33844,
-    SPELL_MOONFIRE                      = 15798,
-    SPELL_WRATH                         = 9739,
-
-    SAY_QUEST_COMPLETE                  = -1999774,
-
-    QUEST_ESCAPE_FROM_FOREWING_POINT_A  = 10051,
-    QUEST_ESCAPE_FROM_FOREWING_POINT_H  = 10052,
-
-    GO_CAGE                             = 182794
-};
-
-struct MANGOS_DLL_DECL npc_isla_starmaneAI : public npc_escortAI
-{
-    npc_isla_starmaneAI(Creature* pCreature) : npc_escortAI(pCreature)
-    {
-        m_uiCageGUID = 0;
-        Reset();
-    }
-
-    uint64 m_uiCageGUID;
-    uint32 m_uiEntanglingRootsTimer;
-    uint32 m_uiMoonfireTimer;
-    uint32 m_uiWrathTimer;
-
-    void Reset()
-    {
-        m_uiEntanglingRootsTimer = 0;
-        m_uiMoonfireTimer = 4000;
-        m_uiWrathTimer = 5000;
-    }
-
-    void AttackStart(Unit* pWho)
-    {
-        if (!pWho)
-            return;
-
-        if (m_creature->Attack(pWho, true))
-        {
-            m_creature->AddThreat(pWho);
-            m_creature->SetInCombatWith(pWho);
-            pWho->SetInCombatWith(m_creature);
-
-            if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
-                m_creature->GetMotionMaster()->MovementExpired();
-
-            m_creature->GetMotionMaster()->Clear(false);
-            m_creature->GetMotionMaster()->MoveChase(pWho, 10.0f);
-        }
-    }
-          
-    void WaypointReached(uint32 uiPointId)
-    {
-        Player* pPlayer = GetPlayerForEscort();
-        if (!pPlayer)
-            return;
-
-        switch(uiPointId)
-        {
-            case 1:
-                m_creature->SetFacingToObject(pPlayer);
-                if (GameObject* pCage = m_creature->GetMap()->GetGameObject(m_uiCageGUID))
-                    pCage->SetGoState(GO_STATE_READY);
-                break;
-            case 41:
-                m_creature->SetFacingToObject(pPlayer);
-                DoScriptText(SAY_QUEST_COMPLETE, m_creature, pPlayer);
-                pPlayer->GroupEventHappens(pPlayer->GetTeam() == ALLIANCE ? QUEST_ESCAPE_FROM_FOREWING_POINT_A : QUEST_ESCAPE_FROM_FOREWING_POINT_H, m_creature);
-                SetEscortPaused(true);
-                break;
-
-            default: break;
-        }
-    }
-
-    void UpdateEscortAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_uiEntanglingRootsTimer <= uiDiff)
-        {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_ENTANGLING_ROOTS, (CAST_AURA_NOT_PRESENT | CAST_INTERRUPT_PREVIOUS));
-            m_uiEntanglingRootsTimer = 7000;
-        }
-        else
-            m_uiEntanglingRootsTimer -= uiDiff;
-
-        if (m_uiMoonfireTimer <= uiDiff)
-        {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MOONFIRE);
-            m_uiMoonfireTimer = 12000;
-        }
-        else
-            m_uiMoonfireTimer -= uiDiff;
-
-        if (m_uiWrathTimer <= uiDiff)
-        {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_WRATH);
-            m_uiWrathTimer = 7000;
-        }
-        else
-            m_uiWrathTimer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-bool QuestAccept_npc_isla_starmane(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
-{
-    if (!pPlayer || !pQuest)
-        return false;
-
-    if (pQuest->GetQuestId() == (pPlayer->GetTeam() == ALLIANCE ? QUEST_ESCAPE_FROM_FOREWING_POINT_A : QUEST_ESCAPE_FROM_FOREWING_POINT_H))
-    {
-        if (npc_isla_starmaneAI* pEscortAI = dynamic_cast<npc_isla_starmaneAI*>(pCreature->AI()))
-        {
-            pEscortAI->Start(false, pPlayer->GetGUID(), pQuest, true);
-            if (GameObject* pCage = GetClosestGameObjectWithEntry(pCreature, GO_CAGE, INTERACTION_DISTANCE))
-            {
-                pCage->SetGoState(GO_STATE_ACTIVE);
-                ((npc_isla_starmaneAI*)pCreature->AI())->m_uiCageGUID = pCage->GetGUID();
-            }
-        }
-    }
-    return true;
-}
-
-CreatureAI* GetAI_npc_isla_starmane(Creature* pCreature)
-{
-    return new npc_isla_starmaneAI(pCreature);
-}
-
 /*#####
 ## go_veil_skith_cage & npc_captive_child
 #####*/
@@ -1195,7 +1052,7 @@ enum
     SAY_THANKS_4              = -1000593
 };
 
-bool GOHello_veil_skith_cage(Player* pPlayer, GameObject* pGo)
+bool GOUse_go_veil_skith_cage(Player* pPlayer, GameObject* pGo)
 {
     if (pPlayer->GetQuestStatus(QUEST_MISSING_FRIENDS) == QUEST_STATUS_INCOMPLETE)
     {
@@ -1242,12 +1099,6 @@ void AddSC_terokkar_forest()
     Script *newscript;
 
     newscript = new Script;
-    newscript->Name = "npc_isla_starmane";
-    newscript->GetAI = &GetAI_npc_isla_starmane;
-    newscript->pQuestAccept = &QuestAccept_npc_isla_starmane;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "mob_unkor_the_ruthless";
     newscript->GetAI = &GetAI_mob_unkor_the_ruthless;
     newscript->RegisterSelf();
@@ -1270,7 +1121,7 @@ void AddSC_terokkar_forest()
     newscript = new Script;
     newscript->Name = "npc_akuno";
     newscript->GetAI = &GetAI_npc_akuno;
-    newscript->pQuestAccept = &QuestAccept_npc_akuno;
+    newscript->pQuestAcceptNPC = &QuestAccept_npc_akuno;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -1284,11 +1135,17 @@ void AddSC_terokkar_forest()
     newscript->Name = "npc_hungry_nether_ray";
     newscript->GetAI = &GetAI_npc_hungry_nether_ray;
     newscript->RegisterSelf();
+    
+    newscript = new Script;
+    newscript->Name = "npc_skywing";
+    newscript->GetAI = &GetAI_npc_skywing;
+    newscript->pQuestAcceptNPC = &QuestAccept_npc_skywing;
+    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_letoll";
     newscript->GetAI = &GetAI_npc_letoll;
-    newscript->pQuestAccept = &QuestAccept_npc_letoll;
+    newscript->pQuestAcceptNPC = &QuestAccept_npc_letoll;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -1298,7 +1155,7 @@ void AddSC_terokkar_forest()
 
     newscript = new Script;
     newscript->Name = "go_mana_bomb";
-    newscript->pGOHello = &GOHello_go_mana_bomb;
+    newscript->pGOUse = &GOUse_go_mana_bomb;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -1308,25 +1165,18 @@ void AddSC_terokkar_forest()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "npc_skywing";
-    newscript->GetAI = &GetAI_npc_skywing;
-    newscript->pQuestAccept = &QuestAccept_npc_skywing;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "npc_slim";
     newscript->pGossipHello =  &GossipHello_npc_slim;
     newscript->pGossipSelect = &GossipSelect_npc_slim;
     newscript->RegisterSelf();
-    
+
     newscript = new Script;
     newscript->Name = "go_veil_skith_cage";
-    newscript->pGOHello =  &GOHello_veil_skith_cage;
+    newscript->pGOUse = &GOUse_go_veil_skith_cage;
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_captive_child";
     newscript->GetAI = &GetAI_npc_captive_child;
     newscript->RegisterSelf();
-
 }

@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -196,55 +196,6 @@ CreatureAI* GetAI_npc_the_scourge_cauldron(Creature* pCreature)
 }
 
 /*######
-# npc_andorhal_towerAI
-######*/
-
-enum
-{
-	GO_BEACON_TORCH_ENTRY	=	176093,
-
-	QUEST_ALL_ALONG_THE_WATCHTOWERS_A	=	5097,
-	QUEST_ALL_ALONG_THE_WATCHTOWERS_H	=	5098
-};
-
-struct MANGOS_DLL_DECL npc_andorhal_towerAI : public ScriptedAI
-{
-	npc_andorhal_towerAI(Creature* pCreature) : ScriptedAI(pCreature)
-	{
-		Reset();
-	}
-	
-	Player* pPlayer;
-
-	void Reset()
-	{
-		pPlayer = NULL;
-	}
-
-	void MoveInLineOfSight(Unit* pWho) 
-	{
-		if(pWho->GetTypeId() != TYPEID_PLAYER)
-			return;
-
-
-		pPlayer = (Player*)pWho;
-
-		if(pPlayer 
-			&& pPlayer->GetQuestStatus(pPlayer->GetTeam() == HORDE ? QUEST_ALL_ALONG_THE_WATCHTOWERS_H : QUEST_ALL_ALONG_THE_WATCHTOWERS_A) == QUEST_STATUS_INCOMPLETE)
-		{
-			if(GetClosestGameObjectWithEntry(m_creature, GO_BEACON_TORCH_ENTRY, 15.0f))
-			{
-				pPlayer->KilledMonsterCredit(m_creature->GetEntry(), m_creature->GetGUID());
-			}
-		}
-	}
-};
-
-CreatureAI* GetAI_npc_andorhal_tower(Creature* pCreature)
-{
-	return new npc_andorhal_towerAI(pCreature);
-}
-/*######
 ##
 ######*/
 
@@ -268,9 +219,4 @@ void AddSC_western_plaguelands()
     newscript->Name = "npc_the_scourge_cauldron";
     newscript->GetAI = &GetAI_npc_the_scourge_cauldron;
     newscript->RegisterSelf();
-    
-   	newscript = new Script;
-	newscript->Name = "npc_andorhal_tower";
-	newscript->GetAI = &GetAI_npc_andorhal_tower;
-	newscript->RegisterSelf();
 }

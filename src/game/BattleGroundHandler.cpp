@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #include "BattleGround.h"
 #include "ArenaTeam.h"
 #include "Language.h"
-#include "ScriptCalls.h"
+#include "ScriptMgr.h"
 #include "World.h"
 
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recv_data)
@@ -105,6 +105,14 @@ void WorldSession::HandleBattlemasterJoinOpcode( WorldPacket & recv_data )
     // ignore if player is already in BG
     if (_player->InBattleGround())
         return;
+
+    // prevent joining from instances
+    uint32 mapid = _player->GetMapId();
+    if(mapid != 0 && mapid != 1 && mapid != 530 && mapid != 571 && mapid !=13)
+    {
+        SendNotification("You cannot join from here");
+        return;
+    }
 
     // get bg instance or bg template if instance not found
     BattleGround *bg = NULL;
@@ -618,7 +626,7 @@ void WorldSession::HandleAreaSpiritHealerQueueOpcode( WorldPacket & recv_data )
     if(!unit->isSpiritService())                            // it's not spirit service
         return;
 
-    Script->GossipHello(GetPlayer(), unit);
+    sScriptMgr.OnGossipHello(GetPlayer(), unit);
 }
 
 void WorldSession::HandleBattlemasterJoinArena( WorldPacket & recv_data )

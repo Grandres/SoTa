@@ -3,7 +3,7 @@
 --
 
 DELETE FROM sd2_db_version;
-INSERT INTO sd2_db_version (version) VALUES ('ScriptDev2 (for MaNGOS 10761+) ');
+INSERT INTO sd2_db_version (version) VALUES ('ScriptDev2 (for MaNGOS 10950+) ');
 
 --
 -- Below contains data for table `script_texts` mainly used in C++ parts.
@@ -939,10 +939,10 @@ INSERT INTO script_texts (entry,content_default,sound,type,language,emote,commen
 (-1409002,'%s refuses to die while its master is in trouble.',0,2,0,0,'core rager EMOTE_LOWHP'),
 
 (-1409003,'Reckless mortals, none may challenge the sons of the living flame!',8035,1,0,0,'majordomo SAY_AGGRO'),
-(-1409004,'The runes of warding have been destroyed! Hunt down the infedels my bretheren.',8039,1,0,0,'majordomo SAY_SPAWN'),
+(-1409004,'The runes of warding have been destroyed! Hunt down the infedels my bretheren.',8039,6,0,0,'majordomo SAY_SPAWN'),
 (-1409005,'Ashes to Ashes!',8037,1,0,0,'majordomo SAY_SLAY'),
 (-1409006,'Burn mortals! Burn for this transgression!',8036,1,0,0,'majordomo SAY_SPECIAL'),
-(-1409007,'Impossible! Stay your attack mortals! I submitt! I submitt! Brashly you have come to rest the secrets of the living flame. You will soon regret the recklessness of your quest. I go now to summon the lord whos house this is. Should you seek an audiance with him your paltry lives will surly be forfit. Nevertheless seek out his lair if you dare!',8038,1,0,0,'majordomo SAY_DEFEAT'),
+(-1409007,'Impossible! Stay your attack mortals! I submitt! I submitt!',8038,1,0,0,'majordomo SAY_DEFEAT_1'),
 
 (-1409008,'Behold Ragnaros, the Firelord! He who was ancient when this world was young! Bow before him, mortals! Bow before your ending!',8040,1,0,0,'ragnaros SAY_SUMMON_MAJ'),
 (-1409009,'TOO SOON! YOU HAVE AWAKENED ME TOO SOON, EXECUTUS! WHAT IS THE MEANING OF THIS INTRUSION?',8043,1,0,0,'ragnaros SAY_ARRIVAL1_RAG'),
@@ -955,7 +955,12 @@ INSERT INTO script_texts (entry,content_default,sound,type,language,emote,commen
 (-1409015,'BY FIRE BE PURGED!',8046,1,0,0,'ragnaros SAY_HAND'),
 (-1409016,'TASTE THE FLAMES OF SULFURON!',8047,1,0,0,'ragnaros SAY_WRATH'),
 (-1409017,'DIE INSECT!',8051,1,0,0,'ragnaros SAY_KILL'),
-(-1409018,'MY PATIENCE IS DWINDILING! COME NATS TO YOUR DEATH!',8048,1,0,0,'ragnaros SAY_MAGMABURST');
+(-1409018,'MY PATIENCE IS DWINDILING! COME NATS TO YOUR DEATH!',8048,1,0,0,'ragnaros SAY_MAGMABURST'),
+
+(-1409019,'You think you\'ve won already? Perhaps you\'ll need another lesson in pain!',0,1,0,0,'majordomo SAY_LAST_ADD'),
+(-1409020,'Brashly you have come to rest the secrets of the living flame. You will soon regret the recklessness of your quest.',0,1,0,0,'majordomo SAY_DEFEAT_2'),
+(-1409021,'I go now to summon the lord whos house this is. Should you seek an audiance with him your paltry lives will surly be forfit. Nevertheless seek out his lair if you dare!',0,1,0,0,'majordomo SAY_DEFEAT_3'),
+(-1409022,'My flame! Please don\'t take away my flame... ',8042,1,0,0,'ragnaros SAY_ARRIVAL4_MAJ');
 
 -- -1 429 000 DIRE MAUL
 
@@ -1373,7 +1378,9 @@ INSERT INTO script_texts (entry,content_default,sound,type,language,emote,commen
 (-1533155,'Corpse Scarabs appear from a Crypt Guard\'s corpse!',0,3,0,0,'anubrekhan EMOTE_CORPSE_SCARABS'),
 
 (-1533156,'%s casts Unyielding Pain on everyone!',0,3,0,0,'lady_blaumeux EMOTE_UNYIELDING_PAIN'),
-(-1533157,'%s casts Condemation on everyone!',0,3,0,0,'sir_zeliek EMOTE_CONDEMATION');
+(-1533157,'%s casts Condemation on everyone!',0,3,0,0,'sir_zeliek EMOTE_CONDEMATION'),
+
+(-1533158,'%s injects you with a mutagen!',0,5,0,0,'grobbulus EMOTE_INJECTION');
 
 -- -1 534 000 THE BATTLE OF MT. HYJAL
 INSERT INTO script_texts (entry,content_default,sound,type,language,emote,comment) VALUES
@@ -1739,12 +1746,12 @@ INSERT INTO script_texts (entry,content_default,sound,type,language,emote,commen
 
 -- -1 554 000 THE MECHANAR
 INSERT INTO script_texts (entry,content_default,sound,type,language,emote,comment) VALUES
-(-1554000,'I predict a painful death.',11101,1,0,0,'gyro SAY_AGGRO'),
-(-1554001,'Measure twice; cut once!',11104,1,0,0,'gyro SAY_SAW_ATTACK1'),
-(-1554002,'If my division is correct, you should be quite dead.',11105,1,0,0,'gyro SAY_SAW_ATTACK2'),
-(-1554003,'Your strategy was flawed!',11102,1,0,0,'gyro SAY_SLAY1'),
-(-1554004,'Yes, the only logical outcome.',11103,1,0,0,'gyro SAY_SLAY2'),
-(-1554005,'An unforseen... contingency',11106,1,0,0,'gyro SAY_DEATH'),
+(-1554000,'REUSE_ME',0,0,0,0,'REUSE_ME'),
+(-1554001,'REUSE_ME',0,0,0,0,'REUSE_ME'),
+(-1554002,'REUSE_ME',0,0,0,0,'REUSE_ME'),
+(-1554003,'REUSE_ME',0,0,0,0,'REUSE_ME'),
+(-1554004,'REUSE_ME',0,0,0,0,'REUSE_ME'),
+(-1554005,'REUSE_ME',0,0,0,0,'REUSE_ME'),
 
 (-1554006,'You have approximately five seconds to live.',11109,1,0,0,'ironhand SAY_AGGRO_1'),
 (-1554007,'With the precise angle and velocity...',11112,1,0,0,'ironhand SAY_HAMMER_1'),
@@ -3354,7 +3361,7 @@ INSERT INTO gossip_texts (entry,content_default,comment) VALUES
 -- -3 000 100 GENERAL MAPS (not instance maps)
 INSERT INTO gossip_texts (entry,content_default,comment) VALUES
 (-3000101,'Taruk send me to collect what you owe.','silvermoon harry GOSSIP_ITEM_GAMBLING_DEBT'),
-(-3000102,'Here\'s the money.','silvermoon harry GOSSIP_ITEM_PAYING'),
+(-3000102,'Pay up, Harry!','silvermoon harry GOSSIP_ITEM_PAYING'),
 (-3000103,'I am ready to travel to you village now.','rainspeaker GOSSIP_ITEM_READY'),
 (-3000104,'<Check for pulse...>','mosswalker victim GOSSIP_ITEM_PULSE'),
 (-3000105,'Ezekiel said that you might have a certain book...','dirty larry GOSSIP_ITEM_BOOK'),

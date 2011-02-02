@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: violet_hold
-SDAuthor: ckegg, modified by rsa
-SD%Complete: 60
+SDAuthor: 
+SD%Complete: 
 SDComment: 
 SDCategory: The Violet Hold
 EndScriptData */

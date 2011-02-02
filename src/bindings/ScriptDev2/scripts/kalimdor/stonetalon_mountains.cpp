@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -103,9 +103,9 @@ struct MANGOS_DLL_DECL npc_kayaAI : public npc_escortAI
                 //apparently NPC say _after_ the ambush is over, and is most likely a bug at you-know-where.
                 //we simplify this, and make say when the ambush actually start.
                 DoScriptText(SAY_AMBUSH, m_creature);
-                m_creature->SummonCreature(NPC_GRIMTOTEM_RUFFIAN, -50.75f, -500.77f, -46.13f, 0.4f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
-                m_creature->SummonCreature(NPC_GRIMTOTEM_BRUTE, -40.05f, -510.89f, -46.05f, 1.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
-                m_creature->SummonCreature(NPC_GRIMTOTEM_SORCERER, -32.21f, -499.20f, -45.35f, 2.8f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
+                m_creature->SummonCreature(NPC_GRIMTOTEM_RUFFIAN, -50.75f, -500.77f, -46.13f, 0.4f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+                m_creature->SummonCreature(NPC_GRIMTOTEM_BRUTE, -40.05f, -510.89f, -46.05f, 1.7f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+                m_creature->SummonCreature(NPC_GRIMTOTEM_SORCERER, -32.21f, -499.20f, -45.35f, 2.8f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
                 break;
             // Award quest credit
             case 18:
@@ -155,6 +155,6 @@ void AddSC_stonetalon_mountains()
     newscript = new Script;
     newscript->Name = "npc_kaya";
     newscript->GetAI = &GetAI_npc_kaya;
-    newscript->pQuestAccept = &QuestAccept_npc_kaya;
+    newscript->pQuestAcceptNPC = &QuestAccept_npc_kaya;
     newscript->RegisterSelf();
 }

@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,82 +16,81 @@
 
 /* ScriptData
 SDName: Boss_Ymiron
-SD%Complete: 90%
+SD%Complete:
 SDComment:
-SDAuthot: ScrappyDoo (c) Andeeria
 SDCategory: Utgarde Pinnacle
 EndScriptData */
 
 #include "precompiled.h"
 #include "utgarde_pinnacle.h"
 
-enum Sounds
+enum
 {
-    SAY_AGGRO                               = -1575031,
-    SAY_SUMMON_BJORN                        = -1575032,
-    SAY_SUMMON_HALDOR                       = -1575033,
-    SAY_SUMMON_RANULF                       = -1575034,
-    SAY_SUMMON_TORGYN                       = -1575035,
-    SAY_SLAY_1                              = -1575036,
-    SAY_SLAY_2                              = -1575037,
-    SAY_SLAY_3                              = -1575038,
-    SAY_SLAY_4                              = -1575039,
-    SAY_DEATH                               = -1575040
-};
+    SAY_AGGRO                   = -1575031,
+    SAY_SUMMON_BJORN            = -1575032,
+    SAY_SUMMON_HALDOR           = -1575033,
+    SAY_SUMMON_RANULF           = -1575034,
+    SAY_SUMMON_TOR              = -1575035,
+    SAY_SLAY_1                  = -1575036,
+    SAY_SLAY_2                  = -1575037,
+    SAY_SLAY_3                  = -1575038,
+    SAY_SLAY_4                  = -1575039,
+    SAY_DEATH                   = -1575040,
 
-enum Spells
-{
-    SPELL_BANE                              = 48294,
-    H_SPELL_BANE                            = 59301,
+    SPELL_BANE_N                            = 48294,
+    SPELL_BANE_H                            = 59301,
     SPELL_DARK_SLASH                        = 48292,
-    SPELL_FETID_ROT                         = 48291,
-    H_SPELL_FETID_ROT                       = 59300,
+    SPELL_FETID_ROT_N                       = 48291,
+    SPELL_FETID_ROT_H                       = 59300,
     SPELL_SCREAMS_OF_THE_DEAD               = 51750,
-    SPELL_SPIRIT_BURST                      = 48529,
-    H_SPELL_SPIRIT_BURST                    = 59305,
-    SPELL_SPIRIT_STRIKE                     = 48423,
-    H_SPELL_SPIRIT_STRIKE                   = 59304,
-    SPELL_ANCESTORS_VENGEANCE               = 16939,
+
+    SPELL_SPIRIT_BURST_N                    = 48529, //granted by Ranulf
+    SPELL_SPIRIT_BURST_H                    = 59305,
+    SPELL_SPIRIT_STRIKE_N                   = 48423, //granted by Haldor
+    SPELL_SPIRIT_STRIKE_H                   = 59304,
+    SPELL_SUMMON_SPIRIT_FOUNT               = 48386, //granted by Bjorn
+    SPELL_SUMMON_SPIRIT_FOUNT_VISUAL        = 48385,
+    SPELL_SPIRIT_FOUNT_N                    = 48380,
+    SPELL_SPIRIT_FOUNT_H                    = 59320,
+    SPELL_AVENGING_SPIRITS                  = 48590, //granted by Tor
+    SPELL_SUMMON_AVENGING_SPIRIT            = 48592,
+    SPELL_SUMMON_AVENGING_SPIRIT_VISUAL     = 48593,
 
     SPELL_CHANNEL_SPIRIT_TO_YMIRON          = 48316,
     SPELL_CHANNEL_YMIRON_TO_SPIRIT          = 48307,
-
-    SPELL_SPIRIT_FOUNT                      = 48380,
-    H_SPELL_SPIRIT_FOUNT                    = 59320,
-    SPELL_SPIRIT_FOUNT_BEAM                 = 48385,
-
     SPELL_SPIRIT_EMERGE                     = 56864,
     SPELL_SPIRIT_DIES                       = 48596,
 
-    SPELL_SUMMON_SPIRIT_FOUNT               = 48386,
-    SPELL_SPIRIT_SUMMONED_VISUAL            = 52096,
-    SPELL_AVENGING_SPIRITS                  = 48590,
-
-    SPELL_TORGYN_VISUAL                     = 48313,
-    SPELL_BJORN_VISUAL                      = 48308,    
-    SPELL_HALDOR_VISUAL                     = 48311,    
     SPELL_RANULF_VISUAL                     = 48312,
+    SPELL_HALDOR_VISUAL                     = 48311,    
+    SPELL_BJORN_VISUAL                      = 48308,    
+    SPELL_TOR_VISUAL                        = 48313,
 
-    // currently not used
-    SPELL_CHOOSE_SPIRIT                     = 48306,
-    SPELL_DESTROY_ALL_SPIRITS               = 44659
+    MODEL_ID_INVISIBLE                      = 11686,
+
+    NPC_SPIRIT_FOUNT                        = 27339
 };
 
-enum Creatures
-{   
-    CREATURE_SPIRIT_FOUNT                   = 27339,
-    CREATURE_AVENGING_SPIRIT                = 27386,
-};
-
-uint32 Kings[4][2] = 
+struct Locations
 {
-    {DATA_TORGYN, SPELL_TORGYN_VISUAL},
-    {DATA_BJORN,  SPELL_BJORN_VISUAL },
-    {DATA_HALDOR, SPELL_HALDOR_VISUAL},
-    {DATA_RANULF, SPELL_RANULF_VISUAL}    
+    float x, y, z;
+    uint32 id;
 };
 
-int32 KingsGossip[4] = {SAY_SUMMON_TORGYN, SAY_SUMMON_BJORN, SAY_SUMMON_HALDOR, SAY_SUMMON_RANULF};
+static Locations YmironPoints[] =
+{
+    {402.577f, -335.175f, 104.757f},  // RANULF
+    {403.175f, -314.411f, 104.755f},  // HALDOR
+    {381.753f, -314.570f, 104.757f},  // BJORN
+    {381.044f, -335.059f, 104.754f},  // TOR
+};
+
+static uint32 Ancestors[3][4] = 
+{
+    {NPC_RANULF,          NPC_HALDOR,          NPC_BJORN,          NPC_TOR},
+    {SPELL_RANULF_VISUAL, SPELL_HALDOR_VISUAL, SPELL_BJORN_VISUAL, SPELL_TOR_VISUAL},
+    {SAY_SUMMON_RANULF,   SAY_SUMMON_HALDOR,   SAY_SUMMON_BJORN,   SAY_SUMMON_TOR},
+};
 
 /*######
 ## boss_ymiron
@@ -103,81 +102,61 @@ struct MANGOS_DLL_DECL boss_ymironAI : public ScriptedAI
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        memset(&m_auiDummyCasterGUID, 0, sizeof(m_auiDummyCasterGUID));
         Reset();
     }
 
     ScriptedInstance* m_pInstance;
-
-    std::list<uint64> Summons;
     bool m_bIsRegularMode;
-    bool bKingSequence;
-    bool bKingSpiritPresent;
-    bool bIsInRun;
 
-    uint32 m_uiPauseTimer;
     uint32 m_uiBaneTimer;
-    uint32 m_uiFetidRotTimer; 
     uint32 m_uiDarkSlashTimer;
+    uint32 m_uiFetidRotTimer;
     uint32 m_uiAncestorsVengeanceTimer;
-    uint32 m_uiSpecialAbilityTimer;
-    uint8  m_uiCurrentKing;
-    uint32 m_uiThreshhold;
-    uint8 subphase;
+    uint32 m_uiStepTimer;
+    uint32 m_uiAncestorAbilityTimer;
+    uint32 m_uiDelayTimer;
+    bool m_bDelay;
+    uint8 m_uiStep;
+    uint8 m_uiPhase;
+    bool m_bIsGhostEvent;
+    uint8 m_auiAncestorsOrder[4];
+    uint64 m_auiDummyCasterGUID[4];
 
     void Reset()
     {
-        bKingSequence               = false;
-        bIsInRun                    = false;
-        bKingSpiritPresent          = false;
-        m_uiFetidRotTimer           = urand(8000, 13000);
-        m_uiBaneTimer               = urand(18000, 23000);
-        m_uiDarkSlashTimer          = urand(28000, 33000);
-        m_uiAncestorsVengeanceTimer = 50000;
-        m_uiSpecialAbilityTimer     = 8000;
-        m_uiCurrentKing             = 0;
-        m_uiPauseTimer              = 0;
-        m_uiThreshhold              = 80;
-        subphase                    = 0;
+        m_uiAncestorAbilityTimer = 0; 
+        m_uiBaneTimer = urand(13000, 17000);
+        m_uiDarkSlashTimer = urand(10000, 12000);
+        m_uiFetidRotTimer = urand(8000, 10000);
+        m_uiPhase = 0;
+        m_bIsGhostEvent = false;
+        m_bDelay = false;
+        m_uiDelayTimer = 0;
+
+    	for (uint8 i = 0; i < 4; ++i)
+        {
+            m_auiAncestorsOrder[i] = i;
+            if (Creature* pAncestor = m_pInstance->instance->GetCreature(m_pInstance->GetData64(Ancestors[0][i])))
+                pAncestor->RemoveAllAuras();
+            if (Creature* pDummyCaster = m_pInstance->instance->GetCreature(m_auiDummyCasterGUID[i]))
+                pDummyCaster->ForcedDespawn();
+            m_auiDummyCasterGUID[i] = 0;
+        }
+        srand((unsigned int)time(NULL));
+    	for (uint8 i = 0; i < 4; ++i)
+        {
+            uint8 j = urand(0, 3);
+	        uint8 uiTmp = m_auiAncestorsOrder[i];
+	        m_auiAncestorsOrder[i] = m_auiAncestorsOrder[j];
+	        m_auiAncestorsOrder[j] = uiTmp;
+        }
     }
 
     void Aggro(Unit* pWho)
     {
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_YMIRON, IN_PROGRESS);
-
         DoScriptText(SAY_AGGRO, m_creature);
     }
-
-     void JustReachedHome()
-     {
-        // Hide triggers
-        for (uint8 i = 0; i < 4; ++i)
-        {
-            if (Creature* pKingSpirit = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(Kings[i][0])))
-            {
-                pKingSpirit->InterruptNonMeleeSpells(false);
-                pKingSpirit->RemoveAllAuras();
-            }
-        }
-
-        DespawnAdds();
-
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_YMIRON, NOT_STARTED);
-     }
-
-    void MovementInform(uint32 uiMotionType, uint32 uiPointId)
-    {
-        if (uiMotionType != POINT_MOTION_TYPE)
-           return;
-    
-        if (!bKingSequence)
-        {
-            bIsInRun      = false;
-            bKingSequence = true;
-        }
-    }
-
 
     void KilledUnit(Unit* pVictim)
     {
@@ -192,184 +171,295 @@ struct MANGOS_DLL_DECL boss_ymironAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_YMIRON, DONE);
-
         DoScriptText(SAY_DEATH, m_creature);
-        DespawnAdds();
-        BurnKing();
+        if (m_pInstance)
+        {
+            m_pInstance->SetData(TYPE_YMIRON, DONE);
+            if (m_uiPhase > 0)
+            {
+                if (Creature* pDummyCaster = m_pInstance->instance->GetCreature(m_auiDummyCasterGUID[m_uiPhase-1]))
+                    pDummyCaster->ForcedDespawn();
+                if (Creature* pAncestor = m_pInstance->instance->GetCreature(m_pInstance->GetData64(Ancestors[0][m_auiAncestorsOrder[m_uiPhase-1]])))
+                {
+                    pAncestor->RemoveAllAuras();
+                    pAncestor->CastSpell(pAncestor, SPELL_SPIRIT_DIES, false);
+                }
+            }
+        }
     }
 
     void JustSummoned(Creature* pSummoned)
     {
-        // stor GUIDs in list for easy management
-        Summons.push_back(pSummoned->GetGUID());
-
-        if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+        if (pSummoned->GetEntry() == 27339)
         {
-            if (pSummoned->IsHostileTo(pUnit) && pUnit->isInAccessablePlaceFor(pSummoned))
-            {
-                pSummoned->AddThreat(pUnit);
-                pSummoned->GetMotionMaster()->MoveChase(pUnit);
-                pUnit->AddThreat(pSummoned);
-            }
-        }
-
-        if (pSummoned->GetEntry() == CREATURE_SPIRIT_FOUNT)
-        {
-            DoCast(pSummoned, SPELL_SPIRIT_FOUNT_BEAM, true);
-            pSummoned->CastSpell(pSummoned, m_bIsRegularMode ? SPELL_SPIRIT_FOUNT : H_SPELL_SPIRIT_FOUNT, true);
-        }
-        
-    }
-
-    void DespawnAdds()
-    {
-        if (!Summons.empty())
-        {
-            for (std::list<uint64>::iterator itr = Summons.begin(); itr != Summons.end(); ++itr)
-            {
-                if (Creature* pSummoned = m_creature->GetMap()->GetCreature(*itr))
-                    pSummoned->ForcedDespawn();
-            }
-            Summons.clear();
+            m_creature->InterruptNonMeleeSpells(true);
+            DoCast(m_creature, SPELL_SUMMON_SPIRIT_FOUNT_VISUAL, true);
         }
     }
 
-    void BurnKing()
+    void MovementInform(uint32 uiType, uint32 uiPointId)
     {
-        if (m_uiCurrentKing <= 0)
-            return;
-
-        if (Creature* pKingSpirit = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(Kings[m_uiCurrentKing - 1][0])))
+        if (uiType == POINT_MOTION_TYPE && uiPointId == 0)
         {
-            pKingSpirit->InterruptSpell(CURRENT_CHANNELED_SPELL);
-            pKingSpirit->CastSpell(pKingSpirit, SPELL_SPIRIT_DIES, false);
+            if (m_pInstance)
+                if (Creature* pAncestor = m_pInstance->instance->GetCreature(m_pInstance->GetData64(Ancestors[0][m_auiAncestorsOrder[m_uiPhase]])))
+                {
+                    m_creature->SetFacingToObject(pAncestor);
+                    m_creature->CastSpell(pAncestor, SPELL_CHANNEL_YMIRON_TO_SPIRIT, true);
+                }
+            DoScriptText(Ancestors[2][m_auiAncestorsOrder[m_uiPhase]], m_creature);
+            m_uiStepTimer = 3000;
+            ++m_uiStep;
         }
+    }
+
+    void SetDelay(uint32 uiTimer)
+    {
+        m_bDelay = true;
+        m_uiDelayTimer = uiTimer;
+        m_creature->GetMotionMaster()->MovementExpired(false);
+        m_creature->GetMotionMaster()->Clear();
+        m_creature->StopMoving();
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if(!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if(bKingSequence)
+        if (m_bDelay)
         {
-            if(m_uiPauseTimer <= uiDiff)
+            if (m_uiDelayTimer <= uiDiff)
             {
-                if (Creature* pKingSpirit = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(Kings[m_uiCurrentKing][0])))
-                {
-                    switch(subphase)
-                    {
-                        case 0:
-                            DoScriptText(KingsGossip[m_uiCurrentKing], m_creature, pKingSpirit);
-                            m_creature->SetFacingToObject(pKingSpirit);
-                            m_uiThreshhold = m_uiThreshhold - 20;
-                            m_creature->CastSpell(pKingSpirit, SPELL_CHANNEL_YMIRON_TO_SPIRIT, true);
-                            ++subphase;
-                            m_uiPauseTimer = 3000;
-                            break;
-                        case 1:
-                            pKingSpirit->CastSpell(pKingSpirit, Kings[m_uiCurrentKing][1], true);
-                            pKingSpirit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_EMERGE);
-                            ++subphase;
-                            m_uiPauseTimer = 3000;
-                            break;
-                        case 2:
-                            pKingSpirit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                            m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                            pKingSpirit->CastSpell(m_creature, SPELL_CHANNEL_SPIRIT_TO_YMIRON, true);
-                            ++m_uiCurrentKing;
-                            bKingSpiritPresent = true;
-                            bKingSequence = false;
-                            bIsInRun = false;
-                            subphase = 0;
-                            m_uiPauseTimer = 0;
-                            break;
-                        default: break;
-                    }
-                }
-            }else m_uiPauseTimer -= uiDiff;
+                m_bDelay = false;
+                m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+            }
+            else
+                m_uiDelayTimer -= uiDiff;
+
+            return;
         }
-        else if (!bIsInRun)
+
+        if (m_bIsGhostEvent)
         {
-            if(m_uiBaneTimer <= uiDiff)
+            if (m_uiStepTimer <= uiDiff)
             {
-                DoCastSpellIfCan(m_creature, m_bIsRegularMode ? SPELL_BANE : H_SPELL_BANE);
-                m_uiBaneTimer = urand(15000, 20000);
-            }else m_uiBaneTimer -= uiDiff;
-
-            if(m_uiFetidRotTimer <= uiDiff)
-            {
-                if(Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                    DoCastSpellIfCan(pUnit, m_bIsRegularMode ? SPELL_FETID_ROT : H_SPELL_FETID_ROT);
-                m_uiFetidRotTimer = urand(10000, 15000);
-            }else m_uiFetidRotTimer -= uiDiff;
-
-            if(m_uiDarkSlashTimer <= uiDiff)
-            {
-                if(Unit* pUnit = m_creature->getVictim())
+                if (m_pInstance)
                 {
-                    int32 damage = int32(pUnit->GetHealth() * 0.5);
-                    m_creature->CastCustomSpell(pUnit, SPELL_DARK_SLASH, &damage, 0, 0, false); 
-                }                                                               
-                m_uiDarkSlashTimer = urand(30000, 35000);
-            }else m_uiDarkSlashTimer -= uiDiff;
-
-            if(m_uiAncestorsVengeanceTimer <= uiDiff)
-            {
-                DoCastSpellIfCan(m_creature, SPELL_ANCESTORS_VENGEANCE);
-                m_uiAncestorsVengeanceTimer =  (m_bIsRegularMode ? urand(60000, 65000) : urand(45000, 50000));
-            }else m_uiAncestorsVengeanceTimer -= uiDiff;
-
-            if (bKingSpiritPresent)
-            {
-                if (m_uiSpecialAbilityTimer <= uiDiff)
-                {
-                    switch(m_uiCurrentKing)
+                    switch (m_uiStep)
                     {
                         case 1:
-                            DoCastSpellIfCan(m_creature, SPELL_AVENGING_SPIRITS, false);
-                            // used only once
-                            bKingSpiritPresent = false;
-                            m_uiSpecialAbilityTimer = 5000;
+                            if (m_uiPhase > 0)
+                            {
+                                if (Creature* pDummyCaster = m_pInstance->instance->GetCreature(m_auiDummyCasterGUID[m_uiPhase-1]))
+                                    pDummyCaster->ForcedDespawn();
+                                if (Creature* pAncestor = m_pInstance->instance->GetCreature(m_pInstance->GetData64(Ancestors[0][m_auiAncestorsOrder[m_uiPhase-1]])))
+                                    pAncestor->CastSpell(pAncestor, SPELL_SPIRIT_DIES, false);
+                                SetDelay(2000);
+                            }
+                            ++m_uiStep;
                             break;
                         case 2:
-                            DoCast(m_creature, SPELL_SUMMON_SPIRIT_FOUNT, false);
-                            // used only once
-                            bKingSpiritPresent = false;
-                            m_uiSpecialAbilityTimer = 5000;
-                            break;
-                        case 3:
-                            DoCastSpellIfCan(m_creature->getVictim(), m_bIsRegularMode ? SPELL_SPIRIT_STRIKE : H_SPELL_SPIRIT_STRIKE, false);
-                            m_uiSpecialAbilityTimer = 5000;
+                            if (m_uiPhase > 0)
+                                if (Creature* pAncestor = m_pInstance->instance->GetCreature(m_pInstance->GetData64(Ancestors[0][m_auiAncestorsOrder[m_uiPhase-1]])))
+                                    pAncestor->RemoveAurasDueToSpell(Ancestors[1][m_auiAncestorsOrder[m_uiPhase-1]]);
+                            m_creature->InterruptNonMeleeSpells(true);
+                            m_creature->GetMotionMaster()->MovePoint(0, YmironPoints[m_auiAncestorsOrder[m_uiPhase]].x, YmironPoints[m_auiAncestorsOrder[m_uiPhase]].y, YmironPoints[m_auiAncestorsOrder[m_uiPhase]].z);
+                            ++m_uiStep;
                             break;
                         case 4:
-                            DoCastSpellIfCan(m_creature, m_bIsRegularMode ? SPELL_SPIRIT_BURST : H_SPELL_SPIRIT_BURST, false);
-                            m_uiSpecialAbilityTimer = 10000;
+                            if (Creature* pAncestor = m_pInstance->instance->GetCreature(m_pInstance->GetData64(Ancestors[0][m_auiAncestorsOrder[m_uiPhase]])))
+                            {
+                                pAncestor->CastSpell(pAncestor, Ancestors[1][m_auiAncestorsOrder[m_uiPhase]], false);
+                                pAncestor->CastSpell(pAncestor, SPELL_SPIRIT_EMERGE, true);
+                            }
+                            m_uiStepTimer = 2500;
+                            ++m_uiStep;
                             break;
+                        case 5:
+                            if (Creature* pAncestor = m_pInstance->instance->GetCreature(m_pInstance->GetData64(Ancestors[0][m_auiAncestorsOrder[m_uiPhase]])))
+                            {
+                                if (Creature* pDummyCaster = m_creature->SummonCreature(1921, pAncestor->GetPositionX(), pAncestor->GetPositionY(), pAncestor->GetPositionZ()+7.0f, 0, TEMPSUMMON_DEAD_DESPAWN, 0))
+                                {
+                                    pDummyCaster->SetDisplayId(MODEL_ID_INVISIBLE);
+                                    pDummyCaster->setFaction(35);
+                                    pDummyCaster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                    pDummyCaster->GetMap()->CreatureRelocation(pDummyCaster, pDummyCaster->GetPositionX(), pDummyCaster->GetPositionY(), pDummyCaster->GetPositionZ()+15.0f, 0);
+                                    pDummyCaster->CastSpell(m_creature, SPELL_CHANNEL_SPIRIT_TO_YMIRON, true);
+                                    m_auiDummyCasterGUID[m_uiPhase] = pDummyCaster->GetGUID();
+                                }
+                                pAncestor->CastSpell(m_creature, SPELL_CHANNEL_SPIRIT_TO_YMIRON, true);
+                            }
+                            m_bIsGhostEvent = false;
+                            switch (Ancestors[0][m_auiAncestorsOrder[m_uiPhase]])
+                            {
+                                case NPC_RANULF:
+                                case NPC_HALDOR:
+                                    m_uiAncestorAbilityTimer = 5000;
+                                    break;
+                                case NPC_BJORN:
+                                    m_uiAncestorAbilityTimer = 4000;
+                                    break;
+                                case NPC_TOR:
+                                    m_uiAncestorAbilityTimer = 7000;
+                                    break;
+                            }
+                            ++m_uiPhase;
+                            ++m_uiStep;
+                            SetDelay(2000);
+                            break;      
                     }
-                }else m_uiSpecialAbilityTimer -= uiDiff;
+                }
             }
+            else
+                m_uiStepTimer -= uiDiff;
 
-            if((m_creature->GetHealth() * 100 / m_creature->GetMaxHealth()) < m_uiThreshhold)
-            {
-                DoCast(m_creature->getVictim(), SPELL_SCREAMS_OF_THE_DEAD, false);
-                
-                BurnKing();
-                DespawnAdds();
-
-                if (Creature* pKingSpirit = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(Kings[m_uiCurrentKing][0])))
-                {
-                    float x, y, z;
-                    pKingSpirit->GetClosePoint(x, y, z, pKingSpirit->GetObjectBoundingRadius(), 2*INTERACTION_DISTANCE, pKingSpirit->GetAngle(m_creature));
-                    // z hardcoded
-                    m_creature->GetMotionMaster()->MovePoint(0, x, y, 104.76f);
-                    bIsInRun = true;
-                }     
-            }
-            DoMeleeAttackIfReady();
+                return;
         }
+
+        if (m_uiBaneTimer <= uiDiff)
+        {
+            m_creature->InterruptNonMeleeSpells(true);
+            DoCast(m_creature, m_bIsRegularMode ? SPELL_BANE_N : SPELL_BANE_H);
+            m_uiBaneTimer = urand(13000, 17000);
+        }
+        else
+            m_uiBaneTimer -= uiDiff;
+
+        if (m_uiDarkSlashTimer <= uiDiff)
+        {
+            if (Unit* pTarget = m_creature->getVictim())
+            {
+                int32 iDmg = pTarget->GetHealth()/2;
+                m_creature->CastCustomSpell(m_creature->getVictim(), SPELL_DARK_SLASH, &iDmg, 0, 0, false);
+            }
+            m_uiDarkSlashTimer = urand(20000, 25000);
+        }
+        else
+            m_uiDarkSlashTimer -= uiDiff;
+
+        if (m_uiFetidRotTimer <= uiDiff)
+        {
+            DoCast(m_creature->getVictim(), m_bIsRegularMode ? SPELL_FETID_ROT_N : SPELL_FETID_ROT_H);
+            m_uiFetidRotTimer = urand(13000, 16000);
+        }
+        else
+            m_uiFetidRotTimer -= uiDiff;
+
+        if (!m_bIsGhostEvent && m_creature->GetHealthPercent() < 100 - (m_bIsRegularMode ? 33.4f : 20.0f) * (m_uiPhase+1))
+        {
+            m_creature->InterruptNonMeleeSpells(true);
+            DoCast(m_creature, SPELL_SCREAMS_OF_THE_DEAD, true);
+            m_uiStepTimer = 0;
+            m_uiStep = 1;
+            m_bIsGhostEvent = true;
+        }
+
+        if (m_uiPhase > 0)
+        {
+            if (m_uiAncestorAbilityTimer <= uiDiff)
+            {
+                m_creature->InterruptNonMeleeSpells(true);
+                switch (Ancestors[0][m_auiAncestorsOrder[m_uiPhase-1]])
+                {
+                    case NPC_RANULF:
+                        DoCast(m_creature, m_bIsRegularMode ? SPELL_SPIRIT_BURST_N : SPELL_SPIRIT_BURST_H);
+                        m_uiAncestorAbilityTimer = urand(5000, 8000);
+                        break;
+                    case NPC_HALDOR:
+                        DoCast(m_creature->getVictim(), m_bIsRegularMode ? SPELL_SPIRIT_STRIKE_N : SPELL_SPIRIT_STRIKE_H);
+                        m_uiAncestorAbilityTimer = 5000;
+                        break;
+                    case NPC_BJORN:
+                        DoCast(m_creature, SPELL_SUMMON_SPIRIT_FOUNT);
+                        m_uiAncestorAbilityTimer = 20000;
+                        SetDelay(3500);
+                        break;
+                    case NPC_TOR:
+                        DoCast(m_creature, SPELL_AVENGING_SPIRITS);
+                        m_uiAncestorAbilityTimer = 22000;
+                        break;
+                }
+            }
+            else
+                m_uiAncestorAbilityTimer -= uiDiff;
+        }
+        DoMeleeAttackIfReady();
+    }
+ };
+
+struct MANGOS_DLL_DECL npc_avenging_spirit_summonerAI : public ScriptedAI
+{
+    npc_avenging_spirit_summonerAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+	
+    uint32 m_uiSummonAvengingSpiritTimer;
+
+    void Reset()
+    {
+        m_uiSummonAvengingSpiritTimer = 7500;
+        m_creature->SetDisplayId(MODEL_ID_INVISIBLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->setFaction(35);
+        DoCast(m_creature, SPELL_SUMMON_AVENGING_SPIRIT_VISUAL);
+        m_creature->ForcedDespawn(9000);
+    }
+
+    void JustSummoned(Creature* pSummoned)
+    {
+        pSummoned->SetInCombatWithZone();
+    }
+  
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (m_uiSummonAvengingSpiritTimer <= uiDiff)
+        {
+            DoCast(m_creature, SPELL_SUMMON_AVENGING_SPIRIT);
+            m_uiSummonAvengingSpiritTimer = 7500;
+        }
+        else
+            m_uiSummonAvengingSpiritTimer -= uiDiff;
+    }
+};
+
+struct MANGOS_DLL_DECL npc_bjorn_sphereAI : public ScriptedAI
+{
+    npc_bjorn_sphereAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        Reset();
+    }
+
+    bool m_bIsRegularMode;
+    uint32 m_uiSpiritFoutTimer;
+	
+    void Reset()
+    {
+        m_uiSpiritFoutTimer = 3000;
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        m_creature->setFaction(14);
+        m_creature->SetDisplayId(11686);
+        m_creature->SetLevel(82);
+        m_creature->SetSpeedRate(MOVE_RUN, 0.3f);
+        m_creature->SetInCombatWithZone();
+        m_creature->ForcedDespawn(21000);
+    }
+  
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+        
+        if (m_uiSpiritFoutTimer <= uiDiff)
+        {
+            m_creature->CastSpell(m_creature, m_bIsRegularMode ? SPELL_SPIRIT_FOUNT_N : SPELL_SPIRIT_FOUNT_H, false);
+            m_uiSpiritFoutTimer = 30000;
+        }
+        else
+            m_uiSpiritFoutTimer -= uiDiff;
     }
 };
 
@@ -378,37 +468,14 @@ CreatureAI* GetAI_boss_ymiron(Creature* pCreature)
     return new boss_ymironAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL mob_ymiron_addAI : public ScriptedAI
+CreatureAI* GetAI_npc_avenging_spirit_summoner(Creature* pCreature)
 {
-    mob_ymiron_addAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
+    return new npc_avenging_spirit_summonerAI(pCreature);
+}
 
-    ScriptedInstance* m_pInstance;
-
-    void Reset()
-    {
-        if (m_creature->GetEntry() == CREATURE_AVENGING_SPIRIT)
-            DoCast(m_creature, SPELL_SPIRIT_SUMMONED_VISUAL, false);
-
-        if (!m_pInstance)
-            return;
-        if (Creature* pYmiron = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(DATA_YMIRON)))
-            pYmiron->AI()->JustSummoned(m_creature);
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (m_creature->GetEntry() == CREATURE_AVENGING_SPIRIT)
-            DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_mob_ymiron_add(Creature* pCreature)
+CreatureAI* GetAI_npc_bjorn_sphere(Creature* pCreature)
 {
-    return new mob_ymiron_addAI(pCreature);
+    return new npc_bjorn_sphereAI(pCreature);
 }
 
 void AddSC_boss_ymiron()
@@ -421,7 +488,12 @@ void AddSC_boss_ymiron()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_ymiron_add";
-    newscript->GetAI = &GetAI_mob_ymiron_add;
+    newscript->Name = "npc_avenging_spirit_summoner";
+    newscript->GetAI = &GetAI_npc_avenging_spirit_summoner;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_bjorn_sphere";
+    newscript->GetAI = &GetAI_npc_bjorn_sphere;
     newscript->RegisterSelf();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class WorldTimer
             return newMSTime - oldMSTime;
         }
 
-        //get last world tick time 
+        //get last world tick time
         static MANGOS_DLL_SPEC uint32 tickTime();
         //get previous world tick time
         static MANGOS_DLL_SPEC uint32 tickPrevTime();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ Map* MapManager::CreateMap(uint32 id, const WorldObject* obj)
     MANGOS_ASSERT(obj);
     //if(!obj->IsInWorld()) sLog.outError("GetMap: called for map %d with object (typeid %d, guid %d, mapid %d, instanceid %d) who is not in world!", id, obj->GetTypeId(), obj->GetGUIDLow(), obj->GetMapId(), obj->GetInstanceId());
     Guard _guard(*this);
-    
+
     Map * m = NULL;
 
     const MapEntry* entry = sMapStore.LookupEntry(id);
@@ -143,7 +143,7 @@ Map* MapManager::FindMap(uint32 mapid, uint32 instanceId) const
     MapMapType::const_iterator iter = i_maps.find(MapID(mapid, instanceId));
     if(iter == i_maps.end())
         return NULL;
-    
+
     //this is a small workaround for transports
     if(instanceId == 0 && iter->second->Instanceable())
     {
@@ -161,12 +161,14 @@ Map* MapManager::FindMap(uint32 mapid, uint32 instanceId) const
 bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
 {
     const MapEntry *entry = sMapStore.LookupEntry(mapid);
-    if(!entry) return false;
+    if(!entry)
+        return false;
+
     const char *mapName = entry->name[player->GetSession()->GetSessionDbcLocale()];
 
-    if(entry->map_type == MAP_INSTANCE || entry->map_type == MAP_RAID)
+    if(entry->IsDungeon())
     {
-        if (entry->map_type == MAP_RAID)
+        if (entry->IsRaid())
         {
             // GMs can avoid raid limitations
             if(!player->isGameMaster() && !sWorld.getConfig(CONFIG_BOOL_INSTANCE_IGNORE_RAID))
@@ -237,10 +239,9 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
                 return false;
             }
         }
-        return true;
     }
-    else
-        return true;
+
+    return true;
 }
 
 void MapManager::DeleteInstance(uint32 mapid, uint32 instanceId)

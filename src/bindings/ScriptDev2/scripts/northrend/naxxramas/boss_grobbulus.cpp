@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,59 +16,71 @@
 
 /* ScriptData
 SDName: Boss_Grobbulus
-SD%Complete: 80%
-SDComment: Need to check spell Mutating Injection
-SDAuthor: aramilnaile
+SD%Complete: 80
+SDComment: Timer need more care; Spells of Adds (Posion Cloud) need Mangos Fixes, and further handling
 SDCategory: Naxxramas
 EndScriptData */
+
+/*Poison Cloud 26590
+Slime Spray 28157
+Fallout slime 28218
+Mutating Injection 28169
+Enrages 26527*/
 
 #include "precompiled.h"
 #include "naxxramas.h"
 
 enum
 {
-    SPELL_BERSERK               = 26662,
-    SPELL_MUTATINGINJECTION     = 28169,
-    SPELL_SLIMESPRAY            = 28157,
-    SPELL_SLIMESPRAY_H          = 54364,
-    SPELL_POISONCLOUD           = 28240,
-    SPELL_POISONCLOUDAOE        = 59116,
-    
-    NPC_SLIME                   = 16290
+    EMOTE_SPRAY_SLIME               = -1533021,
+    EMOTE_INJECTION                 = -1533158,
+
+    SPELL_SLIME_STREAM              = 28137,
+    SPELL_MUTATING_INJECTION        = 28169,
+    SPELL_POISON_CLOUD              = 28240,
+    SPELL_SLIME_SPRAY               = 28157,
+    SPELL_SLIME_SPRAY_H             = 54364,
+    SPELL_BERSERK                   = 26662,
+
+    NPC_FALLOUT_SLIME               = 16290
 };
 
-// Grobbulus Structure
 struct MANGOS_DLL_DECL boss_grobbulusAI : public ScriptedAI
 {
     boss_grobbulusAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+
         Reset();
     }
 
     instance_naxxramas* m_pInstance;
-
     bool m_bIsRegularMode;
-    bool m_bBerserking;
-    
-    uint32 m_uiBerserkTimer;
+
+    uint32 m_uiInjectionTimer;
     uint32 m_uiPoisonCloudTimer;
-    uint32 m_uiMutatingInjectionTimer;
     uint32 m_uiSlimeSprayTimer;
+    uint32 m_uiBerserkTimeSecs;
+    uint32 m_uiBerserkTimer;
+    uint32 m_uiSlimeStreamTimer;
 
     void Reset()
     {
-        m_uiBerserkTimer = 720000;                       // 12 minutes
-        m_uiPoisonCloudTimer = 15000;                    // 15 seconds and last 75 seconds 
-        m_uiMutatingInjectionTimer = 20000;              // 20 seconds
-        m_uiSlimeSprayTimer = urand(15000, 30000);      // 15 seconds + random seconds (up to 15 seconds)
+        m_uiInjectionTimer = 12*IN_MILLISECONDS;
+        m_uiPoisonCloudTimer = urand (20*IN_MILLISECONDS, 25*IN_MILLISECONDS);
+        m_uiSlimeSprayTimer = urand(20*IN_MILLISECONDS, 30*IN_MILLISECONDS);
+        m_uiBerserkTimeSecs = m_bIsRegularMode ? 12*MINUTE : 9*MINUTE;
+        m_uiBerserkTimer = m_uiBerserkTimeSecs*IN_MILLISECONDS;
+        m_uiSlimeStreamTimer = 5*IN_MILLISECONDS;           // The first few secs it is ok to be out of range
     }
 
     void Aggro(Unit* pWho)
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GROBBULUS, IN_PROGRESS);
+
+        m_creature->SetInCombatWithZone();
     }
 
     void JustDied(Unit* pKiller)
@@ -80,86 +92,119 @@ struct MANGOS_DLL_DECL boss_grobbulusAI : public ScriptedAI
     void JustReachedHome()
     {
         if (m_pInstance)
-            m_pInstance->SetData(TYPE_GROBBULUS, NOT_STARTED);
+            m_pInstance->SetData(TYPE_GROBBULUS, FAIL);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell)
+    // This custom selecting function, because we only want to select players without mutagen aura
+    bool DoCastMutagenInjection()
     {
-        if(pSpell->Id == SPELL_SLIMESPRAY || pSpell->Id == SPELL_SLIMESPRAY_H)
-        {
-            if (pTarget->GetTypeId() != TYPEID_PLAYER) 
-                return; 
+        if (m_creature->IsNonMeleeSpellCasted(true))
+            return false;
 
-            if (Creature* pSlime = m_creature->SummonCreature(NPC_SLIME, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
-                if (Unit* pVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                {
-                    pSlime->AI()->AttackStart(pVictim);
-                }
+        std::vector<Unit*> suitableTargets;
+        ThreatList const& threatList = m_creature->getThreatManager().getThreatList();
+        ThreatList::const_iterator itr = threatList.begin();
+
+        for (itr; itr != threatList.end(); ++itr)
+        {
+            if (Unit* pTarget = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+            {
+                if (pTarget->GetTypeId() == TYPEID_PLAYER && !pTarget->HasAura(SPELL_MUTATING_INJECTION))
+                    suitableTargets.push_back(pTarget);
+            }
         }
+
+        if (suitableTargets.empty())
+            return false;
+
+        Unit* pTarget = suitableTargets[urand(0, suitableTargets.size() - 1)];
+        if (DoCastSpellIfCan(pTarget, SPELL_MUTATING_INJECTION) == CAST_OK)
+        {
+            DoScriptText(EMOTE_INJECTION, m_creature, pTarget);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
+    {
+        if ((pSpell->Id == SPELL_SLIME_SPRAY || pSpell->Id == SPELL_SLIME_SPRAY_H) && pTarget->GetTypeId() == TYPEID_PLAYER)
+            m_creature->SummonCreature(NPC_FALLOUT_SLIME, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10*IN_MILLISECONDS);
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-        
-        // Berserkering after 12 minutes
-        if (!m_bBerserking && m_uiBerserkTimer < uiDiff)
+
+        // Slime Stream
+        if (!m_uiSlimeStreamTimer)
         {
-            DoCastSpellIfCan(m_creature, SPELL_BERSERK);
-            m_bBerserking = true;
-        } else m_uiBerserkTimer -= uiDiff;
+            if (!m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
+            {
+                if (DoCastSpellIfCan(m_creature, SPELL_SLIME_STREAM) == CAST_OK)
+                    // Give some time, to re-reach grobbulus
+                    m_uiSlimeStreamTimer = 3*IN_MILLISECONDS;
+            }
+        }
+        else
+        {
+            if (m_uiSlimeStreamTimer < uiDiff)
+                m_uiSlimeStreamTimer = 0;
+            else
+                m_uiSlimeStreamTimer -= uiDiff;
+        }
+
+        // Berserk
+        if (m_uiBerserkTimer)
+        {
+            if (m_uiBerserkTimer <= uiDiff)
+            {
+                if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
+                    m_uiBerserkTimer = 0;
+            }
+            else
+                m_uiBerserkTimer -= uiDiff;
+        }
+
+        // SlimeSpray
+        if (m_uiSlimeSprayTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), m_bIsRegularMode ? SPELL_SLIME_SPRAY : SPELL_SLIME_SPRAY_H) == CAST_OK)
+            {
+                m_uiSlimeSprayTimer = urand(30*IN_MILLISECONDS, 60*IN_MILLISECONDS);
+                DoScriptText(EMOTE_SPRAY_SLIME, m_creature);
+            }
+        }
+        else
+            m_uiSlimeSprayTimer -= uiDiff;
+
+        // Mutagen Injection
+        if (m_uiInjectionTimer < uiDiff)
+        {
+            if (DoCastMutagenInjection())
+            {
+                // Timer dependend on time of encounter  - on enrage time between 5-8s, heroic 2-5s (TODO no reliable source for heroic)
+                if (m_bIsRegularMode)
+                    m_uiInjectionTimer = urand(10*IN_MILLISECONDS, 13*IN_MILLISECONDS) -  5 * (m_uiBerserkTimeSecs*IN_MILLISECONDS - m_uiBerserkTimer) / m_uiBerserkTimeSecs;
+                else
+                    m_uiInjectionTimer = urand(10*IN_MILLISECONDS, 13*IN_MILLISECONDS) -  8 * (m_uiBerserkTimeSecs*IN_MILLISECONDS - m_uiBerserkTimer) / m_uiBerserkTimeSecs;
+            }
+        }
+        else
+            m_uiInjectionTimer -= uiDiff;
 
         // Poison Cloud
         if (m_uiPoisonCloudTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature, SPELL_POISONCLOUD);
-            m_uiPoisonCloudTimer = 15000;
-        } else m_uiPoisonCloudTimer -= uiDiff;
-
-        // Mutating Injection
-        if (m_uiMutatingInjectionTimer < uiDiff)
-        {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                DoCastSpellIfCan(pTarget, SPELL_MUTATINGINJECTION);
-
-            m_uiMutatingInjectionTimer = 20000;
-        } else m_uiMutatingInjectionTimer -= uiDiff;
-
-        // Slime Spray
-        if (m_uiSlimeSprayTimer < uiDiff)
-        {
-            DoCastSpellIfCan(m_creature, m_bIsRegularMode ? SPELL_SLIMESPRAY : SPELL_SLIMESPRAY_H);
-            m_uiSlimeSprayTimer = urand(15000, 30000);
-        } else m_uiSlimeSprayTimer -= uiDiff;
+            if (DoCastSpellIfCan(m_creature, SPELL_POISON_CLOUD) == CAST_OK)
+                m_uiPoisonCloudTimer = 15*IN_MILLISECONDS;
+        }
+        else
+            m_uiPoisonCloudTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
-    }
-};
-
-// Poison Cloud Structure
-struct MANGOS_DLL_DECL npc_grobbulus_poison_cloudAI : public Scripted_NoMovementAI
-{
-    npc_grobbulus_poison_cloudAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 Cloud_Timer;
-
-    void Reset()
-    {
-        Cloud_Timer = 1000;
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (Cloud_Timer < uiDiff)
-        {
-            DoCastSpellIfCan(m_creature, SPELL_POISONCLOUDAOE);
-            Cloud_Timer = 10000;
-        }else Cloud_Timer -= uiDiff;
     }
 };
 
@@ -168,21 +213,12 @@ CreatureAI* GetAI_boss_grobbulus(Creature* pCreature)
     return new boss_grobbulusAI(pCreature);
 }
 
-CreatureAI* GetAI_npc_grobbulus_poison_cloud(Creature* pCreature)
-{
-    return new npc_grobbulus_poison_cloudAI(pCreature);
-}
-
 void AddSC_boss_grobbulus()
 {
-    Script* NewScript;
-    NewScript = new Script;
-    NewScript->Name = "boss_grobbulus";
-    NewScript->GetAI = &GetAI_boss_grobbulus;
-    NewScript->RegisterSelf();
+    Script* pNewScript;
 
-    NewScript = new Script;
-    NewScript->Name = "npc_grobbulus_poison_cloud";
-    NewScript->GetAI = &GetAI_npc_grobbulus_poison_cloud;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_grobbulus";
+    pNewScript->GetAI = &GetAI_boss_grobbulus;
+    pNewScript->RegisterSelf();
 }

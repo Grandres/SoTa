@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -97,18 +97,7 @@ bool ItemUse_item_gor_dreks_ointment(Player* pPlayer, Item* pItem, const SpellCa
 
     return false;
 }
-/*#####
-# item_fishing_chair
-#####*/
 
-bool ItemUse_item_fishing_chair(Player* pPlayer, Item* _Item, SpellCastTargets const& targets)
-{
-    if ((pPlayer->GetMapId() == 530) || (pPlayer->GetMapId() == 0) || (pPlayer->GetMapId() == 1))
-        return false;
-    else
-    pPlayer->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW,_Item,NULL);
-    return true;
-}
 /*#####
 # item_petrov_cluster_bombs
 #####*/
@@ -158,14 +147,22 @@ bool ItemUse_item_jungle_punch_sample(Player* pPlayer, Item* pItem, const SpellC
     }
 }
 
+/*#####
+# item_fishing_chair
+#####*/
+
+bool ItemUse_item_fishing_chair(Player* pPlayer, Item* _Item, SpellCastTargets const& targets)
+{
+    if ((pPlayer->GetMapId() == 530) || (pPlayer->GetMapId() == 0) || (pPlayer->GetMapId() == 1))
+        return false;
+    else
+    pPlayer->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW,_Item,NULL);
+    return true;
+}
+
 void AddSC_item_scripts()
 {
     Script *newscript;
-
-    newscript = new Script;
-    newscript->Name = "item_jungle_punch_sample";
-    newscript->pItemUse = &ItemUse_item_jungle_punch_sample;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "item_arcane_charges";
@@ -183,12 +180,17 @@ void AddSC_item_scripts()
     newscript->RegisterSelf();
 
     newscript = new Script;
+    newscript->Name = "item_petrov_cluster_bombs";
+    newscript->pItemUse = &ItemUse_item_petrov_cluster_bombs;
+    newscript->RegisterSelf();
+    
+    newscript = new Script;
+    newscript->Name = "item_jungle_punch_sample";
+    newscript->pItemUse = &ItemUse_item_jungle_punch_sample;
+    newscript->RegisterSelf();
+    
+    newscript = new Script;
     newscript->Name = "item_fishing_chair";
     newscript->pItemUse = &ItemUse_item_fishing_chair;
     newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "item_petrov_cluster_bombs";
-    newscript->pItemUse = &ItemUse_item_petrov_cluster_bombs;
-    newscript->RegisterSelf();  
 }

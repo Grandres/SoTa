@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -87,7 +87,7 @@ struct MANGOS_DLL_DECL boss_moamAI : public ScriptedAI
                         m_uiPhase = PHASE_ENERGIZING;
                         return;
                     }
-                } 
+                }
                 else
                     m_uiCheckoutMana_Timer -= uiDiff;
 
@@ -125,7 +125,7 @@ struct MANGOS_DLL_DECL boss_moamAI : public ScriptedAI
                     std::advance(itr, urand(0, lTargets.size()-1));
 
                     DoCastSpellIfCan(*itr, SPELL_DRAIN_MANA);
-                } 
+                }
                 else
                     m_uiManaDrain_Timer -= uiDiff;
 
@@ -133,7 +133,7 @@ struct MANGOS_DLL_DECL boss_moamAI : public ScriptedAI
                 {
                     DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRAMPLE);
                     m_uiTrample_Timer = 15000;
-                } 
+                }
                 else
                     m_uiTrample_Timer -= uiDiff;
 
@@ -151,7 +151,7 @@ struct MANGOS_DLL_DECL boss_moamAI : public ScriptedAI
                         m_uiPhase = PHASE_ATTACKING;
                         return;
                     }
-                } 
+                }
                 else
                     m_uiCheckoutMana_Timer -= uiDiff;
                 break;

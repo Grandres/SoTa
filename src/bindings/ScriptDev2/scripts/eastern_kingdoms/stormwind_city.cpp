@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -321,7 +321,7 @@ struct MANGOS_DLL_DECL npc_corbett_schneiderAI : public npc_escortAI
 /*######
 ## npc_rema_schneider
 ######*/
-bool ChooseReward_npc_rema_schneider(Player* pPlayer, Creature* pCreature, const Quest* pQuest, uint32 slot)
+bool QuestRewarded_npc_rema_schneider(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
 
     if (pPlayer && pQuest->GetQuestId() == QUEST_HARLAN_RESUPPLY)
@@ -844,7 +844,7 @@ void AddSC_stormwind_city()
     newscript = new Script;
     newscript->Name = "npc_bartleby";
     newscript->GetAI = &GetAI_npc_bartleby;
-    newscript->pQuestAccept = &QuestAccept_npc_bartleby;
+    newscript->pQuestAcceptNPC = &QuestAccept_npc_bartleby;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -854,13 +854,13 @@ void AddSC_stormwind_city()
 
     newscript = new Script;
     newscript->Name = "npc_rema_schneider";
-    newscript->pChooseReward = &ChooseReward_npc_rema_schneider;
+    newscript->pQuestRewardedNPC = &QuestRewarded_npc_rema_schneider;
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_dashel_stonefist";
     newscript->GetAI = &GetAI_npc_dashel_stonefist;
-    newscript->pQuestAccept = &QuestAccept_npc_dashel_stonefist;
+    newscript->pQuestAcceptNPC = &QuestAccept_npc_dashel_stonefist;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -886,6 +886,6 @@ void AddSC_stormwind_city()
 
     newscript = new Script;
     newscript->Name = "npc_tyrion";
-    newscript->pQuestAccept = &QuestAccept_npc_tyrion;
+    newscript->pQuestAcceptNPC = &QuestAccept_npc_tyrion;
     newscript->RegisterSelf();
 }

@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -28,11 +28,6 @@ npc_grimstone
 mob_phalanx
 npc_kharan_mighthammer
 npc_lokhtos_darkbargainer
-
-BREWERFEST
-mob_machine_bunny
-go_mole_console
-
 EndContentData */
 
 #include "precompiled.h"
@@ -43,7 +38,7 @@ EndContentData */
 ## go_shadowforge_brazier
 ######*/
 
-bool GOHello_go_shadowforge_brazier(Player* pPlayer, GameObject* pGo)
+bool GOUse_go_shadowforge_brazier(Player* pPlayer, GameObject* pGo)
 {
     if (ScriptedInstance* pInstance = (ScriptedInstance*)pGo->GetInstanceData())
     {
@@ -53,105 +48,6 @@ bool GOHello_go_shadowforge_brazier(Player* pPlayer, GameObject* pGo)
             pInstance->SetData(TYPE_LYCEUM, IN_PROGRESS);
     }
     return false;
-}
-
-/*######
-## go_mole_console
-######*/
-// Brewerfest machine
-enum
-{
-    MOB_MOLE_BUNNY              = 26834,
-    SPELL_RUBLE                 = 42427,
-    SAY_MACHINE                 = -1799999
-};
-
-float MachineLoc[4] = {437.1f, -1.96379f, -70.7342f, 0.0f};
-
-bool GOHello_go_mole_console(Player* pPlayer, GameObject* pGo)
-{
-    ScriptedInstance* m_pInstance = (ScriptedInstance*)pGo->GetInstanceData();
-
-    error_log("Debug: Mole Console nas been used by %s", pPlayer->GetName());
-    if (!m_pInstance)
-    {
-        error_log("Debug: Mole Console - Blackrock Depths instance script has not been initialized!");
-        return true;
-    }
-    GameObject* machine = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(DATA_GO_MOLE_MACHINE));
-    if (!machine)
-    {
-        error_log("Debug: Mole Console - there is no Mole Machine to begin event");
-        return true;
-    }
-    // disable doubleuse in short time (time handled in bunny's UpadteAI 
-    pGo->SetFlag(GAMEOBJECT_FLAGS,GO_FLAG_INTERACT_COND); 
-    
-    if (m_pInstance->GetData(DATA_FIRST_TIME)>0)      // if FirstTime == false
-    {
-        pPlayer->CastSpell(pPlayer,49846,true);
-    }
-
-    Creature* bunny = pGo->SummonCreature(MOB_MOLE_BUNNY, MachineLoc[0], MachineLoc[1], MachineLoc[2], MachineLoc[3], TEMPSUMMON_TIMED_DESPAWN,30000);
-    if (bunny)
-    {
-        bunny->CastSpell(bunny,SPELL_RUBLE,true);
-        machine->SetGoState(GO_STATE_READY);
-        m_pInstance->SetData(DATA_SUBMERGE,1);        // Submerged = true
-    }
-    return false;
-}
-
-
-/*######
-## mob_machine_bunny
-######*/
-
-// trigger for Brewerfest machine
-struct MANGOS_DLL_DECL mob_machine_bunnyAI : public ScriptedAI
-{
-    mob_machine_bunnyAI(Creature* pCreature) : ScriptedAI(pCreature) 
-    
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-
-    uint32 Submerge_Timer;
-  
-    void Reset()
-    {
-        Submerge_Timer = 7000;
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_pInstance)
-            return;
-
-        GameObject* machine = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(DATA_GO_MOLE_MACHINE));
-        GameObject* console = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(DATA_GO_MOLE_CONSOLE));
-        
-        if (!machine || !console) 
-            return;
-
-        if (m_pInstance->GetData(DATA_SUBMERGE)>0 && Submerge_Timer < uiDiff)          // Submerged == true
-        {
-            console->RemoveFlag(GAMEOBJECT_FLAGS,GO_FLAG_INTERACT_COND);
-            machine->SetGoState(GO_STATE_ACTIVE);
-            if (m_pInstance->GetData(DATA_FIRST_TIME) == 0)
-                machine->MonsterSay(SAY_MACHINE,0,m_pInstance->instance->GetCreature(ObjectGuid(m_pInstance->GetData64(DATA_GO_MOLE_MACHINE))));
-            m_pInstance->SetData(DATA_SUBMERGE, 0);                                       // Submerged  = false
-            m_pInstance->SetData(DATA_FIRST_TIME, 1);                                     // First Time = false
-        }else Submerge_Timer -=uiDiff;
-    }
-};
-
-CreatureAI* GetAI_mob_machine_bunny(Creature* pCreature)
-{
-    return new mob_machine_bunnyAI(pCreature);
 }
 
 /*######
@@ -201,8 +97,8 @@ bool AreaTrigger_at_ring_of_law(Player* pPlayer, AreaTriggerEntry const* pAt)
         if (pInstance->GetData(TYPE_RING_OF_LAW) == IN_PROGRESS || pInstance->GetData(TYPE_RING_OF_LAW) == DONE)
             return false;
 
-        pInstance->SetData(TYPE_RING_OF_LAW,IN_PROGRESS);
-        pPlayer->SummonCreature(NPC_GRIMSTONE,625.559f, -205.618f, -52.735f, 2.609f, TEMPSUMMON_DEAD_DESPAWN, 0);
+        pInstance->SetData(TYPE_RING_OF_LAW, IN_PROGRESS);
+        pPlayer->SummonCreature(NPC_GRIMSTONE, 625.559f, -205.618f, -52.735f, 2.609f, TEMPSUMMON_DEAD_DESPAWN, 0);
 
         return false;
     }
@@ -260,7 +156,7 @@ struct MANGOS_DLL_DECL npc_grimstoneAI : public npc_escortAI
     {
 
     }
-
+    
     void DoGate(uint32 id, uint32 state)
     {
         if (GameObject* pGo = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(id)))
@@ -318,7 +214,7 @@ struct MANGOS_DLL_DECL npc_grimstoneAI : public npc_escortAI
             case 5:
                 if (m_pInstance)
                 {
-                    m_pInstance->SetData(TYPE_RING_OF_LAW,DONE);
+                    m_pInstance->SetData(TYPE_RING_OF_LAW, DONE);
                     debug_log("SD2: npc_grimstone: event reached end and set complete.");
                 }
                 break;
@@ -365,7 +261,7 @@ struct MANGOS_DLL_DECL npc_grimstoneAI : public npc_escortAI
                         }
                     }
                 }
-        }
+            }
             else
                 m_uiMobDeathTimer -= uiDiff;
         }
@@ -379,7 +275,7 @@ struct MANGOS_DLL_DECL npc_grimstoneAI : public npc_escortAI
                     case 0:
                         // Shortly after spawn, start walking
                         //DoScriptText(-1000000, m_creature); // no more text on spawn
-                        DoGate(DATA_ARENA4, GO_STATE_READY);
+                        DoGate(GO_ARENA_4, GO_STATE_READY);
                         Start(false);
                         m_bCanWalk = true;
                         m_uiEventTimer = 0;
@@ -394,7 +290,7 @@ struct MANGOS_DLL_DECL npc_grimstoneAI : public npc_escortAI
                         break;
                     case 3:
                         // Open East Gate
-                        DoGate(DATA_ARENA1, GO_STATE_ACTIVE);
+                        DoGate(GO_ARENA_1, GO_STATE_ACTIVE);
                         m_uiEventTimer = 3000;
                         break;
                     case 4:
@@ -415,14 +311,14 @@ struct MANGOS_DLL_DECL npc_grimstoneAI : public npc_escortAI
                     case 7:
                         // Summoned Mobs are dead, continue event
                         m_creature->SetVisibility(VISIBILITY_ON);
-                        DoGate(DATA_ARENA1, GO_STATE_READY);
+                        DoGate(GO_ARENA_1, GO_STATE_READY);
                         //DoScriptText(-1000000, m_creature); // after killed the mobs, no say here
                         m_bCanWalk = true;
                         m_uiEventTimer = 0;
                         break;
                     case 8:
                         // Open North Gate
-                        DoGate(DATA_ARENA2, GO_STATE_ACTIVE);
+                        DoGate(GO_ARENA_2, GO_STATE_ACTIVE);
                         m_uiEventTimer = 5000;
                         break;
                     case 9:
@@ -434,15 +330,15 @@ struct MANGOS_DLL_DECL npc_grimstoneAI : public npc_escortAI
                     case 10:
                         // Boss dead
                         //if quest, complete
-                        DoGate(DATA_ARENA2,GO_STATE_READY);
-                        DoGate(DATA_ARENA3,GO_STATE_ACTIVE);
-                        DoGate(DATA_ARENA4,GO_STATE_ACTIVE);
+                        DoGate(GO_ARENA_2, GO_STATE_READY);
+                        DoGate(GO_ARENA_3, GO_STATE_ACTIVE);
+                        DoGate(GO_ARENA_4, GO_STATE_ACTIVE);
                         m_bCanWalk = true;
                         m_uiEventTimer = 0;
                         break;
                 }
                 ++m_uiEventPhase;
-        }
+            }
             else
                 m_uiEventTimer -= uiDiff;
         }
@@ -491,7 +387,7 @@ struct MANGOS_DLL_DECL mob_phalanxAI : public ScriptedAI
         // ThunderClap
         if (m_uiThunderClapTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(),SPELL_THUNDERCLAP);
+            DoCastSpellIfCan(m_creature->getVictim(), SPELL_THUNDERCLAP);
             m_uiThunderClapTimer = 10000;
         }
         else
@@ -502,9 +398,9 @@ struct MANGOS_DLL_DECL mob_phalanxAI : public ScriptedAI
         {
             if (m_uiFireballVolleyTimer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(),SPELL_FIREBALLVOLLEY);
+                DoCastSpellIfCan(m_creature->getVictim(), SPELL_FIREBALLVOLLEY);
                 m_uiFireballVolleyTimer = 15000;
-        }
+            }
             else
                 m_uiFireballVolleyTimer -= uiDiff;
         }
@@ -512,7 +408,7 @@ struct MANGOS_DLL_DECL mob_phalanxAI : public ScriptedAI
         // MightyBlow
         if (m_uiMightyBlowTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(),SPELL_MIGHTYBLOW);
+            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIGHTYBLOW);
             m_uiMightyBlowTimer = 10000;
         }
         else
@@ -622,7 +518,7 @@ bool GossipSelect_npc_kharan_mighthammer(Player* pPlayer, Creature* pCreature, u
 enum
 {
     FACTION_THORIUM_BROTHERHOOD               = 59,
-
+    
     ITEM_THRORIUM_BROTHERHOOD_CONTRACT        = 18628,
     ITEM_SULFURON_INGOT                       = 17203,
     
@@ -646,7 +542,7 @@ bool GossipHello_npc_lokhtos_darkbargainer(Player* pPlayer, Creature* pCreature)
         !pPlayer->HasItemCount(ITEM_THRORIUM_BROTHERHOOD_CONTRACT, 1, true) &&
         pPlayer->HasItemCount(ITEM_SULFURON_INGOT, 1))
     {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_GET_CONTRACT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_GET_CONTRACT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
     }
 
     if (pPlayer->GetReputationRank(FACTION_THORIUM_BROTHERHOOD) < REP_FRIENDLY)
@@ -747,10 +643,10 @@ struct MANGOS_DLL_DECL npc_rocknotAI : public npc_escortAI
         {
             if (m_uiBreakKegTimer <= uiDiff)
             {
-                DoGo(DATA_GO_BAR_KEG,0);
+                DoGo(GO_BAR_KEG_SHOT, 0);
                 m_uiBreakKegTimer = 0;
                 m_uiBreakDoorTimer = 1000;
-        }
+            }
             else
                 m_uiBreakKegTimer -= uiDiff;
         }
@@ -759,22 +655,22 @@ struct MANGOS_DLL_DECL npc_rocknotAI : public npc_escortAI
         {
             if (m_uiBreakDoorTimer <= uiDiff)
             {
-                DoGo(DATA_GO_BAR_DOOR,2);
-                DoGo(DATA_GO_BAR_KEG_TRAP,0);               //doesn't work very well, leaving code here for future
+                DoGo(GO_BAR_DOOR, 2);
+                DoGo(GO_BAR_KEG_TRAP, 0);                   //doesn't work very well, leaving code here for future
                                                             //spell by trap has effect61, this indicate the bar go hostile
 
-                if (Creature* pTmp = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(DATA_PHALANX)))
+                if (Creature* pTmp = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(NPC_PHALANX)))
                     pTmp->setFaction(14);
 
-                //for later, this event(s) has alot more to it.
-                //optionally, DONE can trigger bar to go hostile.
-                m_pInstance->SetData(TYPE_BAR,DONE);
+                // for later, this event(s) has alot more to it.
+                // optionally, DONE can trigger bar to go hostile.
+                m_pInstance->SetData(TYPE_BAR, DONE);
 
                 m_uiBreakDoorTimer = 0;
-        }
+            }
             else
                 m_uiBreakDoorTimer -= uiDiff;
-    }
+        }
     }
 };
 
@@ -783,7 +679,7 @@ CreatureAI* GetAI_npc_rocknot(Creature* pCreature)
     return new npc_rocknotAI(pCreature);
 }
 
-bool ChooseReward_npc_rocknot(Player* pPlayer, Creature* pCreature, const Quest* pQuest, uint32 item)
+bool QuestRewarded_npc_rocknot(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     ScriptedInstance* pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
 
@@ -800,11 +696,11 @@ bool ChooseReward_npc_rocknot(Player* pPlayer, Creature* pCreature, const Quest*
 
         pInstance->SetData(TYPE_BAR,SPECIAL);
 
-        //keep track of amount in instance script, returns SPECIAL if amount ok and event in progress
+        // keep track of amount in instance script, returns SPECIAL if amount ok and event in progress
         if (pInstance->GetData(TYPE_BAR) == SPECIAL)
         {
             DoScriptText(SAY_GOT_BEER, pCreature);
-            pCreature->CastSpell(pCreature,SPELL_DRUNKEN_RAGE,false);
+            pCreature->CastSpell(pCreature, SPELL_DRUNKEN_RAGE, false);
 
             if (npc_rocknotAI* pEscortAI = dynamic_cast<npc_rocknotAI*>(pCreature->AI()))
                 pEscortAI->Start(false, 0, NULL, true);
@@ -820,16 +716,12 @@ void AddSC_blackrock_depths()
 
     pNewScript = new Script;
     pNewScript->Name = "go_shadowforge_brazier";
-    pNewScript->pGOHello = &GOHello_go_shadowforge_brazier;
+    pNewScript->pGOUse = &GOUse_go_shadowforge_brazier;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
     pNewScript->Name = "at_ring_of_law";
     pNewScript->pAreaTrigger = &AreaTrigger_at_ring_of_law;
-    pNewScript->RegisterSelf();
-    pNewScript = new Script;
-    pNewScript->Name = "go_mole_console";
-    pNewScript->pGOHello = &GOHello_go_mole_console;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
@@ -847,10 +739,6 @@ void AddSC_blackrock_depths()
     pNewScript->pGossipHello =  &GossipHello_npc_kharan_mighthammer;
     pNewScript->pGossipSelect = &GossipSelect_npc_kharan_mighthammer;
     pNewScript->RegisterSelf();
-    pNewScript = new Script;
-    pNewScript->Name = "mob_machine_bunny";
-    pNewScript->GetAI = &GetAI_mob_machine_bunny;
-    pNewScript->RegisterSelf();
 
     pNewScript = new Script;
     pNewScript->Name = "npc_lokhtos_darkbargainer";
@@ -861,6 +749,6 @@ void AddSC_blackrock_depths()
     pNewScript = new Script;
     pNewScript->Name = "npc_rocknot";
     pNewScript->GetAI = &GetAI_npc_rocknot;
-    pNewScript->pChooseReward = &ChooseReward_npc_rocknot;
+    pNewScript->pQuestRewardedNPC = &QuestRewarded_npc_rocknot;
     pNewScript->RegisterSelf();
 }

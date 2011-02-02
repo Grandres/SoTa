@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -32,11 +32,9 @@ struct MANGOS_DLL_DECL instance_ahnkahet : public ScriptedInstance
     std::string strInstData;
 
     uint64 m_uiElderNadoxGUID;
+    uint64 m_uiJedogaShadowseekerGUID;
     uint64 m_uiTaldaramDoorGUID;
     uint64 m_uiTaldaramVortexGUID;
-    uint64 m_uiTaladaramGUID;
-    uint64 m_uiJedogaShadowseekerGUID;
-    uint64 m_uiJedogaControllerGUID;
     uint8 m_uiDevicesActivated;
 
     void Initialize()
@@ -54,10 +52,8 @@ struct MANGOS_DLL_DECL instance_ahnkahet : public ScriptedInstance
     {
         switch(pCreature->GetEntry())
         {
-            case NPC_ELDER_NADOX:         m_uiElderNadoxGUID = pCreature->GetGUID();        break;
-            case NPC_TALADARAN:           m_uiTaladaramGUID = pCreature->GetGUID();         break;
-            case NPC_JEDOGA_SHADOWSEEKER: m_uiJedogaShadowseekerGUID = pCreature->GetGUID();break;
-            case NPC_JEDOGA_CONTROLLER:   m_uiJedogaControllerGUID = pCreature->GetGUID();  break;
+            case NPC_ELDER_NADOX:         m_uiElderNadoxGUID = pCreature->GetGUID();         break;
+            case NPC_JEDOGA_SHADOWSEEKER: m_uiJedogaShadowseekerGUID = pCreature->GetGUID(); break;
         }
     }
 
@@ -174,9 +170,9 @@ struct MANGOS_DLL_DECL instance_ahnkahet : public ScriptedInstance
         switch(uiType)
         {
             case TYPE_TALDARAM:
-                return m_auiEncounter[1];
+                return m_auiEncounter[0];
             case TYPE_JEDOGA:
-                return m_auiEncounter[2];
+                return m_auiEncounter[1];
         }
         return 0;
     }
@@ -187,12 +183,8 @@ struct MANGOS_DLL_DECL instance_ahnkahet : public ScriptedInstance
         {
             case NPC_ELDER_NADOX:
                 return m_uiElderNadoxGUID;
-            case NPC_TALADARAN:
-                return m_uiTaladaramGUID;
             case NPC_JEDOGA_SHADOWSEEKER:
                 return m_uiJedogaShadowseekerGUID;
-            case NPC_JEDOGA_CONTROLLER:
-                return m_uiJedogaControllerGUID;
         }
         return 0;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 #ifndef __BATTLEGROUNDDS_H
 #define __BATTLEGROUNDDS_H
+#define WATERFALL_EVENT 250
 
 class BattleGround;
 
@@ -45,6 +46,13 @@ class BattleGroundDS : public BattleGround
         void RemovePlayer(Player *plr, ObjectGuid guid);
         void HandleAreaTrigger(Player *Source, uint32 Trigger);
         bool SetupBattleGround();
+        virtual void Reset();
+        virtual void FillInitialWorldStates(WorldPacket &d, uint32& count);
         void HandleKillPlayer(Player* player, Player *killer);
+        bool HandlePlayerUnderMap(Player * plr);
+        bool WaterfallActivated;
+    private:
+        uint32 m_uiKnockback;
+        uint32 m_uiWaterfall;
 };
 #endif

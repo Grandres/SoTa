@@ -79,6 +79,7 @@ UPDATE gameobject_template SET ScriptName='go_blood_filled_orb' WHERE entry=1820
 UPDATE gameobject_template SET ScriptName='go_andorhal_tower' WHERE entry IN (176094,176095,176096,176097);
 UPDATE gameobject_template SET ScriptName='go_scourge_enclosure' WHERE entry=191548;
 UPDATE gameobject_template SET ScriptName='go_veil_skith_cage' WHERE entry IN (185202,185203,185204,185205);
+UPDATE gameobject_template SET ScriptName='go_lab_work_reagents' WHERE entry IN (190462, 190473, 190478, 190459);
 
 /* GUARD */
 UPDATE creature_template SET ScriptName='guard_azuremyst' WHERE entry=18038;
@@ -315,7 +316,7 @@ UPDATE creature_template SET ScriptName='boss_rend_blackhand' WHERE entry=10429;
 UPDATE creature_template SET ScriptName='boss_pyroguard_emberseer' WHERE entry=9816;
 
 /* BLACKWING LAIR */
--- UPDATE instance_template SET ScriptName='instance_blackwing_lair' WHERE map=469;
+UPDATE instance_template SET ScriptName='instance_blackwing_lair' WHERE map=469;
 UPDATE creature_template SET ScriptName='boss_razorgore' WHERE entry=12435;
 UPDATE creature_template SET ScriptName='boss_vaelastrasz' WHERE entry=13020;
 UPDATE creature_template SET ScriptName='boss_broodlord' WHERE entry=12017;
@@ -804,7 +805,7 @@ UPDATE creature_template SET ScriptName='boss_sir_zeliek' WHERE entry=16063;
 UPDATE creature_template SET ScriptName='boss_lady_blaumeux' WHERE entry=16065;
 UPDATE creature_template SET ScriptName='boss_rivendare_naxx' WHERE entry=30549;
 UPDATE creature_template SET ScriptName='boss_patchwerk' WHERE entry=16028;
--- UPDATE creature_template SET ScriptName='boss_grobbulus' WHERE entry=15931;
+UPDATE creature_template SET ScriptName='boss_grobbulus' WHERE entry=15931;
 UPDATE creature_template SET ScriptName='boss_gluth' WHERE entry=15932;
 -- UPDATE creature_template SET ScriptName='boss_thaddius' WHERE entry=15928;
 -- UPDATE creature_template SET ScriptName='boss_stalagg' WHERE entry=15929;
@@ -1271,9 +1272,9 @@ UPDATE creature_template SET ScriptName='mob_darkheart' WHERE entry=24246;
 UPDATE creature_template SET ScriptName='mob_koragg' WHERE entry=24247;
 UPDATE creature_template SET ScriptName='boss_nalorakk' WHERE entry=23576;
 UPDATE creature_template SET ScriptName='boss_zuljin' WHERE entry=23863;
-UPDATE creature_template SET ScriptName='mob_jandalai_firebomb' WHERE entry=23920;
-UPDATE creature_template SET ScriptName='mob_amanishi_hatcher' WHERE entry IN (23818,24504);
-UPDATE creature_template SET ScriptName='mob_hatchling' WHERE entry=23598;
+UPDATE creature_template SET ScriptName='npc_janalai_firebomb' WHERE entry=23920;
+UPDATE creature_template SET ScriptName='npc_amanishi_hatcher' WHERE entry IN (23818,24504);
+UPDATE creature_template SET ScriptName='npc_hatchling' WHERE entry=23598;
 UPDATE creature_template SET ScriptName='npc_forest_frog' WHERE entry=24396;
 
 /* ZUL'DRAK */

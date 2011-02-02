@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -121,7 +121,7 @@ struct MANGOS_DLL_DECL npc_galen_goodwardAI : public npc_escortAI
         {
             if (HasEscortState(STATE_ESCORT_NONE))
                 DoScriptText(SAY_PERIODIC, m_creature);
-            m_uiPeriodicSay = 60000;
+            m_uiPeriodicSay = 6000;
         }
         else
             m_uiPeriodicSay -= uiDiff;
@@ -160,6 +160,6 @@ void AddSC_swamp_of_sorrows()
     newscript = new Script;
     newscript->Name = "npc_galen_goodward";
     newscript->GetAI = &GetAI_npc_galen_goodward;
-    newscript->pQuestAccept = &QuestAccept_npc_galen_goodward;
+    newscript->pQuestAcceptNPC = &QuestAccept_npc_galen_goodward;
     newscript->RegisterSelf();
 }

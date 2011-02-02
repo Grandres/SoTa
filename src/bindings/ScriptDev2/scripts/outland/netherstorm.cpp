@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -312,7 +312,7 @@ CreatureAI* GetAI_npc_manaforge_control_console(Creature* pCreature)
 ######*/
 
 // TODO: clean up this workaround when mangos adds support to do it properly (with gossip selections instead of instant summon)
-bool GOHello_go_manaforge_control_console(Player* pPlayer, GameObject* pGo)
+bool GOUse_go_manaforge_control_console(Player* pPlayer, GameObject* pGo)
 {
     if (pGo->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
     {
@@ -757,32 +757,6 @@ CreatureAI* GetAI_npc_bessy(Creature* pCreature)
 }
 
 /*######
-## GO_Ethereal_Power_Pad
-######*/
-enum
-{
-	QUEST_NOT_SO_MODEST_PROPOSAL    = 10270,
-	ITEM_TELEPORTER_POWER_PACK      = 28969,
-	NPC_IMAGE_OF_WIND_TRADER_MARID  = 20518
-
-};
-bool GOHello_go_Ethereal_Teleport_pad(Player* pPlayer, GameObject* pGo)
-{
-	Creature* pMarid = GetClosestCreatureWithEntry(pPlayer, NPC_IMAGE_OF_WIND_TRADER_MARID, 30.0f);
-
-    if (pMarid)
-        return true;
-
-	if ((pPlayer->GetQuestRewardStatus(QUEST_NOT_SO_MODEST_PROPOSAL) == QUEST_STATUS_COMPLETE)|| pPlayer->GetQuestStatus(QUEST_NOT_SO_MODEST_PROPOSAL) == QUEST_STATUS_COMPLETE )
-	{
-		pPlayer->SummonCreature(NPC_IMAGE_OF_WIND_TRADER_MARID, 4007.11f, 1517.15f, -116.363f, -0.453786f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
-
-	}
-	return true;
-
-}
-
-/*######
 ## npc_maxx_a_million
 ######*/
 
@@ -806,6 +780,7 @@ struct MANGOS_DLL_DECL npc_maxx_a_million_escortAI : public npc_escortAI
     uint32 m_uiSubEventTimer;
     uint64 m_uiAlleyGUID;
     uint64 m_uiLastDraeneiMachineGUID;
+
     void Reset()
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
@@ -981,6 +956,31 @@ CreatureAI* GetAI_npc_zeppit(Creature* pCreature)
     return new npc_zeppitAI(pCreature);
 }
 
+/*######
+## go_Ethereal_Power_Pad
+######*/
+enum
+{
+	QUEST_NOT_SO_MODEST_PROPOSAL    = 10270,
+	ITEM_TELEPORTER_POWER_PACK      = 28969,
+	NPC_IMAGE_OF_WIND_TRADER_MARID  = 20518
+
+};
+bool GOUse_go_Ethereal_Teleport_pad(Player* pPlayer, GameObject* pGo)
+{
+	Creature* pMarid = GetClosestCreatureWithEntry(pPlayer, NPC_IMAGE_OF_WIND_TRADER_MARID, 30.0f);
+
+    if (pMarid)
+        return true;
+
+	if ((pPlayer->GetQuestRewardStatus(QUEST_NOT_SO_MODEST_PROPOSAL) == QUEST_STATUS_COMPLETE)|| pPlayer->GetQuestStatus(QUEST_NOT_SO_MODEST_PROPOSAL) == QUEST_STATUS_COMPLETE )
+	{
+		pPlayer->SummonCreature(NPC_IMAGE_OF_WIND_TRADER_MARID, 4007.11f, 1517.15f, -116.363f, -0.453786f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
+
+	}
+	return true;
+
+}
 
 void AddSC_netherstorm()
 {
@@ -988,7 +988,7 @@ void AddSC_netherstorm()
 
     pNewScript = new Script;
     pNewScript->Name = "go_manaforge_control_console";
-    pNewScript->pGOHello = &GOHello_go_manaforge_control_console;
+    pNewScript->pGOUse = &GOUse_go_manaforge_control_console;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
@@ -1021,22 +1021,22 @@ void AddSC_netherstorm()
     pNewScript = new Script;
     pNewScript->Name = "npc_bessy";
     pNewScript->GetAI = &GetAI_npc_bessy;
-    pNewScript->pQuestAccept = &QuestAccept_npc_bessy;
+    pNewScript->pQuestAcceptNPC = &QuestAccept_npc_bessy;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "go_Ethereal_Teleport_pad";
-    pNewScript->pGOHello = &GOHello_go_Ethereal_Teleport_pad;
-    pNewScript->RegisterSelf();
-    
-    pNewScript = new Script;
     pNewScript->Name = "npc_maxx_a_million";
     pNewScript->GetAI = &GetAI_npc_maxx_a_million;
-    pNewScript->pQuestAccept = &QuestAccept_npc_maxx_a_million;
+    pNewScript->pQuestAcceptNPC = &QuestAccept_npc_maxx_a_million;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
     pNewScript->Name = "npc_zeppit";
     pNewScript->GetAI = &GetAI_npc_zeppit;
+    pNewScript->RegisterSelf();
+    
+    pNewScript = new Script;
+    pNewScript->Name = "go_Ethereal_Teleport_pad";
+    pNewScript->pGOUse = &GOUse_go_Ethereal_Teleport_pad;
     pNewScript->RegisterSelf();
 }

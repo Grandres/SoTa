@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -107,14 +107,12 @@ struct MANGOS_DLL_DECL boss_vexallusAI : public ScriptedAI
             m_pInstance->SetData(DATA_VEXALLUS_EVENT, IN_PROGRESS);
     }
 
-    void JustSummoned(Creature *summoned)
+    void JustSummoned(Creature* pSummoned)
     {
-        if (Unit *temp = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            summoned->GetMotionMaster()->MoveFollow(temp,0,0);
+        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            pSummoned->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
 
-        //spells are SUMMON_TYPE_GUARDIAN, so using setOwner should be ok
-        summoned->SetOwnerGuid(m_creature->GetObjectGuid());
-        summoned->CastSpell(summoned,SPELL_ENERGY_BOLT,false,0,0,m_creature->GetGUID());
+        pSummoned->CastSpell(pSummoned, SPELL_ENERGY_BOLT, false, NULL, NULL, m_creature->GetGUID());
     }
 
     void UpdateAI(const uint32 diff)
