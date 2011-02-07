@@ -516,7 +516,7 @@ struct MANGOS_DLL_DECL boss_kologarnAI : public ScriptedAI
                     pLeft->SetSpeedRate(MOVE_RUN, 1.0);
                     pLeft->CastSpell(pLeft, m_bIsRegularMode ? SPELL_EYEBEAM_PERIODIC : SPELL_EYEBEAM_PERIODIC_H, true);
                     pLeft->CastSpell(pLeft, SPELL_EYEBEAM_VISUAL_LEFT_2, true);
-                    pLeft->AI()->AttackStart(m_creature->getVictim());
+                    pLeft->AI()->AttackStart(pTarget);
                 }
                 if (Creature *pRight = m_creature->SummonCreature(NPC_FOCUSED_EYEBEAM_RIGHT, pTarget->GetPositionX(), pTarget->GetPositionY()+4.0f, pTarget->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000))
                 {
@@ -525,7 +525,7 @@ struct MANGOS_DLL_DECL boss_kologarnAI : public ScriptedAI
                     pRight->SetSpeedRate(MOVE_RUN, 1.0);
                     pRight->CastSpell(pRight, SPELL_EYEBEAM_PERIODIC_VIS, true);
                     pRight->CastSpell(pRight, SPELL_EYEBEAM_VISUAL_RIGHT, true);
-                    pRight->AI()->AttackStart(m_creature->getVictim());
+                    pRight->AI()->AttackStart(pTarget);
                 }
                 m_uiEyebeam_Timer = 10000 + urand(1000, 5000);
             }
