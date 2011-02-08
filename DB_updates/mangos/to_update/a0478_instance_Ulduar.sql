@@ -298,6 +298,29 @@ INSERT INTO vehicle_seat_data VALUES
 (3691, 0),
 (3692, 0);
 
+-- missing loot 25man
+DELETE FROM gameobject_loot_template WHERE entry = 26929;
+INSERT INTO gameobject_loot_template VALUES
+(26929, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
+(26929, 45261, 100, 1, -26929, 4, 0, 0, 0); -- 4 items
+DELETE FROM reference_loot_template WHERE entry = 26929;
+INSERT INTO reference_loot_template VALUES
+(26929, 45261, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45266, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45269, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45273, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45271, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45262, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45263, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45270, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45274, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45267, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45272, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45265, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45275, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45264, 0, 1, 1, 1, 0, 0, 0),
+(26929, 45268, 0, 1, 1, 1, 0, 0, 0);
+
 -- Auriaya
 UPDATE creature_template SET mechanic_immune_mask=583745371, equipment_id = 103000, scriptname='boss_auriaya' WHERE entry=33515;
 UPDATE creature_template SET mechanic_immune_mask=619395071, scriptname='mob_feral_defender' WHERE entry=34035;
