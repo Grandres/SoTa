@@ -621,7 +621,7 @@ struct MANGOS_DLL_DECL boss_molgeimAI : public ScriptedAI
 
     void Aggro(Unit* pWho)
     {
-        if (m_pInstance)
+        if (!m_pInstance)
             return;
 
         if (Creature* pTemp = m_pInstance->instance->GetCreature(m_pInstance->GetData64(NPC_BRUNDIR)))
@@ -861,13 +861,23 @@ struct MANGOS_DLL_DECL boss_steelbreakerAI : public ScriptedAI
 
     void Aggro(Unit* pWho)
     {
+        if (!m_pInstance)
+            return;
+
         uint32 uiText = SAY_STEEL_AGGRO;
         Creature *pSource = m_creature;
+
+        // aggro
+        if (Creature* pTemp = m_pInstance->instance->GetCreature(m_pInstance->GetData64(NPC_MOLGEIM)))
+            pTemp->SetInCombatWithZone();
+        if (Creature* pTemp = m_pInstance->instance->GetCreature(m_pInstance->GetData64(NPC_BRUNDIR)))
+            pTemp->SetInCombatWithZone();
+
         switch (urand(0, 2))
         {
             case 0:
             {
-                if (Creature* pTemp = m_creature->GetMap()->GetCreature( m_pInstance->GetData64(NPC_MOLGEIM)))
+                if (Creature* pTemp = m_pInstance->instance->GetCreature(m_pInstance->GetData64(NPC_MOLGEIM)))
                 {
                     pTemp->SetInCombatWithZone();
                     pSource = pTemp;
@@ -877,7 +887,7 @@ struct MANGOS_DLL_DECL boss_steelbreakerAI : public ScriptedAI
             }
             case 1:
             {
-                if (Creature* pTemp = m_creature->GetMap()->GetCreature( m_pInstance->GetData64(NPC_BRUNDIR)))
+                if (Creature* pTemp = m_pInstance->instance->GetCreature(m_pInstance->GetData64(NPC_BRUNDIR)))
                 {
                     pTemp->SetInCombatWithZone();
                     pSource = pTemp;
