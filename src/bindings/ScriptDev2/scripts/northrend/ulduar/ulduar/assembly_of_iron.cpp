@@ -790,6 +790,7 @@ struct MANGOS_DLL_DECL boss_steelbreakerAI : public ScriptedAI
         m_uiFusion_Punch_Timer      = 20000;
         m_uiEnrage_Timer            = 900000;
         m_uiStatic_Disruption_Timer = 10000;
+        m_uiPower_Timer             = 2000;
         m_bEnrage                   = false;
         m_bBrundirDead              = false;
         m_bMolgeimDead              = false;
