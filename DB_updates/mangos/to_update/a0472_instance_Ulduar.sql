@@ -192,6 +192,81 @@ UPDATE creature_template SET ScriptName = 'mob_rune_of_summoning' WHERE entry = 
 UPDATE creature_template SET ScriptName = 'mob_ulduar_lightning_elemental' WHERE entry = 32958;
 UPDATE creature_template SET mechanic_immune_mask = 619397115 WHERE entry IN (32857, 33694, 32927, 33692, 32867, 33693);
 UPDATE creature_template SET mechanic_immune_mask = 619395067 WHERE entry IN (32857, 33694); -- Brundir stunnable
+-- LOOT
+UPDATE creature_template SET lootid = entry WHERE entry IN (32857, 32927, 32867, 33694, 33692, 33693);
+DELETE FROM creature_loot_template WHERE entry IN (32857, 32927, 32867, 33694, 33692, 33693);
+INSERT INTO creature_loot_template VALUES
+-- 10man
+-- Brundir
+(32857, 40753, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Valor
+(32857, 1, 100, 1, -32857, 2, 0, 0, 0),
+-- Molgeim
+(32927, 40753, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Valor
+(32927, 1, 100, 1, -32857, 2, 0, 0, 0),
+(32927, 45506, 50, 2, 1, 1, 0, 0, 0), -- Data Disk qitem
+-- Steelbreaker
+(32867, 40753, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Valor
+(32867, 1, 100, 1, -32857, 2, 0, 0, 0),
+(32867, 45506, 50, 2, 1, 1, 0, 0, 0), -- Data Disk qitem
+(32867, 2, 100, 3, -32867, 1, 0, 0, 0), -- hard mode loot
+-- 25man
+-- Brundir
+(33694, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
+(33694, 1, 100, 1, -33694, 4, 0, 0, 0),
+-- Molgeim
+(33692, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
+(33692, 1, 100, 1, -33694, 4, 0, 0, 0),
+(33692, 45857, 50, 2, 1, 1, 0, 0, 0), -- Data Disk qitem
+-- Steelbreaker
+(33693, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
+(33693, 1, 100, 1, -33694, 4, 0, 0, 0),
+(33693, 45857, 50, 2, 1, 1, 0, 0, 0), -- Data Disk qitem
+(33693, 2, 100, 3, -33693, 1, 0, 0, 0); -- hard mode loot
+
+
+DELETE FROM `reference_loot_template` WHERE `entry` IN (32857, 33694, 32867, 33693);
+INSERT INTO `reference_loot_template` VALUES
+-- 10man
+-- normal mode
+(32857, 45333, 0, 1, 1, 1, 0, 0, 0),
+(32857, 45378, 0, 1, 1, 1, 0, 0, 0),
+(32857, 45329, 0, 1, 1, 1, 0, 0, 0),
+(32857, 45322, 0, 1, 1, 1, 0, 0, 0),
+(32857, 45330, 0, 1, 1, 1, 0, 0, 0),
+(32857, 45418, 0, 1, 1, 1, 0, 0, 0),
+(32857, 45324, 0, 1, 1, 1, 0, 0, 0),
+(32857, 45331, 0, 1, 1, 1, 0, 0, 0),
+(32857, 45423, 0, 1, 1, 1, 0, 0, 0),
+(32857, 45332, 0, 1, 1, 1, 0, 0, 0),
+-- hard mode
+(32867, 45455, 0, 3, 1, 1, 0, 0, 0),
+(32867, 45456, 0, 3, 1, 1, 0, 0, 0),
+(32867, 45448, 0, 3, 1, 1, 0, 0, 0),
+(32867, 45449, 0, 3, 1, 1, 0, 0, 0),
+(32867, 45447, 0, 3, 1, 1, 0, 0, 0),
+-- 25man
+(33694, 45226, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45224, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45228, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45193, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45227, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45238, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45237, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45235, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45240, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45234, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45232, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45239, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45225, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45233, 0, 1, 1, 1, 0, 0, 0),
+(33694, 45236, 0, 1, 1, 1, 0, 0, 0),
+-- hard mode
+(33693, 45241, 0, 3, 1, 1, 0, 0, 0),
+(33693, 45245, 0, 3, 1, 1, 0, 0, 0),
+(33693, 45607, 0, 3, 1, 1, 0, 0, 0),
+(33693, 45243, 0, 3, 1, 1, 0, 0, 0),
+(33693, 45242, 0, 3, 1, 1, 0, 0, 0),
+(33693, 45244, 0, 3, 1, 1, 0, 0, 0);
 
 -- Kologarn
 -- fix arms position because of the missing vehicles
@@ -231,14 +306,51 @@ UPDATE creature_template SET ScriptName = 'mob_sanctum_sentry' WHERE entry = 340
 UPDATE `creature_template` SET `mechanic_immune_mask` = 619397115 WHERE `entry` IN (33515, 34175);
 DELETE FROM creature_equip_template WHERE entry = 103000;
 INSERT INTO creature_equip_template values (103000, 45315, 0, 0);
--- 2 more defenders for 25 man
--- DELETE FROM creature WHERE guid IN (800010, 800011);
--- INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`DeathState`,`MovementType`) VALUES
--- (800010, 34014, 603, 2, 65535, 0, 0, 1945.2, 37.2442, 411.356, 3.62107, 7200, 0, 0, 334680, 0, 0, 0),
--- (800011, 34014, 603, 2, 65535, 0, 0, 1936.11, 49.8233, 411.352, 3.85276, 7200, 0, 0, 334680, 0, 0, 0);
 DELETE FROM spell_script_target WHERE entry = 64449;
 INSERT INTO spell_script_target VALUES
 (64449, 1, 34096);
+
+-- LOOT
+UPDATE creature_template SET lootid = entry WHERE entry IN (33515, 34175);
+DELETE FROM creature_loot_template WHERE entry IN (33515, 34175);
+INSERT INTO creature_loot_template VALUES
+-- 10man
+(33515, 40753, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Valor
+(33515, 1, 100, 1, -33515, 2, 0, 0, 0),
+-- 25man
+(34175, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
+(34175, 1, 100, 1, -34175, 4, 0, 0, 0);
+
+DELETE FROM `reference_loot_template` WHERE `entry` IN (33515, 34175);
+INSERT INTO `reference_loot_template` VALUES
+-- 10man
+-- normal mode
+(33515, 45864, 0, 1, 1, 1, 0, 0, 0),
+(33515, 45866, 0, 1, 1, 1, 0, 0, 0),
+(33515, 45709, 0, 1, 1, 1, 0, 0, 0),
+(33515, 45708, 0, 1, 1, 1, 0, 0, 0),
+(33515, 45711, 0, 1, 1, 1, 0, 0, 0),
+(33515, 45713, 0, 1, 1, 1, 0, 0, 0),
+(33515, 45707, 0, 1, 1, 1, 0, 0, 0),
+(33515, 45865, 0, 1, 1, 1, 0, 0, 0),
+(33515, 45712, 0, 1, 1, 1, 0, 0, 0),
+(33515, 45832, 0, 1, 1, 1, 0, 0, 0),
+-- 25man
+(34175, 45327, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45319, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45434, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45438, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45334, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45439, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45440, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45325, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45436, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45435, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45326, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45441, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45320, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45315, 0, 1, 1, 1, 0, 0, 0),
+(34175, 45437, 0, 1, 1, 1, 0, 0, 0);
 
 -- Freya
 UPDATE creature_template SET ScriptName = 'boss_freya' WHERE entry = 32906;
