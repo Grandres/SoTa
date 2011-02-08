@@ -11,7 +11,7 @@ WHERE entry IN (26889,26887);
 DELETE FROM creature_ai_scripts WHERE creature_id IN (26889,26887);
 INSERT INTO creature_ai_scripts VALUES
 (2688901,26889,10,0,100,1,1,5,1000,1000,33,26889,6,0,0,0,0,0,0,0,0,0,'The End of the Line  - Area Credit at LOS'),
-(2688701,26887,8,0,100,1,47634,-1,0,0,16,26887,50548,6,0,0,0,0,0,0,0,0,'The End of the Line: Ley Line Focus Bunny Beam on Ley Line Focus Control Talisman Spellhit');
+(2688701,26887,8,0,100,1,47634,-1,0,0,33,26887,6,0,0,0,0,0,0,0,0,0,'The End of the Line: Ley Line Focus Bunny Beam on Ley Line Focus Control Talisman Spellhit');
 
 -- Add into world missing triggers
 DELETE FROM creature WHERE id=26887;
