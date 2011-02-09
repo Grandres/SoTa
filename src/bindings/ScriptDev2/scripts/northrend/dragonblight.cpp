@@ -453,7 +453,7 @@ struct MANGOS_DLL_DECL npc_hourglassAI : public ScriptedAI
 
      void JustDied(Unit* pKiller)
      {
-        if(Player *pPlayer = m_creature->GetMap()->GetPlayer(m_creature->GetOwnerGUID()))
+        if(Player *pPlayer = m_creature->GetMap()->GetPlayer(m_creature->GetOwnerGuid()))
         {
             pPlayer->FailQuest(QUEST_MYSTERY_OF_INFINITE);
         }
