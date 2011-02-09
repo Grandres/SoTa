@@ -307,11 +307,7 @@ struct MANGOS_DLL_DECL boss_brundirAI : public ScriptedAI
     void JustDied(Unit* pKiller)
     {
         // Supercharge
-        // stacking workaround
-        if (Creature *pTrigger = GetClosestCreatureWithEntry(m_creature, NPC_WORLD_TRIGGER, 100.0f))
-            m_creature->CastSpell(m_creature, SPELL_SUPERCHARGE, true, 0, 0, pTrigger->GetObjectGuid());
-        else
-            DoCast(m_creature, SPELL_SUPERCHARGE, true);
+        DoCast(m_creature, SPELL_SUPERCHARGE, true);
 
         // loot
         m_creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
@@ -397,11 +393,18 @@ struct MANGOS_DLL_DECL boss_brundirAI : public ScriptedAI
         if (spellInfo->Id != SPELL_SUPERCHARGE)
             return;
 
-        if (SpellAuraHolder *pHolder = m_creature->GetSpellAuraHolder(SPELL_SUPERCHARGE))
+        // if already is Supercharge 1, then it's 2 now
+        if (m_bHasSupercharge1)
+        {
+            m_bHasSupercharge2 = true;
+            DoCast(m_creature, SPELL_STORMSHIELD, true);
+            if (SpellAuraHolder *pHolder = m_creature->GetSpellAuraHolder(SPELL_SUPERCHARGE))
+                pHolder->SetStackAmount(2);
+        }
+        // else, it is the first Supercharge
+        else
         {
             m_bHasSupercharge1 = true;
-            if (pHolder->GetStackAmount() >= 2)
-                m_bHasSupercharge2 = true;
         }
     }
 
@@ -576,11 +579,7 @@ struct MANGOS_DLL_DECL boss_molgeimAI : public ScriptedAI
     void JustDied(Unit* pKiller)
     {
         // Supercharge
-        // stacking workaround
-        if (Creature *pTrigger = GetClosestCreatureWithEntry(m_creature, NPC_WORLD_TRIGGER, 100.0f))
-            m_creature->CastSpell(m_creature, SPELL_SUPERCHARGE, true, 0, 0, pTrigger->GetObjectGuid());
-        else
-            DoCast(m_creature, SPELL_SUPERCHARGE, true);
+        DoCast(m_creature, SPELL_SUPERCHARGE, true);
 
         // loot
         m_creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
@@ -662,11 +661,17 @@ struct MANGOS_DLL_DECL boss_molgeimAI : public ScriptedAI
         if (spellInfo->Id != SPELL_SUPERCHARGE)
             return;
 
-        if (SpellAuraHolder *pHolder = m_creature->GetSpellAuraHolder(SPELL_SUPERCHARGE))
+        // if already is Supercharge 1, then it's 2 now
+        if (m_bHasSupercharge1)
+        {
+            m_bHasSupercharge2 = true;
+            if (SpellAuraHolder *pHolder = m_creature->GetSpellAuraHolder(SPELL_SUPERCHARGE))
+                pHolder->SetStackAmount(2);
+        }
+        // else, it is the first Supercharge
+        else
         {
             m_bHasSupercharge1 = true;
-            if (pHolder->GetStackAmount() >= 2)
-                m_bHasSupercharge2 = true;
         }
     }
 
@@ -817,11 +822,7 @@ struct MANGOS_DLL_DECL boss_steelbreakerAI : public ScriptedAI
     void JustDied(Unit* pKiller)
     {
         // Supercharge
-        // stacking workaround
-        if (Creature *pTrigger = GetClosestCreatureWithEntry(m_creature, NPC_WORLD_TRIGGER, 100.0f))
-            m_creature->CastSpell(m_creature, SPELL_SUPERCHARGE, true, 0, 0, pTrigger->GetObjectGuid());
-        else
-            DoCast(m_creature, SPELL_SUPERCHARGE, true);
+        DoCast(m_creature, SPELL_SUPERCHARGE, true);
 
         // loot
         m_creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
@@ -935,11 +936,17 @@ struct MANGOS_DLL_DECL boss_steelbreakerAI : public ScriptedAI
         if (spellInfo->Id != SPELL_SUPERCHARGE)
             return;
 
-        if (SpellAuraHolder *pHolder = m_creature->GetSpellAuraHolder(SPELL_SUPERCHARGE))
+        // if already is Supercharge 1, then it's 2 now
+        if (m_bHasSupercharge1)
+        {
+            m_bHasSupercharge2 = true;
+            if (SpellAuraHolder *pHolder = m_creature->GetSpellAuraHolder(SPELL_SUPERCHARGE))
+                pHolder->SetStackAmount(2);
+        }
+        // else, it is the first Supercharge
+        else
         {
             m_bHasSupercharge1 = true;
-            if (pHolder->GetStackAmount() >= 2)
-                m_bHasSupercharge2 = true;
         }
     }
 
