@@ -566,6 +566,7 @@ struct MANGOS_DLL_DECL boss_molgeimAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
         m_uiShield_Timer     = 20000;
         m_uiRune_Power_Timer = 10000;
+        m_uiRune_Death_Timer = 5000;
         m_uiEnrage_Timer     = 900000;
         m_bEnrage            = false;
         m_bBrundirDead       = false;
@@ -723,7 +724,7 @@ struct MANGOS_DLL_DECL boss_molgeimAI : public ScriptedAI
             {
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 {
-                    if (DoCastSpellIfCan(pTarget, m_bIsRegularMode ? SPELL_RUNE_OF_DEATH : SPELL_RUNE_OF_DEATH_H) == CAST_OK)
+                    if (DoCastSpellIfCan(pTarget, m_bIsRegularMode ? SPELL_RUNE_OF_DEATH : SPELL_RUNE_OF_DEATH_H, CAST_TRIGGERED) == CAST_OK)
                     {
                         DoScriptText(SAY_MOLGEIM_DEATH_RUNE, m_creature);
                         m_uiRune_Death_Timer = 30000;
@@ -739,7 +740,7 @@ struct MANGOS_DLL_DECL boss_molgeimAI : public ScriptedAI
             {
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
                 {
-                    DoCast(pTarget, SPELL_RUNE_OF_SUMMONING);
+                    DoCast(pTarget, SPELL_RUNE_OF_SUMMONING, true);
                     m_uiRune_Summon_Timer = 30000;
                     DoScriptText(SAY_MOLGEIM_SURGE, m_creature);
                 }
@@ -979,13 +980,10 @@ struct MANGOS_DLL_DECL boss_steelbreakerAI : public ScriptedAI
         {
             if (m_uiPower_Timer < uiDiff)
             {
-                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0))
+                if (DoCastSpellIfCan(m_creature->getVictim(), m_bIsRegularMode ? SPELL_POWER : SPELL_POWER_H, CAST_TRIGGERED) == CAST_OK)
                 {
-                    if (DoCastSpellIfCan(pTarget, m_bIsRegularMode ? SPELL_POWER : SPELL_POWER_H) == CAST_OK)
-                    {
-                        DoScriptText(SAY_STEEL_OVERWHELM, m_creature);
-                        m_uiPower_Timer = m_bIsRegularMode ? 65000 : 35000;
-                    }
+                    DoScriptText(SAY_STEEL_OVERWHELM, m_creature);
+                    m_uiPower_Timer = m_bIsRegularMode ? 65000 : 35000;
                 }
             }else m_uiPower_Timer -= uiDiff;
         }
