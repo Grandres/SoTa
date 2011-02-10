@@ -56,7 +56,7 @@ enum TeleporterGossipItems
 
 bool GossipHello_go_ulduar_teleporter(Player* pPlayer, GameObject* pGo)
 {
-    instance_ulduar* pInstance = (instance_ulduar*)pPlayer->GetInstanceData();
+    instance_ulduar* pInstance = (instance_ulduar*)pGo->GetInstanceData();
     if (!pInstance)
         return true;
 
