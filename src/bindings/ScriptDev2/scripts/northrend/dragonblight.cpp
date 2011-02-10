@@ -503,6 +503,49 @@ CreatureAI* GetAI_npc_hourglass(Creature* pCreature)
     return new npc_hourglassAI(pCreature);
 }
 
+/*######
+## npc_vehicle
+######*/
+enum 
+{
+    NPC_WYRMREST_DEFENDER  = 27629
+
+};
+
+struct MANGOS_DLL_DECL npc_vehicleAI : public ScriptedAI
+{
+    npc_vehicleAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    uint32 uiCheckTimer;
+    void Reset() 
+    {
+        uiCheckTimer = 15000;
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+     {
+            if (uiCheckTimer <= uiDiff)
+            {
+                switch(m_creature->GetEntry())
+                {
+                case NPC_WYRMREST_DEFENDER: if(m_creature->GetAreaId() != 4254 && m_creature->GetAreaId() != 4183)
+                                                {
+                                                     m_creature->ForcedDespawn();
+                                                }
+                                                break;
+                }
+                uiCheckTimer = 10000;
+
+            } else uiCheckTimer -= uiDiff;
+     }
+
+    
+};
+CreatureAI* GetAI_npc_vehicle(Creature* pCreature)
+{
+    return new npc_vehicleAI(pCreature);
+}
+
 void AddSC_dragonblight()
 {
     Script *newscript;
@@ -555,5 +598,10 @@ void AddSC_dragonblight()
     newscript = new Script;
     newscript->Name = "npc_hourglass";
     newscript->GetAI = &GetAI_npc_hourglass;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_vehicle";
+    newscript->GetAI = &GetAI_npc_vehicle;
     newscript->RegisterSelf();
 }
