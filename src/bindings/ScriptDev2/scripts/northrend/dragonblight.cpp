@@ -528,7 +528,7 @@ struct MANGOS_DLL_DECL npc_vehicleAI : public ScriptedAI
             {
                 switch(m_creature->GetEntry())
                 {
-                case NPC_WYRMREST_DEFENDER: if(m_creature->GetAreaId() != 4254 && m_creature->GetAreaId() != 4183)
+                case NPC_WYRMREST_DEFENDER: if(m_creature->GetAreaId() != 4254 && m_creature->GetAreaId() != 4183 && m_creature->GetAreaId() != 4161)
                                                 {
                                                      m_creature->ForcedDespawn();
                                                 }
