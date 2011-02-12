@@ -1723,7 +1723,7 @@ Vehicle* WorldObject::SummonVehicle(uint32 id, float x, float y, float z, float 
     if (GetTypeId()==TYPEID_PLAYER)
         team = ((Player*)this)->GetTeam();
 
-    if(!v->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_VEHICLE), map, GetPhaseMask(), id, vehicleId, TEAM_NONE))
+    if(!v->Create(GetMap()->GenerateLocalLowGuid(HIGHGUID_VEHICLE), map, GetPhaseMask(), id, vehicleId, TEAM_NONE))
     {
         delete v;
         return NULL;

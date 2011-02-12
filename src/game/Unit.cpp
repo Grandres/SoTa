@@ -11283,7 +11283,7 @@ struct SetPvPHelper
 
 void Unit::ChangeSeat(int8 seatId, bool next)
 {
-    Vehicle *m_vehicle = ObjectAccessor::GetVehicle(GetVehicleGUID());
+    Vehicle *m_vehicle = ObjectAccessor::GetVehicle(*this, GetVehicleGUID());
 
     if (!m_vehicle)
         return;
@@ -11682,7 +11682,7 @@ void Unit::ExitVehicle()
     if(uint64 vehicleGUID = GetVehicleGUID())
     {
         float v_size = 0.0f;
-        if(Vehicle *vehicle = ObjectAccessor::GetVehicle(vehicleGUID))
+        if(Vehicle *vehicle = ObjectAccessor::GetVehicle(*this, vehicleGUID))
         {
             if(m_movementInfo.GetVehicleSeatFlags() & SF_MAIN_RIDER)
             {

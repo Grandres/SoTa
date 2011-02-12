@@ -30,6 +30,7 @@
 #include "GridNotifiersImpl.h"
 #include "ObjectGuid.h"
 #include "World.h"
+#include "Vehicle.h"
 
 #include <cmath>
 
@@ -46,6 +47,15 @@ ObjectAccessor::~ObjectAccessor()
         itr->second->RemoveFromWorld();
         delete itr->second;
     }
+}
+
+Vehicle*
+ObjectAccessor::GetVehicle(WorldObject const &u, ObjectGuid guid)
+{
+    if(guid.IsPlayer() || !u.IsInWorld())
+        return NULL;
+
+    return u.GetMap()->GetVehicle(guid);
 }
 
 Creature*

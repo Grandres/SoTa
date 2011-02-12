@@ -374,9 +374,9 @@ bool Vehicle::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, u
     //Notify the map's instance data.
     //Only works if you create the object in it, not if it is moves to that map.
     //Normally non-players do not teleport to other maps.
-    if(map->IsDungeon() && ((InstanceMap*)map)->GetInstanceData())
+    if(map->IsDungeon() && ((DungeonMap*)map)->GetInstanceData())
     {
-        ((InstanceMap*)map)->GetInstanceData()->OnCreatureCreate(this);
+        ((DungeonMap*)map)->GetInstanceData()->OnCreatureCreate(this);
     }
 
     if(m_vehicleInfo->m_powerType == POWER_TYPE_STEAM)
@@ -617,7 +617,7 @@ void Vehicle::EmptySeatsCountChanged()
 
     if(uint64 vehicleGUID = GetVehicleGUID())
     {
-        if(Vehicle *vehicle = ObjectAccessor::GetVehicle(vehicleGUID))
+        if(Vehicle *vehicle = ObjectAccessor::GetVehicle(*this, vehicleGUID))
         {
             if(u_count > 0)
                 vehicle->ChangeSeatFlag(vehicle->GetPassengerSeat(this), SEAT_VEHICLE_FREE);
@@ -957,7 +957,7 @@ void Vehicle::InstallAllAccessories()
             if(passAddon && passAddon->vehicle_id != 0)
                 isVehicle = true;
             else
-                guid = sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT);
+                guid = GetMap()->GenerateLocalLowGuid(HIGHGUID_UNIT);
         }
         // Create it
         Creature *pPassenger = new Creature;

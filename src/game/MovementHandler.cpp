@@ -772,7 +772,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recv_data)
 
     _player->m_movementInfo = mi;
 
-    if(Vehicle *vehicle = ObjectAccessor::GetVehicle(vehicleGUID))
+    if(Vehicle *vehicle = ObjectAccessor::GetVehicle(*GetPlayer(), vehicleGUID))
     {
         if(vehicle->GetVehicleFlags() & VF_DESPAWN_AT_LEAVE)
             vehicle->Dismiss();
@@ -815,7 +815,7 @@ void WorldSession::HandleRequestVehicleSwitchSeat(WorldPacket &recv_data)
     if(!vehicleGUID)                                        // something wrong here...
         return;
 
-    if(Vehicle *vehicle = ObjectAccessor::GetVehicle(vehicleGUID))
+    if(Vehicle *vehicle = ObjectAccessor::GetVehicle(*GetPlayer(), vehicleGUID))
     {
         ObjectGuid guid;
         recv_data >> guid.ReadAsPacked();
@@ -827,7 +827,7 @@ void WorldSession::HandleRequestVehicleSwitchSeat(WorldPacket &recv_data)
         {
             if(vehicleGUID != guid.GetRawValue())
             {
-                if(Vehicle *veh = ObjectAccessor::GetVehicle(guid.GetRawValue()))
+                if(Vehicle *veh = ObjectAccessor::GetVehicle(*GetPlayer(), guid.GetRawValue()))
                 {
                     if(!_player->IsWithinDistInMap(veh, 10))
                         return;
@@ -884,7 +884,7 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recv_data)
 
     if(guid.GetRawValue() == guid2.GetRawValue())
         _player->ChangeSeat(seatId, false);
-    else if(Vehicle *vehicle = ObjectAccessor::GetVehicle(guid2.GetRawValue()))
+    else if(Vehicle *vehicle = ObjectAccessor::GetVehicle(*GetPlayer(), guid2.GetRawValue()))
     {
         if(vehicle->HasEmptySeat(seatId))
         {

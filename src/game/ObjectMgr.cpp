@@ -5826,32 +5826,6 @@ void ObjectMgr::SetHighestGuids()
     }
 }
 
-uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
-{
-    switch(guidhigh)
-    {
-        case HIGHGUID_ITEM:
-            return m_ItemGuids.Generate();
-        case HIGHGUID_UNIT:
-            return m_CreatureGuids.Generate();
-        case HIGHGUID_VEHICLE:
-            return m_VehicleGuids.Generate();
-        case HIGHGUID_PLAYER:
-            return m_CharGuids.Generate();
-        case HIGHGUID_GAMEOBJECT:
-            return m_GameobjectGuids.Generate();
-        case HIGHGUID_CORPSE:
-            return m_CorpseGuids.Generate();
-        case HIGHGUID_INSTANCE:
-            return m_InstanceGuids.Generate();
-        default:
-            MANGOS_ASSERT(0);
-    }
-
-    MANGOS_ASSERT(0);
-    return 0;
-}
-
 void ObjectMgr::LoadGameObjectLocales()
 {
     mGameObjectLocaleMap.clear();                           // need for reload case
