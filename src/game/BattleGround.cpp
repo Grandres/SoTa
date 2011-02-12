@@ -287,16 +287,6 @@ BattleGround::~BattleGround()
     for(int i = 0; i < size; ++i)
         DelObject(i);
 
-    if (GetInstanceID())                                    // not spam by useless queries in case BG templates
-    {
-        // delete creature and go respawn times
-        CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE instance = '%u'", GetInstanceID());
-        CharacterDatabase.PExecute("DELETE FROM gameobject_respawn WHERE instance = '%u'", GetInstanceID());
-        // delete instance from db
-        CharacterDatabase.PExecute("DELETE FROM instance WHERE id = '%u'",GetInstanceID());
-        // remove from battlegrounds
-    }
-
     sBattleGroundMgr.RemoveBattleGround(GetInstanceID(), GetTypeID());
     sBattleGroundMgr.DeleteClientVisibleInstanceId(GetTypeID(), GetBracketId(), GetClientInstanceID());
 
@@ -1452,7 +1442,7 @@ bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float 
     // and when loading it (in go::LoadFromDB()), a new guid would be assigned to the object, and a new object would be created
     // so we must create it specific for this instance
     GameObject * go = new GameObject;
-    if(!go->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT),entry, GetBgMap(),
+    if(!go->Create(GetBgMap()->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT),entry, GetBgMap(),
         PHASEMASK_NORMAL, x,y,z,o,rotation0,rotation1,rotation2,rotation3,GO_ANIMPROGRESS_DEFAULT,GO_STATE_READY))
     {
         sLog.outErrorDb("Gameobject template %u not found in database! BattleGround not created!", entry);

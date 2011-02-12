@@ -987,11 +987,6 @@ struct MANGOS_DLL_DECL boss_illidan_stormrageAI : public ScriptedAI
             m_pInstance->SetData(TYPE_ILLIDAN, NOT_STARTED);
     }
 
-    void Aggro(Unit* pWho)
-    {
-        m_creature->SetInCombatWithZone();
-    }
-
     void AttackStart(Unit *who)
     {
         if (!who || IsTalking || Phase == 2 || Phase == 4 || Phase == 6 || m_creature->HasAura(SPELL_KNEEL, EFFECT_INDEX_0))
@@ -2278,6 +2273,9 @@ struct MANGOS_DLL_DECL flamecrashAI : public ScriptedAI
     }
 };
 
+/* ** TODO This code was unused for long time (not used in DB and pointless)
+ * ** Keep it temporarily as reference
+
 // Shadowfiends interact with Illidan, setting more targets in Illidan's hashmap
 struct MANGOS_DLL_DECL mob_parasitic_shadowfiendAI : public ScriptedAI
 {
@@ -2291,7 +2289,7 @@ struct MANGOS_DLL_DECL mob_parasitic_shadowfiendAI : public ScriptedAI
     void DoMeleeAttackIfReady()
     {
         //If we are within range melee the target
-        if (m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
+        if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
         {
             //Make sure our attack is ready and we aren't currently casting
             if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
@@ -2305,6 +2303,7 @@ struct MANGOS_DLL_DECL mob_parasitic_shadowfiendAI : public ScriptedAI
         }
     }
 };
+*/
 
 struct MANGOS_DLL_DECL blazeAI : public ScriptedAI
 {
@@ -2406,10 +2405,12 @@ CreatureAI* GetAI_blade_of_azzinoth(Creature* pCreature)
     return new blade_of_azzinothAI(pCreature);
 }
 
+/* ** TODO dead code
 CreatureAI* GetAI_parasitic_shadowfiend(Creature* pCreature)
 {
     return new mob_parasitic_shadowfiendAI(pCreature);
 }
+*/
 
 void AddSC_boss_illidan()
 {
@@ -2472,8 +2473,10 @@ void AddSC_boss_illidan()
     newscript->GetAI = &GetAI_blaze;
     newscript->RegisterSelf();
 
+    /* ** TODO dead code
     newscript = new Script;
     newscript->Name = "mob_parasitic_shadowfiend";
     newscript->GetAI = &GetAI_parasitic_shadowfiend;
     newscript->RegisterSelf();
+    */
 }

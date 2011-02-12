@@ -527,6 +527,22 @@ void Spell::FillTargetMap()
                     case TARGET_EFFECT_SELECT:
                         SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         break;
+                    // dest point setup required
+                    case TARGET_AREAEFFECT_INSTANT:
+                    case TARGET_AREAEFFECT_CUSTOM:
+                    case TARGET_ALL_ENEMY_IN_AREA:
+                    case TARGET_ALL_ENEMY_IN_AREA_INSTANT:
+                    case TARGET_ALL_ENEMY_IN_AREA_CHANNELED:
+                    case TARGET_ALL_FRIENDLY_UNITS_IN_AREA:
+                    case TARGET_AREAEFFECT_GO_AROUND_DEST:
+                    case TARGET_RANDOM_NEARBY_DEST:
+                        // triggered spells get dest point from default target set, ignore it
+                        if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION) || m_IsTriggeredSpell)
+                            if (WorldObject* castObject = GetAffectiveCasterObject())
+                                m_targets.setDestination(castObject->GetPositionX(), castObject->GetPositionY(), castObject->GetPositionZ());
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        break;
+                    // target pre-selection required
                     case TARGET_INNKEEPER_COORDINATES:
                     case TARGET_TABLE_X_Y_Z_COORDINATES:
                     case TARGET_CASTER_COORDINATES:
@@ -542,7 +558,6 @@ void Spell::FillTargetMap()
                     case TARGET_POINT_AT_NW:
                     case TARGET_POINT_AT_SE:
                     case TARGET_POINT_AT_SW:
-                    case TARGET_RANDOM_NEARBY_DEST:
                         // need some target for processing
                         SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
@@ -2444,7 +2459,12 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             else if (m_spellInfo->SpellIconID == 3757 || m_spellInfo->SpellIconID == 3021)
             {
                 // targets are checked with original caster, which is in fact hostile, not friendly
-                FillAreaTargets(targetUnitMap, m_targets.m_destX, m_targets.m_destY, radius, PUSH_DEST_CENTER, SPELL_TARGETS_HOSTILE);
+                if (Unit *pTarget = m_targets.getUnitTarget())
+                {
+                    FillAreaTargets(targetUnitMap, pTarget->GetPositionX(), pTarget->GetPositionY(), radius, PUSH_TARGET_CENTER, SPELL_TARGETS_FRIENDLY, pTarget);
+                    targetUnitMap.remove(pTarget); // the target of aura triggering this spell
+                    return;
+                }
             }
             else
             {
@@ -3040,24 +3060,27 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                             targetUnitMap.push_back(m_caster);
                             break;
                         case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+                        case SPELL_AURA_PERIODIC_DAMAGE:
+                        {
                             switch (m_spellInfo->Id)
                             {
                                 case 63024:                                 // Gravity Bomb (XT-002)
                                 case 64234:                                 // Gravity Bomb (h) (XT-002)
                                 case 63018:                                 // Searing Light (XT-002)
                                 case 65121:                                 // Searing Light (h) (XT-002)
-                                    if (m_targets.getUnitTarget())
+                                {
+                                    if (Unit *pTarget = m_targets.getUnitTarget())
                                     {
-                                        targetUnitMap.push_back(m_targets.getUnitTarget());
-                                        break;
+                                        targetUnitMap.clear();
+                                        targetUnitMap.push_back(pTarget);
+                                        return;
                                     }
-
-                                    FillAreaTargets(targetUnitMap, m_caster->GetPositionX(), m_caster->GetPositionY(), radius, PUSH_TARGET_CENTER, SPELL_TARGETS_HOSTILE);
-                                    if (m_caster->getVictim())
-                                    targetUnitMap.push_back(m_caster);
+                                }
+                                default:
                                     break;
                             }
                             break;
+                        }
                         default:                            // apply to target in other case
                             if (m_targets.getUnitTarget())
                                 targetUnitMap.push_back(m_targets.getUnitTarget());
@@ -6347,8 +6370,13 @@ SpellCastResult Spell::CheckRange(bool strict)
                 if (target == m_caster)
                     return SPELL_CAST_OK;
 
+                float range_mod = strict ? 0.0f : 5.0f;
+                float base = ATTACK_DISTANCE;
+                if (Player* modOwner = m_caster->GetSpellModOwner())
+                    range_mod += modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RANGE, base, this);
+
                 // with additional 5 dist for non stricted case (some melee spells have delay in apply
-                return m_caster->CanReachWithMeleeAttack(target, strict ? 0.0f : 5.0f) ? SPELL_CAST_OK : SPELL_FAILED_OUT_OF_RANGE;
+                return m_caster->CanReachWithMeleeAttack(target, range_mod) ? SPELL_CAST_OK : SPELL_FAILED_OUT_OF_RANGE;
             }
             break;                                          // let continue in generic way for no target
         }

@@ -419,6 +419,232 @@ CreatureAI* GetAI_mob_maggot(Creature* pCreature)
     return new mob_maggotAI(pCreature);
 }
 
+/*######
+## npc_hourglass_of_eternity
+######*/
+/*Support for 'Future you' is currently missing*/ 
+enum
+{
+    NPC_INFINITE_CHRONO_MAGUS    = 27898,
+    NPC_INFINITE_ASSAILANT       = 27896,
+    NPC_INFINITE_DESTROYER       = 27897,
+    NPC_INFINITE_TIMERENDER      = 27900,
+    QUEST_MYSTERY_OF_INFINITE    = 12470
+
+};
+
+struct MANGOS_DLL_DECL npc_hourglassAI : public ScriptedAI
+{
+    npc_hourglassAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+    
+    uint64 uiWaveTimer;
+    uint32 uiWaveCounter;
+
+     void Reset()
+     {
+         uiWaveTimer = 5000;
+         uiWaveCounter = 0;
+     }
+
+     void JustSummoned(Creature* pSummoned)
+     {
+         pSummoned->AI()->AttackStart(m_creature);
+     }  
+
+     void JustDied(Unit* pKiller)
+     {
+        if(Player *pPlayer = m_creature->GetMap()->GetPlayer(m_creature->GetOwnerGuid()))
+        {
+            pPlayer->FailQuest(QUEST_MYSTERY_OF_INFINITE);
+        }
+     }
+
+     void SummonWave()
+     {
+         switch(uiWaveCounter)
+         {
+            case 0: m_creature->SummonCreature(NPC_INFINITE_CHRONO_MAGUS, m_creature->GetPositionX()+5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_INFINITE_ASSAILANT, m_creature->GetPositionX()-5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    break;
+            case 1: m_creature->SummonCreature(NPC_INFINITE_CHRONO_MAGUS, m_creature->GetPositionX()+5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_INFINITE_CHRONO_MAGUS, m_creature->GetPositionX()-5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    break;
+            case 2: m_creature->SummonCreature(NPC_INFINITE_CHRONO_MAGUS, m_creature->GetPositionX()+5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_INFINITE_ASSAILANT, m_creature->GetPositionX()-5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_INFINITE_DESTROYER, m_creature->GetPositionX()+5,m_creature->GetPositionY()+5 ,m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    break;
+            case 3: m_creature->SummonCreature(NPC_INFINITE_CHRONO_MAGUS, m_creature->GetPositionX()+5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_INFINITE_ASSAILANT, m_creature->GetPositionX()-5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_INFINITE_DESTROYER, m_creature->GetPositionX()+5,m_creature->GetPositionY()+5 ,m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    break;
+            case 4: m_creature->SummonCreature(NPC_INFINITE_TIMERENDER, m_creature->GetPositionX()+5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000);
+                    break;
+
+         }
+     }
+     void UpdateAI(const uint32 uiDiff)
+     {
+            if (uiWaveTimer <= uiDiff)
+            {
+                if(uiWaveCounter<=4)
+                {
+                    SummonWave();
+                    uiWaveTimer = 15000;
+                    uiWaveCounter++;
+                }
+                else m_creature->ForcedDespawn();
+
+            } else uiWaveTimer -= uiDiff;
+     }
+};
+
+CreatureAI* GetAI_npc_hourglass(Creature* pCreature)
+{
+    return new npc_hourglassAI(pCreature);
+}
+
+/*######
+## npc_vehicle
+######*/
+enum 
+{
+    NPC_WYRMREST_DEFENDER  = 27629
+
+};
+
+struct MANGOS_DLL_DECL npc_vehicleAI : public ScriptedAI
+{
+    npc_vehicleAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    uint32 uiCheckTimer;
+    void Reset() 
+    {
+        uiCheckTimer = 15000;
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+     {
+            if (uiCheckTimer <= uiDiff)
+            {
+                switch(m_creature->GetEntry())
+                {
+                case NPC_WYRMREST_DEFENDER: if(m_creature->GetAreaId() != 4254 && m_creature->GetAreaId() != 4183 && m_creature->GetAreaId() != 4161)
+                                                {
+                                                     m_creature->ForcedDespawn();
+                                                }
+                                                break;
+                }
+                uiCheckTimer = 10000;
+
+            } else uiCheckTimer -= uiDiff;
+     }
+
+    
+};
+CreatureAI* GetAI_npc_vehicle(Creature* pCreature)
+{
+    return new npc_vehicleAI(pCreature);
+}
+
+/*######
+## npc_destructive_ward
+######*/
+enum
+{
+    NPC_SMOLDERING_SKELETON    = 27360,
+    NPC_SMOLDERING_CONSTRUCT   = 27362,
+    KILL_CREDIT_BUNNY          = 28820,
+    QUEST_NO_PLACE_TO_RUN      = 12261,
+    WARD_EMOTE_1               = -1799900,
+    WARD_EMOTE_2               = -1799901
+
+};
+
+struct MANGOS_DLL_DECL npc_destructive_wardAI : public ScriptedAI
+{
+    npc_destructive_wardAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+    
+    uint64 uiWaveTimer;
+    uint32 uiWaveCounter;
+
+     void Reset()
+     {
+         uiWaveTimer = 2000;
+         uiWaveCounter = 0;
+     }
+
+     void JustSummoned(Creature* pSummoned)
+     {
+         pSummoned->AI()->AttackStart(m_creature);
+     }  
+
+     void JustDied(Unit* pKiller)
+     {
+        if(Player *pPlayer = m_creature->GetMap()->GetPlayer(m_creature->GetOwnerGuid()))
+        {
+            pPlayer->FailQuest(QUEST_NO_PLACE_TO_RUN);
+        }
+     }
+
+     void SummonWave()
+     {
+         switch(uiWaveCounter)
+         {
+            case 0: m_creature->SummonCreature(NPC_SMOLDERING_SKELETON, m_creature->GetPositionX()+5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_SMOLDERING_SKELETON, m_creature->GetPositionX()-5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    break;
+            case 1: m_creature->SummonCreature(NPC_SMOLDERING_CONSTRUCT, m_creature->GetPositionX()+5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_SMOLDERING_CONSTRUCT, m_creature->GetPositionX()-5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_SMOLDERING_SKELETON, m_creature->GetPositionX()-5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    DoScriptText(WARD_EMOTE_1, m_creature);
+                    break;
+            case 2: m_creature->SummonCreature(NPC_SMOLDERING_CONSTRUCT, m_creature->GetPositionX()+5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_SMOLDERING_CONSTRUCT, m_creature->GetPositionX()-5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_SMOLDERING_SKELETON, m_creature->GetPositionX()-5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    DoScriptText(WARD_EMOTE_1, m_creature);
+                    break;
+            case 3: m_creature->SummonCreature(NPC_SMOLDERING_CONSTRUCT, m_creature->GetPositionX()+5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_SMOLDERING_CONSTRUCT, m_creature->GetPositionX()-5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    m_creature->SummonCreature(NPC_SMOLDERING_SKELETON, m_creature->GetPositionX()-5,m_creature->GetPositionY(),m_creature->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    DoScriptText(WARD_EMOTE_1, m_creature);
+                    break;
+         }
+     }
+     void UpdateAI(const uint32 uiDiff)
+     {
+            if (uiWaveTimer <= uiDiff)
+            {
+                if(Player *pPlayer = m_creature->GetMap()->GetPlayer(m_creature->GetOwnerGuid()))
+                {
+                if(pPlayer->GetQuestStatus(QUEST_NO_PLACE_TO_RUN) != QUEST_STATUS_INCOMPLETE)
+                         m_creature->ForcedDespawn();
+                }
+                if(uiWaveCounter == 4)
+                {
+                    DoScriptText(WARD_EMOTE_2, m_creature);
+                    if(Player *pPlayer = m_creature->GetMap()->GetPlayer(m_creature->GetOwnerGuid()))
+                    {
+                        if(pPlayer->isAlive())
+                            pPlayer->KilledMonsterCredit(KILL_CREDIT_BUNNY, m_creature->GetGUID());
+                    }
+                    m_creature->ForcedDespawn();
+                }
+                if(uiWaveCounter<=3)
+                {
+                    SummonWave();
+                    uiWaveTimer = 15000;
+                    uiWaveCounter++;
+                }
+
+            } else uiWaveTimer -= uiDiff;
+     }
+};
+
+CreatureAI* GetAI_npc_destructive_ward(Creature* pCreature)
+{
+    return new npc_destructive_wardAI(pCreature);
+}
+
 void AddSC_dragonblight()
 {
     Script *newscript;
@@ -466,5 +692,20 @@ void AddSC_dragonblight()
     newscript = new Script;
     newscript->Name = "mob_maggot";
     newscript->GetAI = &GetAI_mob_maggot;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_hourglass";
+    newscript->GetAI = &GetAI_npc_hourglass;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_vehicle";
+    newscript->GetAI = &GetAI_npc_vehicle;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_destructive_ward";
+    newscript->GetAI = &GetAI_npc_destructive_ward;
     newscript->RegisterSelf();
 }

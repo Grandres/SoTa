@@ -35,6 +35,8 @@ const char ItemPrototypedstfmt[]="iiiisiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 const char PageTextfmt[]="isi";
 const char InstanceTemplatesrcfmt[]="iiiis";
 const char InstanceTemplatedstfmt[]="iiiii";
+const char WorldTemplatesrcfmt[]="is";
+const char WorldTemplatedstfmt[]="ii";
 
 SQLStorage sCreatureStorage(CreatureInfosrcfmt, CreatureInfodstfmt, "entry","creature_template");
 SQLStorage sCreatureDataAddonStorage(CreatureDataAddonInfofmt,"guid","creature_addon");
@@ -45,3 +47,4 @@ SQLStorage sGOStorage(GameObjectInfosrcfmt, GameObjectInfodstfmt, "entry","gameo
 SQLStorage sItemStorage(ItemPrototypesrcfmt, ItemPrototypedstfmt, "entry","item_template");
 SQLStorage sPageTextStore(PageTextfmt,"entry","page_text");
 SQLStorage sInstanceTemplate(InstanceTemplatesrcfmt, InstanceTemplatedstfmt, "map","instance_template");
+SQLStorage sWorldTemplate(WorldTemplatesrcfmt, WorldTemplatedstfmt, "map","world_template");

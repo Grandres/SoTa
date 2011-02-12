@@ -175,9 +175,10 @@ struct MANGOS_DLL_DECL boss_ignisAI : public ScriptedAI
 
         if (m_uiSlagPotTimer <= uiDiff)
         {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                if (DoCastSpellIfCan(pTarget, m_bIsRegularMode ? SPELL_CHARGE_SLAG_POT : SPELL_CHARGE_SLAG_POT_H) == CAST_OK)
-                    m_uiSlagPotTimer = urand(15000, 25000);
+            if (Unit* pVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                if (Player *pTarget = pVictim->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    if (DoCastSpellIfCan(pTarget, m_bIsRegularMode ? SPELL_CHARGE_SLAG_POT : SPELL_CHARGE_SLAG_POT_H) == CAST_OK)
+                        m_uiSlagPotTimer = urand(15000, 25000);
         }
         else m_uiSlagPotTimer -= uiDiff;
 

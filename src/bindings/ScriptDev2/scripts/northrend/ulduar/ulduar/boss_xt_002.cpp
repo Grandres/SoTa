@@ -588,6 +588,19 @@ struct MANGOS_DLL_DECL boss_xt_002AI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        // enrage timer
+        if (m_uiEnrage_Timer < uiDiff && !m_bIsEnrage)
+        {
+            DoCast(m_creature, SPELL_ENRAGE, true);
+            if (m_creature->HasAura(SPELL_ENRAGE))
+            {
+                m_bIsEnrage = true;
+                DoScriptText(SAY_BERSERK, m_creature);
+            }
+            else
+                m_uiEnrage_Timer = 5000;
+        }else m_uiEnrage_Timer -= uiDiff;
+
         // Hard mode check
         if (m_pInstance->GetData(TYPE_XT002_HARD) == IN_PROGRESS && !m_bIsHardMode)
         {
@@ -627,19 +640,6 @@ struct MANGOS_DLL_DECL boss_xt_002AI : public ScriptedAI
                 DoScriptText(SAY_TANTRUM, m_creature);
                 m_uiTantrum_Timer = 60000;
             }else m_uiTantrum_Timer -= uiDiff;
-
-            // enrage timer
-            if (m_uiEnrage_Timer < uiDiff && !m_bIsEnrage)
-            {
-                DoCast(m_creature, SPELL_ENRAGE, true);
-                if (m_creature->HasAura(SPELL_ENRAGE))
-                {
-                    m_bIsEnrage = true;
-                    DoScriptText(SAY_BERSERK, m_creature);
-                }
-                else
-                    m_uiEnrage_Timer = 5000;
-            }else m_uiEnrage_Timer -= uiDiff;
 
             if (m_creature->GetHealthPercent() < m_uiHealthPercent && !m_bIsHardMode)
             {

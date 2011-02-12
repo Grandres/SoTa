@@ -1117,8 +1117,7 @@ void WorldObject::GetZoneAndAreaId(uint32& zoneid, uint32& areaid) const
 
 InstanceData* WorldObject::GetInstanceData() const
 {
-    Map *map = GetMap();
-    return map->IsDungeon() ? ((InstanceMap*)map)->GetInstanceData() : NULL;
+    return GetMap()->GetInstanceData();
 }
 
                                                             //slow
@@ -1684,7 +1683,7 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
     if (GetTypeId()==TYPEID_PLAYER)
         team = ((Player*)this)->GetTeam();
 
-    if (!pCreature->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), GetMap(), GetPhaseMask(), id, team))
+    if (!pCreature->Create(GetMap()->GenerateLocalLowGuid(HIGHGUID_UNIT), GetMap(), GetPhaseMask(), id, team))
     {
         delete pCreature;
         return NULL;

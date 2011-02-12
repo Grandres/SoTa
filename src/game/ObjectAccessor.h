@@ -37,7 +37,6 @@
 #include <set>
 #include <list>
 
-class Creature;
 class Unit;
 class GameObject;
 class Vehicle;
