@@ -234,7 +234,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
         }
         if (!player->isGameMaster())
         {
-            InstanceData* i_data = ((InstanceMap*)CreateMap(mapid, player))->GetInstanceData();
+            InstanceData* i_data = ((DungeonMap*)CreateMap(mapid, player))->GetInstanceData();
 
             if (i_data && i_data->IsEncounterInProgress())
             {

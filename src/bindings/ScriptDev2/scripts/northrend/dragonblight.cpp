@@ -645,6 +645,30 @@ CreatureAI* GetAI_npc_destructive_ward(Creature* pCreature)
     return new npc_destructive_wardAI(pCreature);
 }
 
+/*######
+## npc_ravaged_giant
+######*/
+enum
+{
+    QUEST_SLIM_PICKINGS               = 12075,
+    ITEM_SAMPLE_OF_ROCKFLESH          = 36765
+};
+
+bool GossipHello_npc_ravaged_giant(Player* pPlayer, Creature* pCreature)
+{
+    if (pCreature->isQuestGiver())
+        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
+
+    if(pPlayer->GetQuestStatus(QUEST_SLIM_PICKINGS ) == QUEST_STATUS_INCOMPLETE)
+    {
+            ItemPosCountVec dest;
+            uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_SAMPLE_OF_ROCKFLESH, 1, false);
+            if (msg == EQUIP_ERR_OK)
+                pPlayer->StoreNewItem(dest, ITEM_SAMPLE_OF_ROCKFLESH, 1, true);
+    }
+    return true;
+}
+
 void AddSC_dragonblight()
 {
     Script *newscript;
@@ -707,5 +731,10 @@ void AddSC_dragonblight()
     newscript = new Script;
     newscript->Name = "npc_destructive_ward";
     newscript->GetAI = &GetAI_npc_destructive_ward;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_ravaged_giant";
+    newscript->pGossipHello = &GossipHello_npc_ravaged_giant;
     newscript->RegisterSelf();
 }
