@@ -38,9 +38,9 @@
 #include <list>
 
 class Unit;
-class GameObject;
 class WorldObject;
 class Map;
+class GameObject;
 
 template <class T>
 class HashMapHolder
