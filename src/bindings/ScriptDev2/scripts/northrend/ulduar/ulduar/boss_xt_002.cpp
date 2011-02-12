@@ -451,7 +451,7 @@ struct MANGOS_DLL_DECL boss_xt_002AI : public ScriptedAI
         // spell timers
         m_uiBomb_Timer          = 8000;
         m_uiTantrum_Timer       = 35000;
-        m_uiEnrage_Timer        = (m_bIsRegularMode ? 6 : 8)*MINUTE*IN_MILLISECONDS;
+        m_uiEnrage_Timer        = 10*MINUTE*IN_MILLISECONDS;
 
         // summon timers
         m_uiScrapbotTimer       = 5000;
