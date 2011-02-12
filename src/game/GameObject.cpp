@@ -32,6 +32,8 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "InstanceData.h"
+#include "MapManager.h"
+#include "MapPersistentStateMgr.h"
 #include "BattleGround.h"
 #include "BattleGroundAV.h"
 #include "Util.h"
@@ -151,10 +153,8 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map *map, uint32 phaseMa
     //Notify the map's instance data.
     //Only works if you create the object in it, not if it is moves to that map.
     //Normally non-players do not teleport to other maps.
-    if(map->IsDungeon() && ((InstanceMap*)map)->GetInstanceData())
-    {
-        ((InstanceMap*)map)->GetInstanceData()->OnObjectCreate(this);
-    }
+    if (InstanceData* iData = map->GetInstanceData())
+        iData->OnObjectCreate(this);
 
     return true;
 }
@@ -580,7 +580,6 @@ bool GameObject::LoadFromDB(uint32 guid, Map *map)
     GOState go_state = data->go_state;
 
     m_DBTableGuid = guid;
-    if (map->GetInstanceId() != 0) guid = sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT);
 
     if (!Create(guid,entry, map, phaseMask, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, animprogress, go_state) )
         return false;
@@ -598,13 +597,14 @@ bool GameObject::LoadFromDB(uint32 guid, Map *map)
         {
             m_spawnedByDefault = true;
             m_respawnDelayTime = data->spawntimesecs;
-            m_respawnTime = sObjectMgr.GetGORespawnTime(m_DBTableGuid, map->GetInstanceId());
+
+            m_respawnTime  = map->GetPersistentState()->GetGORespawnTime(m_DBTableGuid);
 
             // ready to respawn
-            if(m_respawnTime && m_respawnTime <= time(NULL))
+            if (m_respawnTime && m_respawnTime <= time(NULL))
             {
                 m_respawnTime = 0;
-                sObjectMgr.SaveGORespawnTime(m_DBTableGuid,GetInstanceId(),0);
+                map->GetPersistentState()->SaveGORespawnTime(m_DBTableGuid, 0);
             }
         }
         else
@@ -618,9 +618,30 @@ bool GameObject::LoadFromDB(uint32 guid, Map *map)
     return true;
 }
 
+struct GameObjectRespawnDeleteWorker
+{
+    explicit GameObjectRespawnDeleteWorker(uint32 guid) : i_guid(guid) {}
+
+    void operator() (MapPersistentState* state)
+    {
+        state->SaveGORespawnTime(i_guid, 0);
+    }
+
+    uint32 i_guid;
+};
+
+
 void GameObject::DeleteFromDB()
 {
-    sObjectMgr.SaveGORespawnTime(m_DBTableGuid,GetInstanceId(),0);
+    if (!m_DBTableGuid)
+    {
+        DEBUG_LOG("Trying to delete not saved gameobject!");
+        return;
+    }
+
+    GameObjectRespawnDeleteWorker worker(m_DBTableGuid);
+    sMapPersistentStateMgr.DoForAllStatesWithMapId(GetMapId(), worker);
+
     sObjectMgr.DeleteGOData(m_DBTableGuid);
     WorldDatabase.PExecuteLog("DELETE FROM gameobject WHERE guid = '%u'", m_DBTableGuid);
     WorldDatabase.PExecuteLog("DELETE FROM game_event_gameobject WHERE guid = '%u'", m_DBTableGuid);
@@ -673,7 +694,7 @@ Unit* GameObject::GetOwner() const
 void GameObject::SaveRespawnTime()
 {
     if(m_respawnTime > time(NULL) && m_spawnedByDefault)
-        sObjectMgr.SaveGORespawnTime(m_DBTableGuid,GetInstanceId(),m_respawnTime);
+        GetMap()->GetPersistentState()->SaveGORespawnTime(m_DBTableGuid, m_respawnTime);
 }
 
 bool GameObject::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
@@ -721,7 +742,7 @@ void GameObject::Respawn()
     if(m_spawnedByDefault && m_respawnTime > 0)
     {
         m_respawnTime = time(NULL);
-        sObjectMgr.SaveGORespawnTime(m_DBTableGuid,GetInstanceId(),0);
+        GetMap()->GetPersistentState()->SaveGORespawnTime(m_DBTableGuid, 0);
     }
 }
 
@@ -813,7 +834,7 @@ void GameObject::SummonLinkedTrapIfAny()
         return;
 
     GameObject* linkedGO = new GameObject;
-    if (!linkedGO->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), linkedEntry, GetMap(),
+    if (!linkedGO->Create(GetMap()->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT), linkedEntry, GetMap(),
          GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, GO_ANIMPROGRESS_DEFAULT, GO_STATE_READY))
     {
         delete linkedGO;
@@ -1685,4 +1706,57 @@ bool GameObject::IsInSkillupList(Player* player) const
 void GameObject::AddToSkillupList(Player* player)
 {
     m_SkillupSet.insert(player->GetObjectGuid());
+}
+
+struct AddGameObjectToRemoveListInMapsWorker
+{
+    AddGameObjectToRemoveListInMapsWorker(ObjectGuid guid) : i_guid(guid) {}
+
+    void operator() (Map* map)
+    {
+        if (GameObject* pGameobject = map->GetGameObject(i_guid))
+            pGameobject->AddObjectToRemoveList();
+    }
+
+    ObjectGuid i_guid;
+};
+
+void GameObject::AddToRemoveListInMaps(uint32 db_guid, GameObjectData const* data)
+{
+    AddGameObjectToRemoveListInMapsWorker worker(ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, db_guid));
+    sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
+}
+
+struct SpawnGameObjectInMapsWorker
+{
+    SpawnGameObjectInMapsWorker(uint32 guid, GameObjectData const* data)
+        : i_guid(guid), i_data(data) {}
+
+    void operator() (Map* map)
+    {
+        // Spawn if necessary (loaded grids only)
+        if (map->IsLoaded(i_data->posX, i_data->posY))
+        {
+            GameObject* pGameobject = new GameObject;
+            //DEBUG_LOG("Spawning gameobject %u", *itr);
+            if (!pGameobject->LoadFromDB(i_guid, map))
+            {
+                delete pGameobject;
+            }
+            else
+            {
+                if (pGameobject->isSpawnedByDefault())
+                    map->Add(pGameobject);
+            }
+        }
+    }
+
+    uint32 i_guid;
+    GameObjectData const* i_data;
+};
+
+void GameObject::SpawnInMaps(uint32 db_guid, GameObjectData const* data)
+{
+    SpawnGameObjectInMapsWorker worker(db_guid, data);
+    sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
 }

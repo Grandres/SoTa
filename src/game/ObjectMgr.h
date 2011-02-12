@@ -102,9 +102,6 @@ struct CellObjectGuids
 typedef UNORDERED_MAP<uint32/*cell_id*/,CellObjectGuids> CellObjectGuidsMap;
 typedef UNORDERED_MAP<uint32/*(mapid,spawnMode) pair*/,CellObjectGuidsMap> MapObjectGuids;
 
-typedef UNORDERED_MAP<uint64/*(instance,guid) pair*/,time_t> RespawnTimes;
-
-
 // mangos string ranges
 #define MIN_MANGOS_STRING_ID           1                    // 'mangos_string'
 #define MAX_MANGOS_STRING_ID           2000000000
@@ -529,6 +526,11 @@ class ObjectMgr
             return sInstanceTemplate.LookupEntry<InstanceTemplate>(map);
         }
 
+        static WorldTemplate const* GetWorldTemplate(uint32 map)
+        {
+            return sWorldTemplate.LookupEntry<WorldTemplate>(map);
+        }
+
         PetLevelInfo const* GetPetLevelInfo(uint32 creature_id, uint32 level) const;
 
         PlayerClassInfo const* GetPlayerClassInfo(uint32 class_) const
@@ -663,14 +665,12 @@ class ObjectMgr
         void LoadCreatureLocales();
         void LoadCreatureTemplates();
         void LoadCreatures();
-        void LoadCreatureRespawnTimes();
         void LoadCreatureAddons();
         void LoadCreatureModelInfo();
         void LoadCreatureModelRace();
         void LoadEquipmentTemplates();
         void LoadGameObjectLocales();
         void LoadGameobjects();
-        void LoadGameobjectRespawnTimes();
         void LoadItemConverts();
         void LoadItemPrototypes();
         void LoadItemRequiredTarget();
@@ -682,6 +682,7 @@ class ObjectMgr
         void LoadGossipMenuItemsLocales();
         void LoadPointOfInterestLocales();
         void LoadInstanceTemplate();
+        void LoadWorldTemplate();
         void LoadMailLevelRewards();
 
         void LoadGossipText();
@@ -737,7 +738,16 @@ class ObjectMgr
         void ReturnOrDeleteOldMails(bool serverUp);
 
         void SetHighestGuids();
-        uint32 GenerateLowGuid(HighGuid guidhigh);
+
+        // used for set initial guid counter for map local guids
+        uint32 GetFirstCreatureLowGuid() const { return m_CreatureFirstGuid; }
+        uint32 GetFirstGameObjectLowGuid() const { return m_GameObjectFirstGuid; }
+
+        uint32 GeneratePlayerLowGuid() { return m_CharGuids.Generate(); }
+        uint32 GenerateItemLowGuid() { return m_ItemGuids.Generate(); }
+        uint32 GenerateCorpseLowGuid() { return m_CorpseGuids.Generate(); }
+        uint32 GenerateInstanceLowGuid() { return m_InstanceGuids.Generate(); }
+
         uint32 GenerateArenaTeamId() { return m_ArenaTeamIds.Generate(); }
         uint32 GenerateAuctionID() { return m_AuctionIds.Generate(); }
         uint64 GenerateEquipmentSetGuid() { return m_EquipmentSetIds.Generate(); }
@@ -901,12 +911,6 @@ class ObjectMgr
 
         void AddCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_guid, uint32 instance);
         void DeleteCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_guid);
-
-        time_t GetCreatureRespawnTime(uint32 loguid, uint32 instance) { return mCreatureRespawnTimes[MAKE_PAIR64(loguid,instance)]; }
-        void SaveCreatureRespawnTime(uint32 loguid, uint32 instance, time_t t);
-        time_t GetGORespawnTime(uint32 loguid, uint32 instance) { return mGORespawnTimes[MAKE_PAIR64(loguid,instance)]; }
-        void SaveGORespawnTime(uint32 loguid, uint32 instance, time_t t);
-        void DeleteRespawnTimeForInstance(uint32 instance);
 
         // grid objects
         void AddCreatureToGrid(uint32 guid, CreatureData const* data);
@@ -1083,11 +1087,13 @@ class ObjectMgr
         IdGenerator<uint32> m_PetNumbers;
         IdGenerator<uint32> m_GroupIds;
 
+        // initial free low guid for selected guid type for map local guids
+        uint32 m_CreatureFirstGuid;
+        uint32 m_GameObjectFirstGuid;
+
         // first free low guid for selected guid type
         ObjectGuidGenerator<HIGHGUID_PLAYER>     m_CharGuids;
-        ObjectGuidGenerator<HIGHGUID_UNIT>       m_CreatureGuids;
         ObjectGuidGenerator<HIGHGUID_ITEM>       m_ItemGuids;
-        ObjectGuidGenerator<HIGHGUID_GAMEOBJECT> m_GameobjectGuids;
         ObjectGuidGenerator<HIGHGUID_CORPSE>     m_CorpseGuids;
         ObjectGuidGenerator<HIGHGUID_INSTANCE>   m_InstanceGuids;
 
@@ -1195,8 +1201,6 @@ class ObjectMgr
         MangosStringLocaleMap mMangosStringLocaleMap;
         GossipMenuItemsLocaleMap mGossipMenuItemsLocaleMap;
         PointOfInterestLocaleMap mPointOfInterestLocaleMap;
-        RespawnTimes mCreatureRespawnTimes;
-        RespawnTimes mGORespawnTimes;
 
         // Storage for Conditions. First element (index 0) is reserved for zero-condition (nothing required)
         typedef std::vector<PlayerCondition> ConditionStore;

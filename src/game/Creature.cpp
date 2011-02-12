@@ -38,6 +38,7 @@
 #include "Formulas.h"
 #include "WaypointMovementGenerator.h"
 #include "InstanceData.h"
+#include "MapPersistentStateMgr.h"
 #include "BattleGroundMgr.h"
 #include "Spell.h"
 #include "Util.h"
@@ -454,6 +455,9 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 lootForBody         = false;
                 lootForSkin         = false;
 
+                // Clear possible auras having IsDeathPersistent() attribute
+                RemoveAllAuras();
+
                 if(m_originalEntry != GetEntry())
                 {
                     // need preserver gameevent state
@@ -724,8 +728,8 @@ bool Creature::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, 
         //Notify the map's instance data.
         //Only works if you create the object in it, not if it is moves to that map.
         //Normally non-players do not teleport to other maps.
-        if(map->IsDungeon() && ((InstanceMap*)map)->GetInstanceData())
-            ((InstanceMap*)map)->GetInstanceData()->OnCreatureCreate(this);
+        if (InstanceData* iData = map->GetInstanceData())
+            iData->OnCreatureCreate(this);
 
         switch (GetCreatureInfo()->rank)
         {
@@ -1240,17 +1244,10 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     GameEventCreatureData const* eventData = sGameEventMgr.GetCreatureUpdateDataForActiveEvent(guidlow);
 
     m_DBTableGuid = guidlow;
-    if (map->GetInstanceId() == 0)
-    {
-        // Creature can be loaded already in map if grid has been unloaded while creature walk to another grid
-        // FIXME: until creature guids is global and for instances used dynamic generated guids
-        // in instance possible load creature duplicates with same DB guid but different in game guids
-        // This will be until implementing per-map creature guids
-        if (map->GetCreature(ObjectGuid(HIGHGUID_UNIT, data->id, guidlow)))
-            return false;
-    }
-    else
-        guidlow = sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT);
+
+    // Creature can be loaded already in map if grid has been unloaded while creature walk to another grid
+    if (map->GetCreature(ObjectGuid(HIGHGUID_UNIT, data->id, guidlow)))
+        return false;
 
     if (!Create(guidlow, map, data->phaseMask, data->id, TEAM_NONE, data, eventData))
         return false;
@@ -1269,7 +1266,8 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     m_isDeadByDefault = data->is_dead;
     m_deathState = m_isDeadByDefault ? DEAD : ALIVE;
 
-    m_respawnTime  = sObjectMgr.GetCreatureRespawnTime(m_DBTableGuid, GetInstanceId());
+    m_respawnTime  = map->GetPersistentState()->GetCreatureRespawnTime(m_DBTableGuid);
+
     if(m_respawnTime > time(NULL))                          // not ready to respawn
     {
         m_deathState = DEAD;
@@ -1283,7 +1281,8 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     else if(m_respawnTime)                                  // respawn time set but expired
     {
         m_respawnTime = 0;
-        sObjectMgr.SaveCreatureRespawnTime(m_DBTableGuid,GetInstanceId(),0);
+
+        GetMap()->GetPersistentState()->SaveCreatureRespawnTime(m_DBTableGuid, 0);
     }
 
     uint32 curhealth = data->curhealth;
@@ -1350,6 +1349,19 @@ bool Creature::HasInvolvedQuest(uint32 quest_id) const
     return false;
 }
 
+
+struct CreatureRespawnDeleteWorker
+{
+    explicit CreatureRespawnDeleteWorker(uint32 guid) : i_guid(guid) {}
+
+    void operator() (MapPersistentState* state)
+    {
+        state->SaveCreatureRespawnTime(i_guid, 0);
+    }
+
+    uint32 i_guid;
+};
+
 void Creature::DeleteFromDB()
 {
     if (!m_DBTableGuid)
@@ -1358,7 +1370,9 @@ void Creature::DeleteFromDB()
         return;
     }
 
-    sObjectMgr.SaveCreatureRespawnTime(m_DBTableGuid,GetInstanceId(),0);
+    CreatureRespawnDeleteWorker worker (m_DBTableGuid);
+    sMapPersistentStateMgr.DoForAllStatesWithMapId(GetMapId(), worker);
+
     sObjectMgr.DeleteCreatureData(m_DBTableGuid);
 
     WorldDatabase.BeginTransaction();
@@ -1516,7 +1530,7 @@ void Creature::Respawn()
     if (IsDespawned())
     {
         if (m_DBTableGuid)
-            sObjectMgr.SaveCreatureRespawnTime(m_DBTableGuid,GetInstanceId(), 0);
+            GetMap()->GetPersistentState()->SaveCreatureRespawnTime(m_DBTableGuid, 0);
         m_respawnTime = time(NULL);                         // respawn at next tick
     }
 }
@@ -1815,9 +1829,9 @@ void Creature::SaveRespawnTime()
         return;
 
     if(m_respawnTime > time(NULL))                          // dead (no corpse)
-        sObjectMgr.SaveCreatureRespawnTime(m_DBTableGuid, GetInstanceId(), m_respawnTime);
+        GetMap()->GetPersistentState()->SaveCreatureRespawnTime(m_DBTableGuid, m_respawnTime);
     else if (m_corpseDecayTimer > 0)                        // dead (corpse)
-        sObjectMgr.SaveCreatureRespawnTime(m_DBTableGuid, GetInstanceId(), time(NULL) + m_respawnDelay + m_corpseDecayTimer / IN_MILLISECONDS);
+        GetMap()->GetPersistentState()->SaveCreatureRespawnTime(m_DBTableGuid, time(NULL) + m_respawnDelay + m_corpseDecayTimer / IN_MILLISECONDS);
 }
 
 bool Creature::IsOutOfThreatArea(Unit* pVictim) const
@@ -2374,3 +2388,71 @@ void Creature::ApplyGameEventSpells(GameEventCreatureData const* eventData, bool
     if (cast_spell)
         CastSpell(this, cast_spell, true);
 }
+
+void Creature::FillGuidsListFromThreatList( std::vector<ObjectGuid>& guids, uint32 maxamount /*= 0*/ )
+{
+    if (!CanHaveThreatList())
+        return;
+
+    ThreatList const& threats = getThreatManager().getThreatList();
+
+    maxamount = maxamount > 0 ? std::min(maxamount,uint32(threats.size())) : threats.size();
+
+    guids.reserve(guids.size() + maxamount);
+
+    for (ThreatList::const_iterator itr = threats.begin(); maxamount && itr != threats.end(); ++itr, --maxamount)
+        guids.push_back((*itr)->getUnitGuid());
+}
+
+struct AddCaretureToRemoveListInMapsWorker
+{
+    AddCaretureToRemoveListInMapsWorker(ObjectGuid guid) : i_guid(guid) {}
+
+    void operator() (Map* map)
+    {
+        if (Creature* pCreature = map->GetCreature(i_guid))
+            pCreature->AddObjectToRemoveList();
+    }
+
+    ObjectGuid i_guid;
+};
+
+void Creature::AddToRemoveListInMaps(uint32 db_guid, CreatureData const* data)
+{
+    AddCaretureToRemoveListInMapsWorker worker(ObjectGuid(HIGHGUID_UNIT, data->id, db_guid));
+    sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
+}
+
+struct SpawnCreatureInMapsWorker
+{
+    SpawnCreatureInMapsWorker(uint32 guid, CreatureData const* data)
+        : i_guid(guid), i_data(data) {}
+
+    void operator() (Map* map)
+    {
+        // We use spawn coords to spawn
+        if (map->IsLoaded(i_data->posX, i_data->posY))
+        {
+            Creature* pCreature = new Creature;
+            //DEBUG_LOG("Spawning creature %u",*itr);
+            if (!pCreature->LoadFromDB(i_guid, map))
+            {
+                delete pCreature;
+            }
+            else
+            {
+                map->Add(pCreature);
+            }
+        }
+    }
+
+    uint32 i_guid;
+    CreatureData const* i_data;
+};
+
+void Creature::SpawnInMaps(uint32 db_guid, CreatureData const* data)
+{
+    SpawnCreatureInMapsWorker worker(db_guid, data);
+    sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
+}
+

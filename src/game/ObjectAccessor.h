@@ -37,9 +37,7 @@
 #include <set>
 #include <list>
 
-class Creature;
 class Unit;
-class GameObject;
 class WorldObject;
 class Map;
 
@@ -96,13 +94,6 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
 
     public:
         typedef UNORDERED_MAP<ObjectGuid, Corpse*> Player2CorpsesMapType;
-
-        // global (obj used for map only location local guid objects (pets currently)
-        static Unit*   GetUnitInWorld(WorldObject const& obj, ObjectGuid guid);
-
-        // FIXME: map local object with global search
-        static Creature*   GetCreatureInWorld(ObjectGuid guid)   { return FindHelper<Creature>(guid); }
-        static GameObject* GetGameObjectInWorld(ObjectGuid guid) { return FindHelper<GameObject>(guid); }
 
         // Search player at any map in world and other objects at same map with `obj`
         // Note: recommended use Map::GetUnit version if player also expected at same map only
@@ -166,20 +157,6 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         LockType i_playerGuard;
         LockType i_corpseGuard;
 };
-
-inline Unit* ObjectAccessor::GetUnitInWorld(WorldObject const& obj, ObjectGuid guid)
-{
-    if(guid.IsEmpty())
-        return NULL;
-
-    if (guid.IsPlayer())
-        return FindPlayer(guid);
-
-    if (guid.IsPet())
-        return obj.IsInWorld() ? obj.GetMap()->GetPet(guid) : NULL;
-
-    return GetCreatureInWorld(guid);
-}
 
 #define sObjectAccessor ObjectAccessor::Instance()
 
