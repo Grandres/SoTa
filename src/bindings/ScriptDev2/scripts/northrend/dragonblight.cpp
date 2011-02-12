@@ -674,6 +674,45 @@ bool GossipHello_npc_ravaged_giant(Player* pPlayer, Creature* pCreature)
     return true;
 }
 
+/*######
+## npc_vengeful_geist
+######*/
+
+enum
+{
+    NPC_TRAPPED_VILLAGER             = 27359,
+    QUEST_RESCUE_FROM_TOWN_SQUARE    = 12253,
+    SPELL_DESPAWN_SELF               = 43014
+
+};
+
+struct MANGOS_DLL_DECL npc_vengeful_geistAI : public ScriptedAI
+{
+    npc_vengeful_geistAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+    
+    void Reset(){}
+    void JustDied(Unit* pKiller)
+    {
+        if(Creature* pVillager = GetClosestCreatureWithEntry(m_creature, NPC_TRAPPED_VILLAGER, 15.0f))
+        { 
+            if(Player *pPlayer = m_creature->GetMap()->GetPlayer(pKiller->GetGUID()))
+            {
+                if(pPlayer->GetQuestStatus(QUEST_RESCUE_FROM_TOWN_SQUARE) == QUEST_STATUS_INCOMPLETE)
+                {
+                    pPlayer->KilledMonsterCredit(NPC_TRAPPED_VILLAGER);
+                    pVillager->CastSpell(pVillager, SPELL_DESPAWN_SELF, false);
+                }
+            }
+        }
+    }
+
+};
+
+CreatureAI* GetAI_npc_vengeful_geist(Creature* pCreature)
+{
+    return new npc_vengeful_geistAI(pCreature);
+}
+
 void AddSC_dragonblight()
 {
     Script *newscript;
@@ -741,5 +780,10 @@ void AddSC_dragonblight()
     newscript = new Script;
     newscript->Name = "npc_ravaged_giant";
     newscript->pGossipHello = &GossipHello_npc_ravaged_giant;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_vengeful_geist";
+    newscript->GetAI = &GetAI_npc_vengeful_geist;
     newscript->RegisterSelf();
 }
