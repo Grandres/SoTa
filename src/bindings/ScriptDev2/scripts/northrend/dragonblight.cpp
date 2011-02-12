@@ -508,8 +508,8 @@ CreatureAI* GetAI_npc_hourglass(Creature* pCreature)
 ######*/
 enum 
 {
-    NPC_WYRMREST_DEFENDER  = 27629
-
+    NPC_WYRMREST_DEFENDER      = 27629,
+    NPC_WINTERGARDE_GRYPHOON   = 27258
 };
 
 struct MANGOS_DLL_DECL npc_vehicleAI : public ScriptedAI
@@ -528,11 +528,16 @@ struct MANGOS_DLL_DECL npc_vehicleAI : public ScriptedAI
             {
                 switch(m_creature->GetEntry())
                 {
-                case NPC_WYRMREST_DEFENDER: if(m_creature->GetAreaId() != 4254 && m_creature->GetAreaId() != 4183 && m_creature->GetAreaId() != 4161)
-                                                {
+                    case NPC_WYRMREST_DEFENDER: if(m_creature->GetAreaId() != 4254 && m_creature->GetAreaId() != 4183 && m_creature->GetAreaId() != 4161)
+                                                 {
                                                      m_creature->ForcedDespawn();
-                                                }
-                                                break;
+                                                 }
+                                                 break;
+                    case NPC_WINTERGARDE_GRYPHOON: if(m_creature->GetAreaId() != 4177 && m_creature->GetAreaId() != 4188)
+                                                    {
+                                                        m_creature->ForcedDespawn();
+                                                    }
+                                                    break;
                 }
                 uiCheckTimer = 10000;
 
