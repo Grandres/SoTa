@@ -881,6 +881,50 @@ bool QuestAccept_npc_inquisitor_hallard(Player* pPlayer, Creature* pCreature, co
     }
     return true;
 }
+
+/*######
+## npc_wintergarde_bomb
+######*/
+enum 
+{
+    NPC_UPPER_MINE_SHAFT            = 27436,
+    NPC_LOWER_MINE_SHAFT            = 27437,
+    QUEST_LEAVE_NOTHING_TO_CHANCE   = 12277
+ 
+};
+
+struct MANGOS_DLL_DECL npc_wintergarde_bombAI : public ScriptedAI
+{
+    npc_wintergarde_bombAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    uint32 uiCheckTimer;
+    void Reset() 
+    {
+        uiCheckTimer = 2000;
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+     {
+            if (uiCheckTimer <= uiDiff)
+            {
+                if(Player *pPlayer = m_creature->GetMap()->GetPlayer(m_creature->GetCreatorGuid()))
+                {
+                    if(pPlayer->GetQuestStatus(QUEST_LEAVE_NOTHING_TO_CHANCE) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        if (m_creature->GetPositionZ() < 118.0f)
+                            pPlayer->KilledMonsterCredit(NPC_LOWER_MINE_SHAFT);
+                        else pPlayer->KilledMonsterCredit(NPC_UPPER_MINE_SHAFT);
+                    }
+                    m_creature->ForcedDespawn();
+                }                
+            } else uiCheckTimer -= uiDiff;
+     }    
+};
+CreatureAI* GetAI_npc_wintergarde_bomb(Creature* pCreature)
+{
+    return new npc_wintergarde_bombAI(pCreature);
+}
+
 void AddSC_dragonblight()
 {
     Script *newscript;
@@ -959,5 +1003,10 @@ void AddSC_dragonblight()
     newscript->Name = "npc_inquisitor_hallard";
     newscript->GetAI = &GetAI_npc_inquisitor_hallard;
     newscript->pQuestAccept = &QuestAccept_npc_inquisitor_hallard;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_wintergarde_bomb";
+    newscript->GetAI = &GetAI_npc_wintergarde_bomb;
     newscript->RegisterSelf();
 }
