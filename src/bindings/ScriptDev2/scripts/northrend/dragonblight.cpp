@@ -1002,7 +1002,7 @@ void AddSC_dragonblight()
     newscript = new Script;
     newscript->Name = "npc_inquisitor_hallard";
     newscript->GetAI = &GetAI_npc_inquisitor_hallard;
-    newscript->pQuestAccept = &QuestAccept_npc_inquisitor_hallard;
+    newscript->pQuestAcceptNPC = &QuestAccept_npc_inquisitor_hallard;
     newscript->RegisterSelf();
 
     newscript = new Script;
