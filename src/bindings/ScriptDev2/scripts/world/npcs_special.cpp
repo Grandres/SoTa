@@ -1750,7 +1750,7 @@ bool GossipSelect_npc_locksmith(Player* pPlayer, Creature* pCreature, uint32 uiS
     return true;
 }
 
-*######
+/*######
 ## npc_experience_eliminator
 ######*/
 
