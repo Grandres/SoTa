@@ -4461,7 +4461,10 @@ void Aura::HandleAuraModDisarm(bool apply, bool Real)
         return;
 
     if (apply)
+    {
+        target->RemoveAurasDueToSpell(46924); // Disarm should stop bladestorm
         target->SetAttackTime(attack_type, BASE_ATTACK_TIME);
+    }
     else
         ((Player *)target)->SetRegularAttackTime();
 
