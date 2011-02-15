@@ -1811,7 +1811,7 @@ struct MANGOS_DLL_DECL mob_ebon_gargoyleAI : public ScriptedAI
 
     Unit* pTarget;
     uint64 m_uiTargetGUID;
-    uint64 m_uiCreatorGUID;
+    ObjectGuid m_uiCreatorGUID;
     uint32 m_uiStrikeTimer;
     bool m_bIsReady;
 
