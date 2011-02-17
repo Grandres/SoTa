@@ -712,6 +712,218 @@ CreatureAI* GetAI_npc_vengeful_geist(Creature* pCreature)
 {
     return new npc_vengeful_geistAI(pCreature);
 }
+/*######
+## npc_inquisitor_hallard
+######*/
+
+enum
+{
+    NPC_MAYOR_GODFREY                = 27577,
+    QUEST_RIGHTEOUS_SERMON           = 12321,
+    SPELL_INQUISITOR_PENANCE         = 49062,
+
+    HALLARD_SAY_1                    = -1789900,
+    HALLARD_SAY_2                    = -1789901,
+    GODFREY_EMOTE_1                  = -1789902,
+    HALLARD_SAY_3                    = -1789903,
+    HALLARD_SAY_4                    = -1789904,
+    GODFREY_EMOTE_2                  = -1789905,
+    GODFREY_SAY_1                    = -1789906,
+    GODFREY_SAY_2                    = -1789907,
+    GODFREY_SAY_3                    = -1789908,
+    HALLARD_SAY_5                    = -1789909,
+    HALLARD_SAY_6                    = -1789927,
+    HALLARD_SAY_7                    = -1789910,
+    HALLARD_SAY_8                    = -1789911,
+    HALLARD_SAY_9                    = -1789912,
+    HALLARD_SAY_10                   = -1789913,
+    GODFREY_SAY_4                    = -1789914,
+    GODFREY_SAY_5                    = -1789915,
+    HALLARD_SAY_11                   = -1789916,
+    GODFREY_SAY_6                    = -1789917,
+    HALLARD_SAY_12                   = -1789918,
+    GODFREY_SAY_7                    = -1789919,
+    GODFREY_SAY_8                    = -1789920,
+    HALLARD_SAY_13                   = -1789921,
+    GODFREY_SAY_9                    = -1789922,
+    GODFREY_SAY_10                   = -1789923,
+    HALLARD_SAY_14                   = -1789924,
+    HALLARD_SAY_15                   = -1789925,
+    HALLARD_SAY_16                   = -1789926
+
+};
+
+struct MANGOS_DLL_DECL npc_inquisitor_hallardAI : public ScriptedAI
+{
+    npc_inquisitor_hallardAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+    
+    uint64 uiPlayerGUID;
+    uint64 uiEventTimer;
+    bool bEventStarted;
+    uint32 uiPhase;
+
+     void Reset()
+     {
+         uiPlayerGUID = 0;
+         bEventStarted = false;
+         uiPhase = 0;
+         uiEventTimer = 2000;
+     }
+    
+     void UpdateAI(const uint32 uiDiff)
+     {
+         if(bEventStarted)
+         {
+            if (uiEventTimer <= uiDiff)
+            {
+                switch(uiPhase)
+                {
+                    case 0: if(Player *pPlayer = m_creature->GetMap()->GetPlayer(uiPlayerGUID))
+                                  DoScriptText(HALLARD_SAY_1 ,m_creature, pPlayer);
+                            uiEventTimer = 4000;
+                            break;
+                    case 1: DoScriptText(HALLARD_SAY_2 ,m_creature); uiEventTimer = 2000; break;
+                    case 2: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_EMOTE_1, pGodfrey);
+                            uiEventTimer = 2000; break;
+                    case 3: DoScriptText(HALLARD_SAY_3 ,m_creature); uiEventTimer = 4000; break;
+                    case 4: DoScriptText(HALLARD_SAY_4 ,m_creature); uiEventTimer = 2000; break;
+                    case 5: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_EMOTE_2, pGodfrey);
+                            uiEventTimer = 3000; break;
+                    case 6: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_SAY_1, pGodfrey);
+                            uiEventTimer = 5000; break;
+                    case 7: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_SAY_2, pGodfrey);
+                            uiEventTimer = 5000; break;
+                    case 8: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_SAY_3, pGodfrey);
+                            uiEventTimer = 5000; break;
+                    case 9:  DoScriptText(HALLARD_SAY_5 ,m_creature); uiEventTimer = 7000; break; 
+                    case 10: DoScriptText(HALLARD_SAY_6 ,m_creature); uiEventTimer = 8000; break;
+                    case 11: DoScriptText(HALLARD_SAY_7 ,m_creature); uiEventTimer = 9000; break;
+                    case 12: DoScriptText(HALLARD_SAY_8 ,m_creature); uiEventTimer = 9000; break;
+                    case 13: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                 m_creature->CastSpell(pGodfrey, SPELL_INQUISITOR_PENANCE,false);
+                             DoScriptText(HALLARD_SAY_9 ,m_creature); uiEventTimer = 4000; break;
+                    case 14: DoScriptText(HALLARD_SAY_10 ,m_creature); uiEventTimer = 4000; break;
+                    case 15: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                 m_creature->CastSpell(pGodfrey, SPELL_INQUISITOR_PENANCE,false);
+                             DoScriptText(HALLARD_SAY_9 ,m_creature); uiEventTimer = 4000; break;
+                    case 16: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_SAY_4, pGodfrey);
+                            uiEventTimer = 2000; break;
+                    case 17: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_SAY_5, pGodfrey);
+                            uiEventTimer = 5000; break;
+                    case 18: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                 m_creature->CastSpell(pGodfrey, SPELL_INQUISITOR_PENANCE,false);
+                             DoScriptText(HALLARD_SAY_9 ,m_creature); uiEventTimer = 4000; break;
+                    case 19: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_SAY_4, pGodfrey);
+                            uiEventTimer = 4000; break;
+                    case 20: DoScriptText(HALLARD_SAY_11 ,m_creature); uiEventTimer = 7000; break;
+                    case 21: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_SAY_6, pGodfrey);
+                            uiEventTimer = 7000; break;
+                    case 22: DoScriptText(HALLARD_SAY_12 ,m_creature); uiEventTimer = 10000; break;
+                    case 23: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_SAY_7, pGodfrey);
+                            uiEventTimer = 8000; break;
+                    case 24: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_SAY_8, pGodfrey);
+                            uiEventTimer = 8000; break;
+                    case 25: DoScriptText(HALLARD_SAY_13 ,m_creature); uiEventTimer = 10000; break;
+                    case 26: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_SAY_9, pGodfrey);
+                            uiEventTimer = 7000; break;
+                    case 27: if(Creature *pGodfrey = GetClosestCreatureWithEntry(m_creature, NPC_MAYOR_GODFREY, 15.0f))	
+                                DoScriptText(GODFREY_SAY_10, pGodfrey);
+                            uiEventTimer = 9000; break;
+                    case 28: DoScriptText(HALLARD_SAY_14 ,m_creature); uiEventTimer = 10000; break;
+                    case 29: if(Player *pPlayer = m_creature->GetMap()->GetPlayer(uiPlayerGUID))
+                                DoScriptText(HALLARD_SAY_15 ,m_creature, pPlayer); uiEventTimer = 12000; break;
+                    case 30: DoScriptText(HALLARD_SAY_16 ,m_creature); 
+                             if(Player *pPlayer = m_creature->GetMap()->GetPlayer(uiPlayerGUID))
+                                pPlayer->AreaExploredOrEventHappens(QUEST_RIGHTEOUS_SERMON);
+                             m_creature->ForcedDespawn();
+                             break;
+                    
+
+                } 
+                uiPhase++;
+            } else uiEventTimer -= uiDiff;
+         }
+     }
+
+};
+
+CreatureAI* GetAI_npc_inquisitor_hallard(Creature* pCreature)
+{
+    return new npc_inquisitor_hallardAI(pCreature);
+}
+
+bool QuestAccept_npc_inquisitor_hallard(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+{
+    switch(pQuest->GetQuestId())
+    {
+        case QUEST_RIGHTEOUS_SERMON:
+        {
+            if (npc_inquisitor_hallardAI* pHallardAI = dynamic_cast<npc_inquisitor_hallardAI*>(pCreature->AI()))
+            {
+                pCreature->GetMotionMaster()->MovePoint(0, 3801.38f , -679.13f , 213.73f );
+                pHallardAI->bEventStarted = true;
+                pHallardAI->uiPlayerGUID = (pPlayer->GetGUID());
+            }
+        }
+        break;
+    }
+    return true;
+}
+
+/*######
+## npc_wintergarde_bomb
+######*/
+enum 
+{
+    NPC_UPPER_MINE_SHAFT            = 27436,
+    NPC_LOWER_MINE_SHAFT            = 27437,
+    QUEST_LEAVE_NOTHING_TO_CHANCE   = 12277
+ 
+};
+
+struct MANGOS_DLL_DECL npc_wintergarde_bombAI : public ScriptedAI
+{
+    npc_wintergarde_bombAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    uint32 uiCheckTimer;
+    void Reset() 
+    {
+        uiCheckTimer = 2000;
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+     {
+            if (uiCheckTimer <= uiDiff)
+            {
+                if(Player *pPlayer = m_creature->GetMap()->GetPlayer(m_creature->GetCreatorGuid()))
+                {
+                    if(pPlayer->GetQuestStatus(QUEST_LEAVE_NOTHING_TO_CHANCE) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        if (m_creature->GetPositionZ() < 118.0f)
+                            pPlayer->KilledMonsterCredit(NPC_LOWER_MINE_SHAFT);
+                        else pPlayer->KilledMonsterCredit(NPC_UPPER_MINE_SHAFT);
+                    }
+                    m_creature->ForcedDespawn();
+                }                
+            } else uiCheckTimer -= uiDiff;
+     }    
+};
+CreatureAI* GetAI_npc_wintergarde_bomb(Creature* pCreature)
+{
+    return new npc_wintergarde_bombAI(pCreature);
+}
 
 void AddSC_dragonblight()
 {
@@ -785,5 +997,16 @@ void AddSC_dragonblight()
     newscript = new Script;
     newscript->Name = "npc_vengeful_geist";
     newscript->GetAI = &GetAI_npc_vengeful_geist;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_inquisitor_hallard";
+    newscript->GetAI = &GetAI_npc_inquisitor_hallard;
+    newscript->pQuestAcceptNPC = &QuestAccept_npc_inquisitor_hallard;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_wintergarde_bomb";
+    newscript->GetAI = &GetAI_npc_wintergarde_bomb;
     newscript->RegisterSelf();
 }

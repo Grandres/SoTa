@@ -415,6 +415,20 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     case 67485:
                         damage += uint32(0.5f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
                         break;
+                    //Magic Bane normal (Forge of Souls - Bronjahm)
+                    case 68793:
+                    {
+                        damage += uint32(unitTarget->GetMaxPower(POWER_MANA) / 2);
+                        damage = std::min(damage, 10000);
+                        break;
+                    }
+                    //Magic Bane heroic (Forge of Souls - Bronjahm)
+                    case 69050:
+                    {
+                        damage += uint32(unitTarget->GetMaxPower(POWER_MANA) / 2);
+                        damage = std::min(damage, 15000);
+                        break;
+                    }
                 }
                 break;
             }
@@ -1538,6 +1552,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 case 51961:                                 // Captured Chicken Cover
                 case 55364:                                 // Create Ghoul Drool Cover
                 case 61832:                                 // Rifle the Bodies: Create Magehunter Personal Effects Cover
+                case 74904:                                 // Pickup Sen'jin Frog
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT || m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
@@ -1553,6 +1568,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         case 51961: spellId = 51037; break;
                         case 55364: spellId = 55363; break;
                         case 61832: spellId = 47096; break;
+                        case 74904: spellId = 74905; break;
                     }
 
                     if (const SpellEntry *pSpell = sSpellStore.LookupEntry(spellId))
@@ -6563,6 +6579,32 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     }
                     break;
                 }
+                case 26678: //Heart Candy
+                {
+                    uint32 item = 0;
+                    switch ( urand(0, 7) )
+                    {
+                        case 0:
+                            item = 21816; break;
+                        case 1:
+                            item = 21817; break;
+                        case 2:
+                            item = 21818; break;
+                        case 3:
+                            item = 21819; break;
+                        case 4:
+                            item = 21820; break;
+                        case 5:
+                            item = 21821; break;
+                        case 6:
+                            item = 21822; break;
+                        case 7:
+                            item = 21823; break;
+                    }
+                    if (item)
+                        DoCreateItem(eff_idx,item);
+                    break;
+                }
                 case 29830:                                 // Mirren's Drinking Hat
                 {
                     uint32 item = 0;
@@ -6805,9 +6847,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         return;
 
                     if (unitTarget->GetAreaId() == 4156)
-                        unitTarget->CastSpell(unitTarget, 47324, true);
-                    else if (unitTarget->GetAreaId() == 4157)
                         unitTarget->CastSpell(unitTarget, 47325, true);
+                    else if (unitTarget->GetAreaId() == 4157)
+                        unitTarget->CastSpell(unitTarget, 47324, true);
 
                     break;
                 }
@@ -9175,7 +9217,7 @@ void Spell::EffectRenamePet(SpellEffectIndex /*eff_idx*/)
         !((Creature*)unitTarget)->IsPet() || ((Pet*)unitTarget)->getPetType() != HUNTER_PET)
         return;
 
-    unitTarget->RemoveByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
+    unitTarget->SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
 }
 
 void Spell::EffectPlayMusic(SpellEffectIndex eff_idx)
