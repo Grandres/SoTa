@@ -10,6 +10,7 @@ DELETE FROM `character_achievement_progress` WHERE `guid` NOT IN (SELECT `guid` 
 DELETE FROM `character_action` WHERE `guid` NOT IN (SELECT `guid` FROM `characters`);
 DELETE FROM `character_aura` WHERE `guid` NOT IN (SELECT `guid` FROM `characters`);
 DELETE FROM `character_battleground_data` WHERE `guid` NOT IN (SELECT `guid` FROM `characters`);
+DELETE FROM `character_battleground_random` WHERE `guid` NOT IN (SELECT `guid` FROM `characters`);
 DELETE FROM `character_declinedname` WHERE `guid` NOT IN (SELECT `guid` FROM `characters`);
 DELETE FROM `character_equipmentsets` WHERE `guid` NOT IN (SELECT `guid` FROM `characters`);
 DELETE FROM `character_gifts` WHERE `guid` NOT IN (SELECT `guid` FROM `characters`);
@@ -32,6 +33,14 @@ DELETE FROM `character_spell` WHERE `guid` NOT IN (SELECT `guid` FROM `character
 DELETE FROM `character_spell_cooldown` WHERE `guid` NOT IN (SELECT `guid` FROM `characters`);
 DELETE FROM `character_stats` WHERE `guid` NOT IN (SELECT `guid` FROM `characters`);
 DELETE FROM `character_talent` WHERE `guid` NOT IN (SELECT `guid` FROM `characters`);
+DELETE FROM `character_ticket` WHERE `guid` NOT IN (SELECT `guid` FROM `characters`);
+DELETE FROM `cheaters` WHERE `player` NOT IN (SELECT `name` FROM `characters`);
+
+DELETE FROM `petition_sign` WHERE `ownerguid` NOT IN (SELECT `guid` FROM `characters`);
+DELETE FROM `petition_sign` WHERE `playerguid` NOT IN (SELECT `guid` FROM `characters`);
+DELETE FROM `petition` WHERE `ownerguid` NOT IN (SELECT `guid` FROM `characters`);
+DELETE FROM `petition` WHERE (SELECT COUNT(*) FROM `petition_sign` WHERE `petitionguid` = `petition`.`petitionguid`) = 0;
+DELETE FROM `petition_sign` WHERE `petitionguid` NOT IN (SELECT `petitionguid` FROM `petition`);
 
 DELETE FROM `arena_team_member` WHERE `guid` NOT IN (SELECT `guid` FROM `characters`);
 DELETE FROM `arena_team` WHERE (SELECT COUNT(*) FROM `arena_team_member` WHERE `arenateamid` = `arena_team`.`arenateamid`) = 0;
@@ -50,3 +59,6 @@ DELETE FROM `guild_rank` WHERE `guildid` NOT IN (SELECT `guildid` FROM `guild`);
 
 -- Warning: this query will be executing extremely long in large databases! Add "LIMIT xxx;" at the end!
 DELETE FROM `item_instance` WHERE `guid` NOT IN (SELECT `item` FROM `character_inventory`) AND `guid` NOT IN (SELECT `item_guid` FROM `guild_bank_item`) AND `guid` NOT IN (SELECT `item_guid` FROM `mail_items`) AND `guid` NOT IN (SELECT `itemguid` FROM `auction`);
+
+-- MaNGOS internal cleaning
+UPDATE `saved_variables` SET `cleaning_flags` = 15;
