@@ -1545,6 +1545,23 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                 // all these things below are to take reagents
+                 // from caster and add aura "detect invisibility"
+                 // summon image of drakuru is handled by spellhit in event ai
+                case 47110:
+                {
+                    switch(((Creature*)unitTarget)->GetEntry())
+                    {
+                        case 26498: m_caster->CastSpell(m_caster,47118, false); break;
+                        case 26559: m_caster->CastSpell(m_caster,47150, false); break;
+                        case 26700: m_caster->CastSpell(m_caster,47317, false); break;
+                        case 26789: m_caster->CastSpell(m_caster,47406, false); break;
+                        case 28015: m_caster->CastSpell(m_caster,50440, false); break;
+                        default: break;                                
+                    }
+                   return;
+
+                }
                 case 46167:                                 // Planning for the Future: Create Snowfall Glade Pup Cover
                 case 50926:                                 // Gluttonous Lurkers: Create Zul'Drak Rat Cover
                 case 51026:                                 // Create Drakkari Medallion Cover
