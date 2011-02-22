@@ -3,6 +3,25 @@
 -- teleporter
 UPDATE gameobject_template SET ScriptName = "go_ulduar_teleporter" WHERE entry = 194569;
 
+-- fragments of Val'Anyr
+DELETE FROM creature_loot_template WHERE item = 45038;
+INSERT INTO creature_loot_template VALUES
+(33190, 45038, 6, 2, 1, 1, 0, 0, 0), -- Ignis 6%
+(33724, 45038, 4, 2, 1, 1, 0, 0, 0), -- Razorscale %
+(33885, 45038, 7, 3, 1, 1, 0, 0, 0), -- XT-002 normal %
+(33692, 45038, 4, 3, 1, 1, 0, 0, 0), -- Runemaster %
+(33694, 45038, 4, 2, 1, 1, 0, 0, 0), -- Stormcaller %
+(33693, 45038, 7, 4, 1, 1, 0, 0, 0), --  Steelbreaker %
+(34175, 45038, 6, 2, 1, 1, 0, 0, 0); -- Auriaya %
+
+DELETE FROM gameobject_loot_template WHERE item = 45038;
+INSERT INTO gameobject_loot_template VALUES
+(26929, 45038, 10, 2, 1, 1, 0, 0, 0); -- Kologarn %
+
+DELETE FROM reference_loot_template WHERE item = 45038;
+INSERT INTO reference_loot_template VALUES
+(33886, 45038, 14, 3, 1, 1, 18, 603, 38); -- XT-002 hard %
+
 -- ****** Ignis the Furnace Master ******
 UPDATE `creature_template` SET `ScriptName` = "boss_ignis" WHERE `entry` = 33118;
 UPDATE `creature_template` SET lootid = entry, `mechanic_immune_mask` = 617299839 WHERE entry IN (33118, 33190);
@@ -277,7 +296,7 @@ INSERT INTO creature (id, map, spawnMask, phaseMask, modelid, equipment_id, posi
 -- INSERT INTO creature (id, map, spawnMask, phaseMask, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint, curhealth, curmana, DeathState, MovementType) VALUES
 -- (32934, 603, 3, 65535, 0, 0, 1799.68, -24.3599, 452.227, 3.14747, 604800, 0, 0, 543855, 0, 0, 0);
 UPDATE creature_model_info SET bounding_radius=15, combat_reach=15 WHERE modelid IN (28638, 28822, 28821);
-UPDATE creature_template SET mechanic_immune_mask=617299803, scriptname='boss_kologarn' WHERE entry=32930;
+UPDATE creature_template SET mechanic_immune_mask=617299803, scriptname='boss_kologarn' WHERE entry IN (32930, 33909);
 UPDATE creature_template SET mechanic_immune_mask=652951551, scriptname='boss_right_arm' WHERE entry=32934;
 UPDATE creature_template SET mechanic_immune_mask=652951551, scriptname='boss_left_arm' WHERE entry=32933;
 UPDATE creature_template SET ScriptName = 'mob_ulduar_rubble' WHERE entry IN (33768, 33809, 33908, 33942);
