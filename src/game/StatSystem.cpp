@@ -897,6 +897,10 @@ bool Pet::UpdateStats(Stats stat)
 
             value += float(owner->GetStat(stat) * (mod * ravenous + glyph) );
     }
+    else if (stat == STAT_STAMINA && GetEntry() == 27829 && owner)
+    {
+        value += float(owner->GetStat(stat)) * 0.75f;
+    }
     else if ( stat == STAT_STAMINA )
     {
         if(owner && owner->GetTypeId() == TYPEID_PLAYER  && owner->getClass() == CLASS_WARLOCK)

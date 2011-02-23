@@ -1052,7 +1052,7 @@ struct MANGOS_DLL_DECL dummy_dragonAI : public ScriptedAI
         {
             // bind to the instance only when solo fighting
             if (Player *pCreditPlayer = pKiller->GetCharmerOrOwnerPlayerOrPlayerItself() )
-                ((InstanceMap *)pCreditPlayer->GetMap())->PermBindAllPlayers(pCreditPlayer);
+                ((DungeonMap *)pCreditPlayer->GetMap())->PermBindAllPlayers(pCreditPlayer);
             RemoveDebuff(SPELL_TWILIGHT_SHIFT_ENTER);
         }
         // Twilight Revenge to main boss

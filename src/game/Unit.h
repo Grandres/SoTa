@@ -1993,6 +1993,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // Movement info
         MovementInfo m_movementInfo;
 
+        void ScheduleAINotify(uint32 delay);
+        bool IsAINotifySheduled() const { return m_AINotifySheduled;}
+        void _SetAINotifySheduled(bool on) { m_AINotifySheduled = on;}       // only for call from RelocationNotifyEvent class code
+        void OnRelocated();
+
          // vehicle system
          void EnterVehicle(VehicleKit *vehicle, int8 seatId = -1);
          void EnterVehicle(Vehicle *vehicle, int8 seat_id, bool force = false);
@@ -2077,6 +2082,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_castCounter;                               // count casts chain of triggered spells for prevent infinity cast crashes
 
         UnitVisibility m_Visibility;
+        Position m_last_notified_position;
+        bool m_AINotifySheduled;
 
         Diminishing m_Diminishing;
         // Manage all Units threatening us

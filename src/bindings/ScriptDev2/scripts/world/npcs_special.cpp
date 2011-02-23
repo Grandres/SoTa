@@ -1750,6 +1750,175 @@ bool GossipSelect_npc_locksmith(Player* pPlayer, Creature* pCreature, uint32 uiS
     return true;
 }
 
+/*######
+## npc_experience_eliminator
+######*/
+
+#define GOSSIP_ITEM_STOP_XP_GAIN "I don't want to gain experience anymore."
+#define GOSSIP_CONFIRM_STOP_XP_GAIN "Are you sure you want to stop gaining experience?"
+#define GOSSIP_ITEM_START_XP_GAIN "I want to be able to gain experience again."
+#define GOSSIP_CONFIRM_START_XP_GAIN "Are you sure you want to be able to gain experience once again?"
+
+bool GossipHello_npc_experience_eliminator(Player* pPlayer, Creature* pCreature)
+{
+pPlayer->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_CHAT, pPlayer->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_XP_USER_DISABLED) ? GOSSIP_ITEM_START_XP_GAIN : GOSSIP_ITEM_STOP_XP_GAIN,
+GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1,
+pPlayer->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_XP_USER_DISABLED) ? GOSSIP_CONFIRM_START_XP_GAIN : GOSSIP_CONFIRM_STOP_XP_GAIN, 100000, false);
+
+    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
+    return true;
+}
+
+bool GossipSelect_npc_experience_eliminator(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    if(uiAction == GOSSIP_ACTION_INFO_DEF+1)
+    {
+        // cheater(?) passed through client limitations
+        if(pPlayer->GetMoney() < 100000)
+            return true;
+
+        pPlayer->ModifyMoney(-100000);
+
+        if(pPlayer->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_XP_USER_DISABLED))
+            pPlayer->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_XP_USER_DISABLED);
+        else
+            pPlayer->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_XP_USER_DISABLED);
+    }
+    pPlayer->CLOSE_GOSSIP_MENU();
+    return true;
+}
+
+/*######
+## Ebon Gargoyle(27829)
+######*/
+
+#define SPELL_GARGOYLE_STRIKE 51963
+#define GARGOYLE_STRIKE_RANGE 40.0f
+
+struct MANGOS_DLL_DECL mob_ebon_gargoyleAI : public ScriptedAI
+{
+    mob_ebon_gargoyleAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        // "gargoyle flies into the area"
+        pCreature->NearTeleportTo(m_creature->GetPositionX()+5.0f, m_creature->GetPositionY()+5.0f, m_creature->GetPositionZ()+15.0f, m_creature->GetOrientation(), false);
+        m_creature->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX()-5.0f, m_creature->GetPositionY()-5.0f, m_creature->GetPositionZ()-14.0f);
+
+        m_bIsReady = false; 
+        m_uiCreatorGUID = m_creature->GetCreatorGuid();
+
+        Reset();
+    }
+
+    Unit* pTarget;
+    uint64 m_uiTargetGUID;
+    ObjectGuid m_uiCreatorGUID;
+    uint32 m_uiStrikeTimer;
+    bool m_bIsReady;
+
+    void Reset()
+    {
+        pTarget = NULL;
+        m_uiTargetGUID = 0;
+        m_uiStrikeTimer = 0;
+    }
+
+    void MoveInLineOfSight(Unit *pWho)
+    {
+        if (!m_bIsReady)
+            return;
+
+        ScriptedAI::MoveInLineOfSight(pWho);
+    }
+
+    void MovementInform(uint32 uiMoveType, uint32 uiPointId)
+    {
+        if (uiMoveType != POINT_MOTION_TYPE)
+            return;
+
+        if (uiPointId == 0)
+        {
+            m_bIsReady = true;
+            m_creature->GetMotionMaster()->Clear();
+        }
+    }
+
+    void AttackStart(Unit *pWho)
+    {
+        if (pWho)
+            m_uiTargetGUID = pWho->GetGUID();
+
+        if (!m_bIsReady)
+            return;
+
+        ScriptedAI::AttackStart(pWho);
+    }
+
+    void UpdateAI(uint32 const uiDiff)
+    {
+        if (!m_bIsReady)
+            return;
+
+        Player* pOwner = m_creature->GetMap()->GetPlayer(m_uiCreatorGUID);
+        if (!pOwner || !pOwner->IsInWorld())
+        {
+            m_creature->DealDamage(m_creature, m_creature->GetMaxHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
+            return;
+        }
+
+        // check if current target still exists and is atatckable
+        if (!m_creature->getVictim() )
+        {
+            pTarget = m_creature->GetMap()->GetUnit(m_uiTargetGUID);
+
+            if (!pTarget || !m_creature->CanInitiateAttack() || !pTarget->isTargetableForAttack() ||
+            !m_creature->IsHostileTo(pTarget) || !pTarget->isInAccessablePlaceFor(m_creature))
+            {
+                // we have no target, so look for the new one
+                if (Unit *pTmp = m_creature->SelectRandomUnfriendlyTarget(0, GARGOYLE_STRIKE_RANGE) )
+                    m_uiTargetGUID = pTmp->GetGUID();
+
+                pTarget = m_creature->GetMap()->GetUnit(m_uiTargetGUID);
+
+                // now check again. if no target found then there is nothing to attack - start following the owner
+                if (!pTarget || !m_creature->CanInitiateAttack() || !pTarget->isTargetableForAttack() ||
+                !m_creature->IsHostileTo(pTarget) || !pTarget->isInAccessablePlaceFor(m_creature))
+                {
+                    if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
+                    {
+                        m_creature->InterruptNonMeleeSpells(false);
+                        m_creature->GetMotionMaster()->Clear();
+                        m_creature->GetMotionMaster()->MoveFollow(pOwner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                        SetCombatMovement(true);
+                        Reset();
+                    }
+                    return;
+                }
+            }
+            if (pTarget)
+            {
+                // ok, we found new target
+                SetCombatMovement(false);
+                m_creature->AI()->AttackStart(pTarget);
+            }
+        }
+
+        // Gargoyle Strike
+        if (m_uiStrikeTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(pTarget, SPELL_GARGOYLE_STRIKE) == CAST_OK)
+                m_uiStrikeTimer = 2000;
+            else
+                SetCombatMovement(true);
+        }
+        else m_uiStrikeTimer -= uiDiff;
+    }
+};
+ 
+CreatureAI* GetAI_mob_ebon_gargoyle(Creature* pCreature)
+{
+    return new mob_ebon_gargoyleAI (pCreature);
+}
+
 void AddSC_npcs_special()
 {
     Script* newscript;
@@ -1838,5 +2007,16 @@ void AddSC_npcs_special()
     newscript->Name = "npc_locksmith";
     newscript->pGossipHello =  &GossipHello_npc_locksmith;
     newscript->pGossipSelect = &GossipSelect_npc_locksmith;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_experience_eliminator";
+    newscript->pGossipHello = &GossipHello_npc_experience_eliminator;
+    newscript->pGossipSelect = &GossipSelect_npc_experience_eliminator;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "mob_ebon_gargoyle";
+    newscript->GetAI = &GetAI_mob_ebon_gargoyle;
     newscript->RegisterSelf();
 }
