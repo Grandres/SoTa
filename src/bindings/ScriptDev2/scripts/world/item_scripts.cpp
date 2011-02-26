@@ -153,7 +153,7 @@ bool ItemUse_item_jungle_punch_sample(Player* pPlayer, Item* pItem, const SpellC
 
 bool ItemUse_item_fishing_chair(Player* pPlayer, Item* _Item, SpellCastTargets const& targets)
 {
-    if ((pPlayer->GetMapId() == 530) || (pPlayer->GetMapId() == 0) || (pPlayer->GetMapId() == 1))
+    if ((pPlayer->GetMapId() == 530) || (pPlayer->GetMapId() == 0) || (pPlayer->GetMapId() == 1) || (pPlayer->GetMapId() == 571))
         return false;
     else
     pPlayer->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW,_Item,NULL);

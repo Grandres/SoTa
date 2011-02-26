@@ -7,7 +7,7 @@ DELETE FROM `achievement_criteria_requirement` WHERE `criteria_id` = 3684;
 INSERT INTO `achievement_criteria_requirement` (`criteria_id`, `type`, `value1`) VALUES ('3684', '5', '23505');
 
 -- With a Little Helper from My Friends
-DELETE FROM `achievement_criteria_requirement` WHERE `criteria_id` IN (3827,3826,3828,3829)
+DELETE FROM `achievement_criteria_requirement` WHERE `criteria_id` IN (3827,3826,3828,3829);
 INSERT INTO `achievement_criteria_requirement` (`criteria_id`, `type`, `value1`) VALUES
 ('3827', '5', '26272'),
 ('3826', '5', '26157'),
