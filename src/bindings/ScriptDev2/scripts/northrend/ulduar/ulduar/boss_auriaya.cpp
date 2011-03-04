@@ -548,6 +548,10 @@ struct MANGOS_DLL_DECL boss_auriayaAI : public ScriptedAI
                 DoCast(m_creature, SPELL_FEAR);
                 m_uiFear_Timer = 35000;
                 m_uiSentinel_Blast_Timer = 2500;
+
+                // don't cast Sonic Screech right after the fear!
+                if (m_uiSonic_Screech_Timer < 4000)
+                    m_uiSonic_Screech_Timer = 4000;
             }
         }else m_uiFear_Timer -= uiDiff;
 
