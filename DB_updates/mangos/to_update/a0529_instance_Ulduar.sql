@@ -406,6 +406,17 @@ UPDATE creature_template SET ScriptName = 'mob_iron_roots' WHERE entry IN (33088
 UPDATE creature_template SET ScriptName = 'mob_freya_ground' WHERE entry IN (33215, 33228, 33170, 33050, 34129);
 UPDATE creature_template SET ScriptName = 'mob_freya_spawned' WHERE entry IN (32916, 32919, 33202, 33203, 32918);
 
+-- fill some missing data in creature_template (health, level etc.)
+UPDATE creature_template SET minhealth = 5856900, maxhealth = 5856900 WHERE entry = 33391; -- Brightleaf 25man
+UPDATE creature_template SET minlevel = 80, maxlevel = 80, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 18270, maxhealth = 18270 WHERE entry = 33168; -- Strengthened Iron Roots 10man
+UPDATE creature_template SET minlevel = 80, maxlevel = 80, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 54432, maxhealth = 54432 WHERE entry = 33397; -- Strengthened Iron Roots 25man
+UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 104264, maxhealth = 104264 WHERE entry = 33385; -- Eonar's Gift 25man
+UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 1563960, maxhealth = 1563960 WHERE entry = 33400; -- Snaplasher 25man
+UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 1251168, maxhealth = 1251168, minmana = 8162, maxmana = 8162 WHERE entry = 33401; -- Storm Lasher 25man
+UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 834080, maxhealth = 834080, minmana = 17958, maxmana = 17958 WHERE entry = 33398; -- Ancient Water Spirit 25man
+UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 3544976, maxhealth = 3544976 WHERE entry = 33376; -- Ancient Conservator 25man
+UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 375350, maxhealth = 375350 WHERE entry = 33399; -- Detonating Lasher 25man
+
 -- some aura fixes, this may be wrong
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('62525', '1', '32906');
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('62524', '1', '32906');
