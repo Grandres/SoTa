@@ -314,7 +314,7 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
 
         m_lSparkPortalGUIDList.clear();
 
-        //DismountPlayers();
+        DismountPlayers();
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MALYGOS, NOT_STARTED);
@@ -351,7 +351,7 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
                 if (*itr)
                     m_lSparkPortalGUIDList.push_back((*itr)->GetGUID());
 
-        //DismountPlayers();
+        DismountPlayers();
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MALYGOS, IN_PROGRESS);
@@ -393,7 +393,12 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
     void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
     {
         if (pSpell->Id == SPELL_POWER_SPARK)
-            DoScriptText(SAY_POWER_SPARK_BUFF, m_creature);
+        {
+            if (m_uiPhase != PHASE_FLOOR)
+                m_creature->RemoveAurasDueToSpell(SPELL_POWER_SPARK);
+            else
+                DoScriptText(SAY_POWER_SPARK_BUFF, m_creature);
+        }
     }
     
     void SpellHitTarget(Unit* pUnit, const SpellEntry* pSpell)
@@ -425,22 +430,6 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
             pSummoned->CastSpell(m_creature, SPELL_STATIC_FIELD, false, 0, 0, m_creature->GetGUID());
             pSummoned->ForcedDespawn(30000);
         }
-
-        /*if (uiEntry == NPC_NEXUS_LORD || uiEntry == NPC_SCION_OF_ETERNITY)
-        {
-            if (Creature* pDisk = pSummoned->SummonCreature(NPC_HOVER_DISK, pSummoned->GetPositionX(), pSummoned->GetPositionY(), pSummoned->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN, 0))
-            {
-                pDisk->SetSplineFlags(SPLINEFLAG_FLYING);
-                pDisk->CastSpell(pDisk, SPELL_FLIGHT, true);
-                if (uiEntry == NPC_NEXUS_LORD)
-                    pDisk->SetSpeedRate(MOVE_WALK, 1.5f);
-                if (VehicleKit* pDiskVehicle = pDisk->GetVehicleKit())
-                    pSummoned->EnterVehicle(pDiskVehicle, 0);
-                else if (pDisk->CreateVehicleKit(0))
-                    if (VehicleKit* pDiskVehicle = pDisk->GetVehicleKit())
-                        pSummoned->EnterVehicle(pDiskVehicle, 0);
-            }
-        }*/
     }
 
     void SummonedCreatureJustDied(Creature* pSummoned)
@@ -486,7 +475,7 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
             (*iter)->ForcedDespawn();
     }
 
-    /*void MountPlayers()
+    void MountPlayers()
     {
         if (m_pInstance)
         {
@@ -504,9 +493,9 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
                         }
                     }
         }
-    }*/
+    }
                     
-    /*void DismountPlayers()
+    void DismountPlayers()
     {
         // dismount players
         if (m_pInstance)
@@ -521,7 +510,7 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
                             pVeh->ForcedDespawn(500);
                         }
         }
-    }*/
+    }
 
     void AntiMagicShell()
     {
@@ -888,7 +877,6 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
                 {
                     m_creature->InterruptNonMeleeSpells(true);
                     DoScriptText(SAY_END_PHASE1, m_creature);
-                    DespawnCreatures(NPC_POWER_SPARK);
                     m_uiPhase = PHASE_ADDS;
                     m_uiSubPhase = SUBPHASE_TALK;
                     m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
@@ -931,7 +919,7 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
                 if (!IsThereAnyAdd())
                 {
                     m_creature->StopMoving();
-                    m_creature->GetMotionMaster()->MovePoint(0, CENTER_X, CENTER_Y, m_creature->GetPositionZ());
+                    m_creature->GetMotionMaster()->MovePoint(0, CENTER_X, CENTER_Y, m_creature->GetPositionZ(), false);
                     m_uiPhase = PHASE_DRAGONS;
                     m_uiSubPhase = SUBPHASE_DESTROY_PLATFORM_1;
                     DoScriptText(SAY_END_PHASE2, m_creature);
@@ -1037,7 +1025,7 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
                         pTempTarget->CastSpell(pTempTarget, SPELL_DESTROY_PLATFORM_BOOM, false);
 
                     m_uiSubPhase = SUBPHASE_DESTROY_PLATFORM_2;
-                    m_uiTimer = 5000;//2000;
+                    m_uiTimer = 5000;
                 }
                 else
                     m_uiTimer -= uiDiff;
@@ -1068,8 +1056,8 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
             {
                 if (m_uiTimer<= uiDiff)
                 {
-                    //DismountPlayers();
-                    //MountPlayers();
+                    DismountPlayers();
+                    MountPlayers();
                     m_uiSubPhase = SUBPHASE_DESTROY_PLATFORM_4;
                     m_uiTimer = 10000;
                 }
@@ -1295,10 +1283,6 @@ struct MANGOS_DLL_DECL npc_nexus_lordAI : public ScriptedAI
     void Reset()
     {
         m_uiCheckTimer = 0;
-        /*m_fTargetOldX = 0.0f;
-        m_fTargetOldY = 0.0f;
-        m_fVehicleOldX = 0.0f;
-        m_fVehicleOldY = 0.0f;*/
         m_uiArcaneShockTimer = urand(8000, 9000);
         m_uiHasteTimer = urand(10000, 12000);
         m_bCanAttack = false;
