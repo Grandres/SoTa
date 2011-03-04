@@ -138,6 +138,7 @@ INSERT INTO `reference_loot_template` VALUES
 -- ****** XT-002 Deconstructor ******
 UPDATE `creature_template` SET `ScriptName` = "boss_xt_002" WHERE `entry` = 33293;
 UPDATE `creature_template` SET `mechanic_immune_mask` = 617299839, `lootid` = `entry` WHERE entry IN (33293, 33885);
+UPDATE `creature_template` SET `mechanic_immune_mask` = 617299839 WHERE entry IN (33329, 33995);
 UPDATE `creature_template` SET `ScriptName` = "mob_xtheart" WHERE `entry` = 33329;
 UPDATE `creature_template` SET `ScriptName` = "mob_pummeler" WHERE `entry` = 33344;
 UPDATE `creature_template` SET `ScriptName` = "mob_boombot" WHERE `entry` = 33346;
@@ -288,13 +289,13 @@ INSERT INTO `reference_loot_template` VALUES
 (33693, 45244, 0, 3, 1, 1, 0, 0, 0);
 
 -- Kologarn
--- fix arms position because of the missing vehicles
--- use when can't reach the boss?
+-- fix boss and arm(s) position because when a player leaves the vehicle it falls down sometimes :/
 DELETE FROM creature WHERE id IN (32933, 32934);
 INSERT INTO creature (id, map, spawnMask, phaseMask, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint, curhealth, curmana, DeathState, MovementType) VALUES
-(32933, 603, 3, 65535, 0, 0, 1799.68, -24.3599, 452.227, 3.14747, 604800, 0, 0, 543855, 0, 0, 0);
+(32933, 603, 3, 65535, 0, 0, 1786.30, -24.5499, 448.805, 3.14747, 604800, 0, 0, 543855, 0, 0, 0);
 -- INSERT INTO creature (id, map, spawnMask, phaseMask, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint, curhealth, curmana, DeathState, MovementType) VALUES
 -- (32934, 603, 3, 65535, 0, 0, 1799.68, -24.3599, 452.227, 3.14747, 604800, 0, 0, 543855, 0, 0, 0);
+UPDATE creature SET position_x = 1786.30, position_y = -24.5499, position_z = 448.805 WHERE id = 32930;
 UPDATE creature_model_info SET bounding_radius=15, combat_reach=15 WHERE modelid IN (28638, 28822, 28821);
 UPDATE creature_template SET mechanic_immune_mask=617299803, scriptname='boss_kologarn' WHERE entry IN (32930, 33909);
 UPDATE creature_template SET mechanic_immune_mask=652951551, scriptname='boss_right_arm' WHERE entry=32934;

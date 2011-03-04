@@ -391,7 +391,7 @@ struct MANGOS_DLL_DECL boss_sartharionAI : public ScriptedAI
             pTene->AddSplineFlag(SPLINEFLAG_FLYING);
             pTene->RemoveSplineFlag(SPLINEFLAG_WALKMODE);
             pTene->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            pTene->GetMotionMaster()->MovePoint(POINT_ID_INIT, m_aTene[0].m_fX, m_aTene[0].m_fY, m_aTene[0].m_fZ);
+            pTene->GetMotionMaster()->MovePoint(POINT_ID_INIT, m_aTene[0].m_fX, m_aTene[0].m_fY, m_aTene[0].m_fZ, false);
         }
 
         if (pShad && pShad->isAlive() && !pShad->getVictim())
@@ -402,7 +402,7 @@ struct MANGOS_DLL_DECL boss_sartharionAI : public ScriptedAI
             pShad->AddSplineFlag(SPLINEFLAG_FLYING);
             pShad->RemoveSplineFlag(SPLINEFLAG_WALKMODE);
             pShad->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            pShad->GetMotionMaster()->MovePoint(POINT_ID_INIT, m_aShad[0].m_fX, m_aShad[0].m_fY, m_aShad[0].m_fZ);
+            pShad->GetMotionMaster()->MovePoint(POINT_ID_INIT, m_aShad[0].m_fX, m_aShad[0].m_fY, m_aShad[0].m_fZ, false);
         }
 
         if (pVesp && pVesp->isAlive() && !pVesp->getVictim())
@@ -413,7 +413,7 @@ struct MANGOS_DLL_DECL boss_sartharionAI : public ScriptedAI
             pVesp->AddSplineFlag(SPLINEFLAG_FLYING);
             pVesp->RemoveSplineFlag(SPLINEFLAG_WALKMODE);
             pVesp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            pVesp->GetMotionMaster()->MovePoint(POINT_ID_INIT, m_aVesp[0].m_fX, m_aVesp[0].m_fY, m_aVesp[0].m_fZ);
+            pVesp->GetMotionMaster()->MovePoint(POINT_ID_INIT, m_aVesp[0].m_fX, m_aVesp[0].m_fY, m_aVesp[0].m_fZ, false);
         }
 
         if (bCanUseWill)
@@ -452,17 +452,17 @@ struct MANGOS_DLL_DECL boss_sartharionAI : public ScriptedAI
                     case NPC_TENEBRON:
                         iTextId = SAY_SARTHARION_CALL_TENEBRON;
                         pTemp->GetMotionMaster()->MovementExpired(true);
-                        pTemp->GetMotionMaster()->MovePoint(POINT_ID_LAND, m_aTene[1].m_fX, m_aTene[1].m_fY, m_aTene[1].m_fZ);
+                        pTemp->GetMotionMaster()->MovePoint(POINT_ID_LAND, m_aTene[1].m_fX, m_aTene[1].m_fY, m_aTene[1].m_fZ, false);
                         break;
                     case NPC_SHADRON:
                         iTextId = SAY_SARTHARION_CALL_SHADRON;
                         pTemp->GetMotionMaster()->MovementExpired(true);
-                        pTemp->GetMotionMaster()->MovePoint(POINT_ID_LAND, m_aShad[1].m_fX, m_aShad[1].m_fY, m_aShad[1].m_fZ);
+                        pTemp->GetMotionMaster()->MovePoint(POINT_ID_LAND, m_aShad[1].m_fX, m_aShad[1].m_fY, m_aShad[1].m_fZ, false);
                         break;
                     case NPC_VESPERON:
                         iTextId = SAY_SARTHARION_CALL_VESPERON;
                         pTemp->GetMotionMaster()->MovementExpired(true);
-                        pTemp->GetMotionMaster()->MovePoint(POINT_ID_LAND, m_aVesp[1].m_fX, m_aVesp[1].m_fY, m_aVesp[1].m_fZ);
+                        pTemp->GetMotionMaster()->MovePoint(POINT_ID_LAND, m_aVesp[1].m_fX, m_aVesp[1].m_fY, m_aVesp[1].m_fZ, false);
                         break;
                 }
 
@@ -1080,7 +1080,7 @@ struct MANGOS_DLL_DECL dummy_dragonAI : public ScriptedAI
             if (m_uiMoveNextTimer <= uiDiff)
             {
                 m_creature->GetMotionMaster()->MovePoint(m_uiWaypointId,
-                    m_aDragonCommon[m_uiWaypointId].m_fX, m_aDragonCommon[m_uiWaypointId].m_fY, m_aDragonCommon[m_uiWaypointId].m_fZ);
+                    m_aDragonCommon[m_uiWaypointId].m_fX, m_aDragonCommon[m_uiWaypointId].m_fY, m_aDragonCommon[m_uiWaypointId].m_fZ, false);
 
                 debug_log("dummy_dragonAI: %s moving to point %u", m_creature->GetName(), m_uiWaypointId);
                 m_uiMoveNextTimer = 0;
@@ -1868,7 +1868,7 @@ struct MANGOS_DLL_DECL mob_flame_tsunamiAI : public ScriptedAI
             int8 uiDirection = 1;
             if (m_creature->GetPositionX() > 3240.0f)
                 uiDirection = -1;
-            m_creature->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX()+uiDirection*86.5f, m_creature->GetPositionY(), m_creature->GetPositionZ());
+            m_creature->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX()+uiDirection*86.5f, m_creature->GetPositionY(), m_creature->GetPositionZ(), false);
             m_uiMovementStartTimer = 30000;
         }
         else
