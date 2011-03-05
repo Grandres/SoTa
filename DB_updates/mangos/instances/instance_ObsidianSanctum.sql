@@ -1,6 +1,5 @@
--- ################################################################
--- ####################### OBSIDIAN SANCTUM #######################
--- ################################################################
+-- Instance Obsidian Sanctum
+-- Instance last changes: a262
 
 -- ScriptNames
 UPDATE `creature_template` SET `ScriptName` = "boss_sartharion" WHERE `entry` = 28860;

@@ -1,4 +1,5 @@
 -- Instance Violet Hold
+-- Instance last changes: a146
 
 UPDATE creature_template SET ScriptName='boss_erekem' WHERE entry=29315;
 UPDATE creature_template SET ScriptName='mob_erekem_guard' WHERE entry=29395;

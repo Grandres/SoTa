@@ -1,3 +1,6 @@
+-- Instance Molten Core
+-- Instance last changes: a143
+
 -- Majordomo Executus and Ragnaros
 -- spawn
 DELETE FROM `creature` WHERE `id` IN (11502, 12018);
