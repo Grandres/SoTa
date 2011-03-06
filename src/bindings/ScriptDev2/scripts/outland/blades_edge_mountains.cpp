@@ -399,7 +399,7 @@ struct MANGOS_DLL_DECL mob_cannon_chanellerAI : public Scripted_NoMovementAI
     bool Ridge;
     bool Razzan;
     bool Ruuan;
-    ObjectGuid m_uim_playerGuid;
+    ObjectGuid m_uiPLAYERGUID;
     uint32 m_uiLaunchTimer;
     uint32 m_uiPhaseTimer;
     uint8 Phase;
@@ -411,7 +411,7 @@ struct MANGOS_DLL_DECL mob_cannon_chanellerAI : public Scripted_NoMovementAI
         Razzan    = false;
         Ruuan     = false;
         IsRunning = false;
-        m_uim_playerGuid  = 0;
+        m_uiPLAYERGUID  = 0;
         m_uiLaunchTimer = 12000;
         m_uiPhaseTimer  = 0;
         Phase = 0;
@@ -426,8 +426,8 @@ struct MANGOS_DLL_DECL mob_cannon_chanellerAI : public Scripted_NoMovementAI
     {
         if(pPlayer && pPlayer->isAlive())
         {
-            m_uim_playerGuid = pPlayer->GetGUID();
-            Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uim_playerGuid);
+            m_uiPLAYERGUID = pPlayer->GetGUID();
+            Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPLAYERGUID);
             if(!IsRunning)
             {
                 if(Creature* pCharge = GetClosestCreatureWithEntry(m_creature, NPC_CHARGE, 100.0f))
@@ -479,7 +479,7 @@ struct MANGOS_DLL_DECL mob_cannon_chanellerAI : public Scripted_NoMovementAI
 
         if(m_uiLaunchTimer <= diff)
         {
-            Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uim_playerGuid);
+            Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPLAYERGUID);
             if(Test)
             {
                 pPlayer->SetOrientation(5.10f);
