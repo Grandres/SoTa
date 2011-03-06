@@ -399,7 +399,7 @@ struct MANGOS_DLL_DECL mob_cannon_chanellerAI : public Scripted_NoMovementAI
     bool Ridge;
     bool Razzan;
     bool Ruuan;
-    ObjectGuid m_uiPLAYERGUID;
+    ObjectGuid m_uim_playerGuid;
     uint32 m_uiLaunchTimer;
     uint32 m_uiPhaseTimer;
     uint8 Phase;
@@ -411,7 +411,7 @@ struct MANGOS_DLL_DECL mob_cannon_chanellerAI : public Scripted_NoMovementAI
         Razzan    = false;
         Ruuan     = false;
         IsRunning = false;
-        m_uiPLAYERGUID  = 0;
+        m_uim_playerGuid  = 0;
         m_uiLaunchTimer = 12000;
         m_uiPhaseTimer  = 0;
         Phase = 0;
@@ -426,8 +426,8 @@ struct MANGOS_DLL_DECL mob_cannon_chanellerAI : public Scripted_NoMovementAI
     {
         if(pPlayer && pPlayer->isAlive())
         {
-            m_uiPLAYERGUID = pPlayer->GetGUID();
-            Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPLAYERGUID);
+            m_uim_playerGuid = pPlayer->GetGUID();
+            Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uim_playerGuid);
             if(!IsRunning)
             {
                 if(Creature* pCharge = GetClosestCreatureWithEntry(m_creature, NPC_CHARGE, 100.0f))
@@ -479,7 +479,7 @@ struct MANGOS_DLL_DECL mob_cannon_chanellerAI : public Scripted_NoMovementAI
 
         if(m_uiLaunchTimer <= diff)
         {
-            Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPLAYERGUID);
+            Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uim_playerGuid);
             if(Test)
             {
                 pPlayer->SetOrientation(5.10f);
@@ -602,6 +602,94 @@ bool GossipSelect_npc_tally(Player* pPlayer, Creature* pCreature, uint32 uiSende
 }
 
 /*######
+## Wrangle Some Aether Rays!
+######*/
+
+enum
+{
+    NPC_AETHERRAY        = 22181,
+    NPC_AETHERRAYF       = 23343,
+
+    SPELL_WRANGLING_ROPE = 40856,
+
+    AETHER_RAY_EMOTE     = -1522181
+};
+
+struct MANGOS_DLL_DECL npc_AetherRayAI : public ScriptedAI
+{
+    npc_AetherRayAI(Creature* pCreature) : ScriptedAI(pCreature) {Reset();}
+
+    bool m_bm_bDoEmote;
+    bool m_bm_bCanBeWrangled;
+    ObjectGuid m_m_playerGuid;
+    uint32 m_uiWrangleTimer;
+
+    void Reset()
+    {
+        m_bDoEmote = false;
+        m_bCanBeWrangled = false;
+        m_playerGuid = 0;
+        m_uiWrangleTimer = 5000;
+    }
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if(!m_bDoEmote && (m_creature->GetHealthPercent() < 40.0f))
+        {
+            DoScriptText(AETHER_RAY_EMOTE, m_creature);
+            m_bDoEmote = true;
+        }
+
+        if(m_bCanBeWrangled)
+        {
+            if(m_uiWrangleTimer < uiDiff)
+            {
+                Player* pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid);
+                pPlayer->KilledMonsterCredit(NPC_AETHERRAYF);
+                m_creature->UpdateEntry(NPC_AETHERRAYF);
+                m_creature->DeleteThreatList();
+                m_creature->CombatStop(true);
+                m_bCanBeWrangled = false;
+                m_uiWrangleTimer = 5000;
+            } else m_uiWrangleTimer -= uiDiff;
+        }
+
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_npc_AetherRay(Creature* pCreature)
+{
+    return new npc_AetherRayAI(pCreature);
+}
+
+bool EffectAuraDummy_spell_aura_WranglingRay(const Aura* pAura, bool bApply)
+{
+    if(pAura->GetId() == SPELL_WRANGLING_ROPE)
+    {
+        if(bApply)
+        {
+            if (Creature* pRay = GetClosestCreatureWithEntry(pAura->GetCaster(), NPC_AETHERRAY, 100.0f))
+            {
+                if(pRay->GetHealthPercent() < 40.0f)
+                {
+                    if (npc_AetherRayAI* pRayAI = dynamic_cast<npc_AetherRayAI*>(pRay->AI()))
+                    {
+                        pRayAI->m_bCanBeWrangled = true;
+                        pRayAI->m_playerGuid = pAura->GetCasterGuid();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+    }
+    return false;
+};
+
+/*######
 ## AddSC
 ######*/
 
@@ -651,5 +739,11 @@ void AddSC_blades_edge_mountains()
     newscript = new Script;
     newscript->Name = "npc_channeler";
     newscript->GetAI = &GetAI_mob_cannon_chaneller;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_AetherRay";
+    newscript->GetAI = &GetAI_npc_AetherRay;
+    newscript->pEffectAuraDummy = EffectAuraDummy_spell_aura_WranglingRay;
     newscript->RegisterSelf();
 }
