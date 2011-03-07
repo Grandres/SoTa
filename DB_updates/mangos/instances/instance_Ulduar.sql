@@ -1,4 +1,5 @@
 -- Instance Ulduar
+-- Instance last changes: a531
 
 -- teleporter
 UPDATE gameobject_template SET ScriptName = "go_ulduar_teleporter" WHERE entry = 194569;
@@ -22,6 +23,70 @@ DELETE FROM reference_loot_template WHERE item = 45038;
 INSERT INTO reference_loot_template VALUES
 (33886, 45038, 14, 3, 1, 1, 18, 603, 38); -- XT-002 hard %
 
+-- Trash loot
+-- 10man
+UPDATE `creature_template` SET `lootid` = 33115 WHERE `entry` IN (34183, 34197, 34133, 34193, 33354, 33755, 33754, 33431, 34085, 33430, 34190, 34198, 33526, 34199, 34086, 33525, 33355, 34069, 33527, 34267, 34196, 33699, 33722, 34191, 33818, 33819, 33822, 33824, 34134, 34135, 34273, 34271, 34269);
+-- 25man
+UPDATE `creature_template` SET `lootid` = 33116 WHERE `entry` IN (33700,33723,34186,34214,34217,34220,34268,34270,34272,34274, 33729,33737,33732,33731,33735,33734,33741,33757,33758,33827,33829,33828,33831,34185,34201,34139,34141,34142,34229,34245,34226,34236,34237);
+DELETE FROM `creature_loot_template` WHERE `entry` = 33116;
+INSERT INTO `creature_loot_template` (`entry`,`item`,`ChanceOrQuestChance`,`groupid`,`mincountOrRef`,`maxcount`,`lootcondition`,`condition_value1`,`condition_value2`) VALUES
+(33115, 1, 1, 1, -33115, 1, 0, 0, 0), -- epic item 10man
+(33116, 1, 1, 1, -33116, 1, 0, 0, 0); -- epic item 25man
+
+DELETE FROM `reference_loot_template` WHERE entry IN (33115, 33116);
+INSERT INTO `reference_loot_template` (`entry`,`item`,`ChanceOrQuestChance`,`groupid`,`mincountOrRef`,`maxcount`,`lootcondition`,`condition_value1`,`condition_value2`) VALUES
+-- 25man
+(33115,46341,0,1,1,1,0,0,0), -- Drape of the Spellweaver
+(33115,46347,0,1,1,1,0,0,0), -- Cloak of the Dormant Blaze
+(33115,46344,0,1,1,1,0,0,0), -- Iceshear Mantle
+(33115,46346,0,1,1,1,0,0,0), -- Boots of Unsettled Prey
+(33115,46345,0,1,1,1,0,0,0), -- Bracers of Righteous Reformation
+(33115,46340,0,1,1,1,0,0,0), -- Adamant Handguards
+(33115,46343,0,1,1,1,0,0,0), -- Fervor of the Protectorate
+(33115,46339,0,1,1,1,0,0,0), -- Mimiron's Repeater
+(33115,46351,0,1,1,1,0,0,0), -- Bloodcrush Cudgel
+(33115,46350,0,1,1,1,0,0,0), -- Pillar of Fortitude
+(33115,46342,0,1,1,1,0,0,0), -- Golemheart Longbow
+-- 25man
+(33116,45540,0,1,1,1,0,0,0), -- Bladebearer's Signet
+(33116,45605,0,1,1,1,0,0,0), -- Daschal's Bite
+(33116,45542,0,1,1,1,0,0,0), -- Greaves of the Stonewarder
+(33116,45548,0,1,1,1,0,0,0), -- Belt of the Sleeper
+(33116,45549,0,1,1,1,0,0,0), -- Grips of Chaos
+(33116,46138,0,1,1,1,0,0,0), -- Idol of the Flourishing Life
+(33116,45544,0,1,1,1,0,0,0), -- Leggings of the Tortured Earth
+(33116,45539,0,1,1,1,0,0,0), -- Pendant of Focused Energies
+(33116,45543,0,1,1,1,0,0,0), -- Shoulders of Misfortune
+(33116,45541,0,1,1,1,0,0,0), -- Shroud of Alteration
+(33116,45538,0,1,1,1,0,0,0), -- Titanstone Pendant
+(33116,45547,0,1,1,1,0,0,0), -- Relic Hunter's Cord
+(33116,37254,0,1,1,1,0,0,0); -- Super Simian Sphere
+
+-- patterns - drop from some bosses only on 25man
+-- ignis, xt, auriaya, assembly, kologarn
+DELETE FROM `reference_loot_template` WHERE `entry` = 33117;
+INSERT INTO `reference_loot_template` (`entry`,`item`,`ChanceOrQuestChance`,`groupid`,`mincountOrRef`,`maxcount`,`lootcondition`,`condition_value1`,`condition_value2`) VALUES
+(33117,45105,4,6,1,1,0,0,0), -- Pattern: Savior's Slippers
+(33117,45104,4,6,1,1,0,0,0), -- Pattern: Cord of the White Dawn
+(33117,45103,4,6,1,1,0,0,0), -- Pattern: Spellslinger's Slippers
+(33117,45102,4,6,1,1,0,0,0), -- Pattern: Sash of Ancient Power
+(33117,45100,4,6,1,1,0,0,0), -- Pattern: Belt of Arctic Life
+(33117,45099,4,6,1,1,0,0,0), -- Pattern: Footpads of Silence
+(33117,45098,4,6,1,1,0,0,0), -- Pattern: Death-warmed Belt
+(33117,45101,4,6,1,1,0,0,0), -- Pattern: Boots of Wintry Endurance
+(33117,45095,4,6,1,1,0,0,0), -- Pattern: Boots of Living Scale
+(33117,45096,4,6,1,1,0,0,0), -- Pattern: Blue Belt of Chaos
+(33117,45094,4,6,1,1,0,0,0), -- Pattern: Belt of Dragons
+(33117,45097,4,6,1,1,0,0,0), -- Pattern: Lightning Grounded Boots
+(33117,45091,4,6,1,1,0,0,0), -- Plans: Treads of Destiny
+(33117,45088,4,6,1,1,0,0,0), -- Plans: Belt of the Titans
+(33117,45092,4,6,1,1,0,0,0), -- Plans: Indestructible Plate Girdle
+(33117,45093,4,6,1,1,0,0,0), -- Plans: Spiked Deathdealers
+(33117,45090,4,6,1,1,0,0,0), -- Plans: Plate Girdle of Righteousness
+(33117,45089,4,6,1,1,0,0,0), -- Plans: Battlelord's Plate Boots
+(33117,46027,14,6,1,1,0,0,0), -- Formula: Enchant Weapon - Blade Ward (more likely to drop)
+(33117,46348,14,6,1,1,0,0,0); -- Formula: Enchant Weapon - Blood Draining (more likely to drop)
+
 -- ****** Ignis the Furnace Master ******
 UPDATE `creature_template` SET `ScriptName` = "boss_ignis" WHERE `entry` = 33118;
 UPDATE `creature_template` SET lootid = entry, `mechanic_immune_mask` = 617299839 WHERE entry IN (33118, 33190);
@@ -40,7 +105,9 @@ INSERT INTO `creature_loot_template` VALUES
 (33118, 1, 100, 1, -33119, 2, 0, 0, 0),
 -- 25 man
 (33190, 45624, 100, 0, 1, 1, 0, 0, 0),
-(33190, 1, 100, 1, -33191, 4, 0, 0, 0);
+(33190, 1, 100, 1, -33191, 4, 0, 0, 0),
+(33190, 45087, 19, 2, 1, 1, 0, 0, 0), -- Runed Orb
+(33190, 2, 100, 6, -33117, 1, 0, 0, 0); -- random pattern
 
 DELETE FROM `reference_loot_template` WHERE `entry` IN (33119, 33191);
 INSERT INTO `reference_loot_template` VALUES
@@ -103,7 +170,8 @@ INSERT INTO `creature_loot_template` VALUES
 (33186, 1, 100, 1, -33187, 2, 0, 0, 0),
 -- 25 man
 (33724, 45624, 100, 0, 1, 1, 0, 0, 0),
-(33724, 1, 100, 1, -33725, 4, 0, 0, 0);
+(33724, 1, 100, 1, -33725, 4, 0, 0, 0),
+(33724, 45087, 19, 2, 1, 1, 0, 0, 0); -- Runed Orb
 
 DELETE FROM `reference_loot_template` WHERE `entry` IN (33187, 33725);
 INSERT INTO `reference_loot_template` VALUES
@@ -165,6 +233,8 @@ INSERT INTO `creature_loot_template` VALUES
 -- 25 man normal
 (33885, 45624, 100, 0, 1, 1, 0, 0, 0),
 (33885, 1, 100, 1, -33886, 4, 0, 0, 0),
+(33885, 45087, 17, 2, 1, 1, 0, 0, 0), -- Runed Orb
+(33885, 3, 100, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- 25 man hard mode
 (33885, 45445, 0, 2, 1, 1, 18, 603, 38),
 (33885, 45443, 0, 2, 1, 1, 18, 603, 38),
@@ -233,16 +303,18 @@ INSERT INTO creature_loot_template VALUES
 -- Brundir
 (33694, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
 (33694, 1, 100, 1, -33694, 4, 0, 0, 0),
+(33694, 45087, 17, 4, 1, 1, 0, 0, 0), -- Runed Orb
 -- Molgeim
 (33692, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
 (33692, 1, 100, 1, -33694, 4, 0, 0, 0),
 (33692, 45857, 50, 2, 1, 1, 0, 0, 0), -- Data Disk qitem
+(33692, 45087, 39, 4, 1, 1, 0, 0, 0), -- Runed Orb
 -- Steelbreaker
 (33693, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
 (33693, 1, 100, 1, -33694, 4, 0, 0, 0),
 (33693, 45857, 50, 2, 1, 1, 0, 0, 0), -- Data Disk qitem
-(33693, 2, 100, 3, -33693, 1, 0, 0, 0); -- hard mode loot
-
+(33693, 2, 100, 3, -33693, 1, 0, 0, 0), -- hard mode loot
+(33693, 45087, 40, 4, 1, 1, 0, 0, 0); -- Runed Orb
 
 DELETE FROM `reference_loot_template` WHERE `entry` IN (32857, 33694, 32867, 33693);
 INSERT INTO `reference_loot_template` VALUES
@@ -280,6 +352,7 @@ INSERT INTO `reference_loot_template` VALUES
 (33694, 45225, 0, 1, 1, 1, 0, 0, 0),
 (33694, 45233, 0, 1, 1, 1, 0, 0, 0),
 (33694, 45236, 0, 1, 1, 1, 0, 0, 0),
+(33694, 1, 100, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- hard mode
 (33693, 45241, 0, 3, 1, 1, 0, 0, 0),
 (33693, 45245, 0, 3, 1, 1, 0, 0, 0),
@@ -289,40 +362,44 @@ INSERT INTO `reference_loot_template` VALUES
 (33693, 45244, 0, 3, 1, 1, 0, 0, 0);
 
 -- Kologarn
--- fix boss and arm(s) position because when a player leaves the vehicle it falls down sometimes :/
+-- arms should be mounted on boss?
 DELETE FROM creature WHERE id IN (32933, 32934);
 INSERT INTO creature (id, map, spawnMask, phaseMask, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint, curhealth, curmana, DeathState, MovementType) VALUES
-(32933, 603, 3, 65535, 0, 0, 1786.30, -24.5499, 448.805, 3.14747, 604800, 0, 0, 543855, 0, 0, 0);
--- INSERT INTO creature (id, map, spawnMask, phaseMask, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint, curhealth, curmana, DeathState, MovementType) VALUES
--- (32934, 603, 3, 65535, 0, 0, 1799.68, -24.3599, 452.227, 3.14747, 604800, 0, 0, 543855, 0, 0, 0);
-UPDATE creature SET position_x = 1786.30, position_y = -24.5499, position_z = 448.805 WHERE id = 32930;
-UPDATE creature_model_info SET bounding_radius=15, combat_reach=15 WHERE modelid IN (28638, 28822, 28821);
-UPDATE creature_template SET mechanic_immune_mask=617299803, scriptname='boss_kologarn' WHERE entry IN (32930, 33909);
-UPDATE creature_template SET mechanic_immune_mask=652951551, scriptname='boss_right_arm' WHERE entry=32934;
-UPDATE creature_template SET mechanic_immune_mask=652951551, scriptname='boss_left_arm' WHERE entry=32933;
+(32933, 603, 3, 65535, 0, 0, 1797.15, -24.4027, 448.741, 3.14747, 604800, 0, 0, 543855, 0, 0, 0);
+INSERT INTO creature (id, map, spawnMask, phaseMask, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint, curhealth, curmana, DeathState, MovementType) VALUES
+(32934, 603, 3, 65535, 0, 0, 1797.15, -24.4027, 448.741, 3.14747, 604800, 0, 0, 543855, 0, 0, 0);
+UPDATE creature SET position_x = 1797.15, position_y = -24.4027, position_z = 448.741 WHERE id = 32930;
+UPDATE creature_model_info SET bounding_radius = 40, combat_reach = 40 WHERE modelid IN (28638, 28822, 28821);
+UPDATE creature_template SET scriptname='boss_kologarn' WHERE entry = 32930;
+UPDATE creature_template SET scriptname='boss_right_arm' WHERE entry=32934;
+UPDATE creature_template SET scriptname='boss_left_arm' WHERE entry=32933;
 UPDATE creature_template SET ScriptName = 'mob_ulduar_rubble' WHERE entry IN (33768, 33809, 33908, 33942);
+UPDATE creature_template SET ScriptName = "mob_eyebeam_trigger" WHERE entry IN (33802, 33632);
+UPDATE creature_template SET dmg_multiplier = 0 WHERE entry IN (32934, 32933, 33911, 33910);
+UPDATE creature_template SET mechanic_immune_mask = 617299803 WHERE entry IN (32930, 33909, 32934, 32933, 33911, 33910);
 UPDATE creature_template SET RegenHealth = 1 WHERE entry = 33910;
 UPDATE creature_template SET RegenHealth = 1 WHERE entry = 33911;
-UPDATE creature_template SET ScriptName = "mob_eyebeam_trigger" WHERE entry IN (33802, 33632);
 
-DELETE FROM creature_template_addon WHERE entry = 32934;
-INSERT INTO creature_template_addon VALUES
-(32934, 0, 0, 0, 0, 0, 0, 380, "", "");
+-- DELETE FROM creature_template_addon WHERE entry = 32934;
+-- INSERT INTO creature_template_addon VALUES
+-- (32934, 0, 0, 0, 0, 0, 0, 380, "", "");
 
-DELETE FROM vehicle_data WHERE entry = 380;
-INSERT INTO vehicle_data VALUES (380, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+-- DELETE FROM vehicle_data WHERE entry = 380;
+-- INSERT INTO vehicle_data VALUES (380, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-DELETE FROM vehicle_seat_data WHERE seat IN (3690, 3691, 3692);
-INSERT INTO vehicle_seat_data VALUES
-(3690, 0),
-(3691, 0),
-(3692, 0);
+-- DELETE FROM vehicle_seat_data WHERE seat IN (3690, 3691, 3692);
+-- INSERT INTO vehicle_seat_data VALUES
+-- (3690, 0),
+-- (3691, 0),
+-- (3692, 0);
 
 -- missing loot 25man
 DELETE FROM gameobject_loot_template WHERE entry = 26929;
 INSERT INTO gameobject_loot_template VALUES
 (26929, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
-(26929, 45261, 100, 1, -26929, 4, 0, 0, 0); -- 4 items
+(26929, 45261, 100, 1, -26929, 4, 0, 0, 0), -- 4 items
+(26929, 45087, 13, 2, 1, 1, 0, 0, 0), -- Runed Orb
+(26929, 1, 100, 6, -33117, 1, 0, 0, 0); -- random pattern
 DELETE FROM reference_loot_template WHERE entry = 26929;
 INSERT INTO reference_loot_template VALUES
 (26929, 45261, 0, 1, 1, 1, 0, 0, 0),
@@ -362,7 +439,9 @@ INSERT INTO creature_loot_template VALUES
 (33515, 1, 100, 1, -33515, 2, 0, 0, 0),
 -- 25man
 (34175, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
-(34175, 1, 100, 1, -34175, 4, 0, 0, 0);
+(34175, 1, 100, 1, -34175, 4, 0, 0, 0),
+(34175, 45087, 18, 2, 1, 1, 0, 0, 0), -- Runed Orb
+(34175, 2, 100, 6, -33117, 1, 0, 0, 0); -- random pattern
 
 DELETE FROM `reference_loot_template` WHERE `entry` IN (33515, 34175);
 INSERT INTO `reference_loot_template` VALUES
@@ -403,6 +482,17 @@ UPDATE creature_template SET ScriptName = 'boss_elder_stonebark' WHERE entry = 3
 UPDATE creature_template SET ScriptName = 'mob_iron_roots' WHERE entry IN (33088, 33168);
 UPDATE creature_template SET ScriptName = 'mob_freya_ground' WHERE entry IN (33215, 33228, 33170, 33050, 34129);
 UPDATE creature_template SET ScriptName = 'mob_freya_spawned' WHERE entry IN (32916, 32919, 33202, 33203, 32918);
+
+-- fill some missing data in creature_template (health, level etc.)
+UPDATE creature_template SET minhealth = 5856900, maxhealth = 5856900 WHERE entry = 33391; -- Brightleaf 25man
+UPDATE creature_template SET minlevel = 80, maxlevel = 80, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 18270, maxhealth = 18270 WHERE entry = 33168; -- Strengthened Iron Roots 10man
+UPDATE creature_template SET minlevel = 80, maxlevel = 80, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 54432, maxhealth = 54432 WHERE entry = 33397; -- Strengthened Iron Roots 25man
+UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 104264, maxhealth = 104264 WHERE entry = 33385; -- Eonar's Gift 25man
+UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 1563960, maxhealth = 1563960 WHERE entry = 33400; -- Snaplasher 25man
+UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 1251168, maxhealth = 1251168, minmana = 8162, maxmana = 8162 WHERE entry = 33401; -- Storm Lasher 25man
+UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 834080, maxhealth = 834080, minmana = 17958, maxmana = 17958 WHERE entry = 33398; -- Ancient Water Spirit 25man
+UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 3544976, maxhealth = 3544976 WHERE entry = 33376; -- Ancient Conservator 25man
+UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 375350, maxhealth = 375350 WHERE entry = 33399; -- Detonating Lasher 25man
 
 -- some aura fixes, this may be wrong
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('62525', '1', '32906');

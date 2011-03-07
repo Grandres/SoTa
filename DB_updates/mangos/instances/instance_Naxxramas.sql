@@ -1,4 +1,5 @@
--- NAXXRAMAS
+-- Instance Naxxramas
+-- Instance last changes: a196
 ###################   boss_anubrekhan   ########################################################
 -- crypt guard (summon) based on ACID 3.0.4
 DELETE FROM creature_ai_scripts WHERE creature_id = 16573;

@@ -1,5 +1,5 @@
-
 -- Instance Gundrak
+-- Instance last changes: a221
 
 UPDATE creature_template SET
 ScriptName='mob_sladran_summon_target'

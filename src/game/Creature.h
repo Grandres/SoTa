@@ -200,7 +200,6 @@ struct CreatureData
 struct CreatureDataAddonAura
 {
     uint32 spell_id;
-    SpellEffectIndex effect_idx;
 };
 
 struct CreatureDataAddonPassengers
