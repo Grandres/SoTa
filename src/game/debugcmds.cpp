@@ -680,7 +680,7 @@ bool ChatHandler::HandleDebugSpawnVehicleCommand(char* args)
 
     Map *map = m_session->GetPlayer()->GetMap();
 
-    if (!v->Create(map->GenerateLocalLowGuid(HIGHGUID_VEHICLE), map, entry, id, m_session->GetPlayer()->GetTeam()))
+    if (!v->Create(map->GenerateLocalLowGuid(HIGHGUID_VEHICLE), map, m_session->GetPlayer()->GetPhaseMaskForSpawn(), entry, id, m_session->GetPlayer()->GetTeam()))
     {
         delete v;
         return false;

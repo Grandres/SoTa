@@ -155,7 +155,7 @@ UPDATE creature_template SET mechanic_immune_mask = 652951551 WHERE entry IN (28
 UPDATE creature_template SET maxhealth = 133525, minhealth = 133525, maxmana = 51360, minmana = 51360, speed_run = 2.4, InhabitType = 3 WHERE entry = 28670;
 DELETE FROM npc_spellclick_spells WHERE npc_entry in (28670);
 INSERT INTO npc_spellclick_spells VALUES (28670, 52196, 12779, 1, 12779, 0);
-REPLACE INTO creature_template_addon VALUES (28670, 0, 50331648, 0, 1, 0, 1024, 156, NULL, '53112 0 53112 1 48602 2');
+REPLACE INTO creature_template_addon VALUES (28670, 0, 50331648, 0, 1, 0, 1024, 156, NULL, '53112 48602');
 REPLACE INTO vehicle_data VALUES (156, 24, 53114, 0, 53110, 0, 0, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (1986, 3),(1987, 8);
 UPDATE quest_template SET ReqItemId1 = 39700, ReqItemCount1 = 1 WHERE entry = 12779;
@@ -204,7 +204,7 @@ REPLACE INTO vehicle_seat_data VALUES (2699, 1);
 /* Massacre At Light's Point (new) */
 DELETE FROM npc_spellclick_spells WHERE npc_entry IN (28887,28833,28864);
 INSERT INTO npc_spellclick_spells VALUES (28833,52447,12701,1,12701,1),(28887,52447,12701,1,12701,1),(28864,67373,0,0,0,1);
-REPLACE INTO creature_template_addon VALUES (28887,0,0,0,2049,0,0,79,NULL,NULL),(28833,0,0,0,2049,0,0,79,NULL,NULL),(28864,0,0,0,0,0,0,143,NULL,'48602 0 48602 2');
+REPLACE INTO creature_template_addon VALUES (28887,0,0,0,2049,0,0,79,NULL,NULL),(28833,0,0,0,2049,0,0,79,NULL,NULL),(28864,0,0,0,0,0,0,143,NULL,'48602');
 REPLACE INTO vehicle_data VALUES (143,12,0,0,0,0,0,0,0,0,0,0,0),(79,5,52435,52576,0,52588,0,0,0,0,0,0,0);
 REPLACE INTO vehicle_seat_data VALUES (1427, 1),(1902, 3);
 UPDATE creature_model_info SET bounding_radius = 0 WHERE modelid = 25723;
@@ -277,19 +277,19 @@ UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE 
 /* Amber Drake */
 INSERT INTO spell_script_target VALUES (49460, 1, 27755);
 INSERT INTO npc_spellclick_spells VALUES (27755, 49459, 0, 0, 0, 1);
-INSERT INTO creature_template_addon VALUES (27755, 0, 0, 0, 0, 0, 0, 70, NULL, '48602 0 48602 2');
+INSERT INTO creature_template_addon VALUES (27755, 0, 0, 0, 0, 0, 0, 70, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (70, 12, 49840, 49838, 49592, 0, 0, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (1323, 3);
 /* Emerald Drake */
 INSERT INTO spell_script_target VALUES (49346, 1, 27692);
 INSERT INTO npc_spellclick_spells VALUES (27692, 49427, 0, 0, 0, 1);
-INSERT INTO creature_template_addon VALUES (27692, 0, 0, 0, 0, 0, 0, 181, NULL, '48602 0 48602 2');
+INSERT INTO creature_template_addon VALUES (27692, 0, 0, 0, 0, 0, 0, 181, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (181, 12, 50328, 50341, 50344, 0, 0, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (2081, 3);
 /* Ruby Drake */
 INSERT INTO spell_script_target VALUES (49464, 1, 27756);
 INSERT INTO npc_spellclick_spells VALUES (27756, 49463, 0, 0, 0, 1);
-INSERT INTO creature_template_addon VALUES (27756, 0, 0, 0, 0, 0, 0, 186, NULL, '48602 0 48602 2');
+INSERT INTO creature_template_addon VALUES (27756, 0, 0, 0, 0, 0, 0, 186, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (186, 12, 50232, 50248, 50240, 0, 0, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (2089, 3);
 
@@ -377,7 +377,7 @@ REPLACE INTO spell_script_target VALUES (45877, 1, 25596);
 /* Kor'kron War Rider */
 DELETE FROM npc_spellclick_spells WHERE npc_entry IN (26813);
 INSERT INTO npc_spellclick_spells VALUES (26813, 47424, 0, 0, 0, 1);
-REPLACE INTO creature_template_addon VALUES (26813, 0, 0, 0, 0, 0, 0, 80, NULL, '48602 0 48602 2');
+REPLACE INTO creature_template_addon VALUES (26813, 0, 0, 0, 0, 0, 0, 80, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (80, 4, 47434, 63507, 47454, 0, 0, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (1431, 3),(1432, 2);
 UPDATE creature_template SET modelid_2 = 0, modelid_3 = 0, IconName = 'vehichleCursor' WHERE entry IN (26813);
@@ -385,7 +385,7 @@ UPDATE creature_template SET modelid_2 = 0, modelid_3 = 0, IconName = 'vehichleC
 /* Kor'kron War Rider II */
 DELETE FROM npc_spellclick_spells WHERE npc_entry IN (26572);
 INSERT INTO npc_spellclick_spells VALUES (26572, 47424, 0, 0, 0, 1);
-REPLACE INTO creature_template_addon VALUES (26572, 0, 0, 0, 0, 0, 0, 34, NULL, '48602 0 48602 2');
+REPLACE INTO creature_template_addon VALUES (26572, 0, 0, 0, 0, 0, 0, 34, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (34, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (601, 3);
 UPDATE creature_template SET IconName = 'vehichleCursor' WHERE entry IN (26572);
@@ -417,7 +417,7 @@ UPDATE creature_template SET IconName = 'vehichleCursor' WHERE entry IN (27593);
 /* Steel Gate Flying Machine */
 DELETE FROM npc_spellclick_spells WHERE npc_entry IN (24418);
 INSERT INTO npc_spellclick_spells VALUES (24418, 65403, 0, 0, 0, 1);
-REPLACE INTO creature_template_addon VALUES (24418, 0, 0, 0, 0, 0, 0, 8, NULL, '48602 0 48602 2');
+REPLACE INTO creature_template_addon VALUES (24418, 0, 0, 0, 0, 0, 0, 8, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (8, 4, 44009, 43770, 43799, 43769, 47769, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (261, 1),(461, 2);
 UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE entry IN (24418);
@@ -425,7 +425,7 @@ UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE 
 /* Wintergarde Gryphon */
 DELETE FROM npc_spellclick_spells WHERE npc_entry IN (27258);
 INSERT INTO npc_spellclick_spells VALUES (27258, 49288, 0, 0, 0, 1);
-REPLACE INTO creature_template_addon VALUES (27258, 0, 0, 0, 0, 0, 0, 44, NULL, '48602 0 48602 2');
+REPLACE INTO creature_template_addon VALUES (27258, 0, 0, 0, 0, 0, 0, 44, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (44, 4, 48363, 48397, 54170, 0, 0, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (762, 1),(764, 2);
 UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE entry IN (27258);
@@ -433,7 +433,7 @@ UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE 
 /* Wintergarde Gryphon II, Into Hostile Territory quest */
 DELETE FROM npc_spellclick_spells WHERE npc_entry IN (27661);
 INSERT INTO npc_spellclick_spells VALUES (27661, 48862, 0, 0, 0, 1);
-REPLACE INTO creature_template_addon VALUES (27661, 0, 0, 0, 0, 0, 0, 61, NULL, '48602 0 48602 2');
+REPLACE INTO creature_template_addon VALUES (27661, 0, 0, 0, 0, 0, 0, 61, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (61, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (1267, 1),(1268, 2);
 UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE entry IN (27661);
@@ -449,7 +449,7 @@ UPDATE creature_template SET faction_A = 7, faction_H = 7, IconName = 'vehichleC
 /* Wyrmrest Defender */
 DELETE FROM npc_spellclick_spells WHERE npc_entry IN (27629);
 INSERT INTO npc_spellclick_spells VALUES (27629, 49256, 12372, 1, 12372, 1);
-REPLACE INTO creature_template_addon VALUES (27629,0,50331648,0,1,0,0,60,NULL,'50069 0 50069 1 50069 2');
+REPLACE INTO creature_template_addon VALUES (27629,0,50331648,0,1,0,0,60,NULL,'50069');
 REPLACE INTO vehicle_data VALUES (60,4,49161,49243,49263,49264,49367,0,0,0,0,0,0);
 REPLACE INTO vehicle_seat_data VALUES (1262, 3);
 UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE entry IN (27629);
@@ -457,7 +457,7 @@ UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE 
 /* Wyrmrest Skytalon */
 DELETE FROM npc_spellclick_spells WHERE npc_entry = 32535;
 INSERT INTO npc_spellclick_spells VALUES (32535, 61245, 0, 0, 0, 1);
-REPLACE INTO creature_template_addon VALUES (32535, 0, 0, 0, 0, 0, 0, 165, NULL, '48602 0 48602 2');
+REPLACE INTO creature_template_addon VALUES (32535, 0, 0, 0, 0, 0, 0, 165, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (165, 12, 56091, 61621, 57090, 57143, 57108, 57092, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (2061, 3);
 REPLACE INTO spell_script_target VALUES (61245,1,32535);
@@ -466,7 +466,7 @@ UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE 
 /* Wyrmrest Vanquisher */
 DELETE FROM npc_spellclick_spells WHERE npc_entry IN (27996);
 INSERT INTO npc_spellclick_spells VALUES (27996, 65403, 0, 0, 0, 1);
-REPLACE INTO creature_template_addon VALUES (27996, 0, 50331648, 0, 1, 0, 0, 99, NULL, '48602 0 48602 2');
+REPLACE INTO creature_template_addon VALUES (27996, 0, 50331648, 0, 1, 0, 0, 99, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (99, 4, 50430, 55987, 50348, 0, 0, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (1520, 3),(1521, 8);
 UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE entry IN (27996);
@@ -474,7 +474,7 @@ UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE 
 /* Fizzcrank Bomber */
 DELETE FROM npc_spellclick_spells WHERE npc_entry IN (25765);
 INSERT INTO npc_spellclick_spells VALUES (25765, 65403, 0, 0, 0, 1);
-REPLACE INTO creature_template_addon VALUES (25765, 0, 0, 0, 0, 0, 0, 492, NULL, '48602 0 48602 2');
+REPLACE INTO creature_template_addon VALUES (25765, 0, 0, 0, 0, 0, 0, 492, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (492, 4, 45971, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (5506, 3);
 UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE entry IN (25765);
@@ -589,7 +589,7 @@ UPDATE creature_template SET IconName = 'Gunner' WHERE entry IN (30066);
 /* Argent Skytalon */
 DELETE FROM npc_spellclick_spells WHERE npc_entry IN (30228);
 INSERT INTO npc_spellclick_spells VALUES (30228, 65403, 0, 0, 0, 1);
-REPLACE INTO creature_template_addon VALUES (30228, 0, 50331648, 0, 1, 0, 0, 234, NULL, '48602 0 48602 2');
+REPLACE INTO creature_template_addon VALUES (30228, 0, 50331648, 0, 1, 0, 0, 234, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (234, 4, 56683, 56684, 56712, 0, 0, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (2235, 1),(2236, 8);
 UPDATE creature_template SET IconName = 'vehichleCursor', InhabitType = 3 WHERE entry IN (30228);
@@ -629,7 +629,7 @@ UPDATE creature_template SET IconName = 'Gunner' WHERE entry IN (33114);
 /* Brann's Flying Machine */
 DELETE FROM npc_spellclick_spells WHERE npc_entry IN (34120);
 INSERT INTO npc_spellclick_spells VALUES (34120, 65403, 0, 0, 0, 1);
-REPLACE INTO creature_template_addon VALUES (34120, 0, 0, 0, 0, 0, 0, 390, NULL, '48602 0 48602 2');
+REPLACE INTO creature_template_addon VALUES (34120, 0, 0, 0, 0, 0, 0, 390, NULL, '48602');
 REPLACE INTO vehicle_data VALUES (390, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 REPLACE INTO vehicle_seat_data VALUES (3926, 3);
 UPDATE creature_template SET IconName = 'vehichleCursor' WHERE entry IN (34120);
