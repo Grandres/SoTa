@@ -619,9 +619,9 @@ struct MANGOS_DLL_DECL npc_AetherRayAI : public ScriptedAI
 {
     npc_AetherRayAI(Creature* pCreature) : ScriptedAI(pCreature) {Reset();}
 
-    bool m_bm_bDoEmote;
-    bool m_bm_bCanBeWrangled;
-    ObjectGuid m_m_playerGuid;
+    bool m_bDoEmote;
+    bool m_bCanBeWrangled;
+    ObjectGuid m_playerGuid;
     uint32 m_uiWrangleTimer;
 
     void Reset()
