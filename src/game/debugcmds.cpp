@@ -678,6 +678,14 @@ bool ChatHandler::HandleDebugSpawnVehicleCommand(char* args)
         return false;
     }
 
+    Map *map = m_session->GetPlayer()->GetMap();
+
+    if (!v->Create(map->GenerateLocalLowGuid(HIGHGUID_VEHICLE), map, entry, id, m_session->GetPlayer()->GetTeam()))
+    {
+        delete v;
+        return false;
+    }
+
     map->Add((Creature*)v);
     v->AIM_Initialize();
 

@@ -200,7 +200,6 @@ struct CreatureData
 struct CreatureDataAddonAura
 {
     uint32 spell_id;
-    SpellEffectIndex effect_idx;
 };
 
 struct CreatureDataAddonPassengers
@@ -222,6 +221,7 @@ struct CreatureDataAddon
     uint8  pvp_state;                                       // UnitPVPStateFlags
     uint32 emote;
     uint32 splineFlags;
+    CreatureDataAddonAura const* auras;                     // loaded as char* "spell1 spell2 ... "
     uint32 vehicle_id;
     CreatureDataAddonPassengers const* passengers;          // loaded as char* "entry1 seatid1 entry2 seatid2 ... "
     CreatureDataAddonAura const* auras;                     // loaded as char* "spell1 eff1 spell2 eff2 ... "

@@ -1,6 +1,5 @@
--- **************
--- Halls Of Stone
--- **************
+-- Instance Halls of Stone
+-- Instance last changes: a245
 
 -- boss scripts
 UPDATE creature_template SET ScriptName = 'boss_maiden_of_grief' WHERE entry = 27975;

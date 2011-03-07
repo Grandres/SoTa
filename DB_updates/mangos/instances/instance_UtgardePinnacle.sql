@@ -1,4 +1,5 @@
 -- Utgarde Pinnacle
+-- Instance last changes: a414
 
 -- Svala Sorrowgrave
 UPDATE creature_template SET ScriptName='npc_ritual_channeler' WHERE entry=27281;
