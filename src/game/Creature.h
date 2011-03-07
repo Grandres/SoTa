@@ -211,7 +211,7 @@ struct CreatureDataAddon
     uint8  pvp_state;                                       // UnitPVPStateFlags
     uint32 emote;
     uint32 splineFlags;
-    CreatureDataAddonAura const* auras;                     // loaded as char* "spell1 eff1 spell2 eff2 ... "
+    CreatureDataAddonAura const* auras;                     // loaded as char* "spell1 spell2 ... "
 };
 
 struct CreatureModelInfo
