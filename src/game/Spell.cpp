@@ -4011,12 +4011,6 @@ void Spell::finish(bool ok)
     if( m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET )
         m_caster->AttackStop();
 
-    // hack for Fingers of Frost stacks remove
-    if(m_caster->HasAura(74396) && !m_IsTriggeredSpell && m_spellInfo->SpellFamilyName == SPELLFAMILY_MAGE)
-        if (SpellAuraHolder *holder = m_caster->GetSpellAuraHolder(74396))
-            if(holder->DropAuraCharge())
-                m_caster->RemoveSpellAuraHolder(holder);
-
     // For SPELL_AURA_IGNORE_UNIT_STATE charges
     // TODO: find way without this hack
     bool break_for = false;
