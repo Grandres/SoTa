@@ -1064,7 +1064,8 @@ bool Aura::IsEffectStacking()
         case SPELL_AURA_MOD_HEALING_DONE:                               // Demonic Pact
         case SPELL_AURA_MOD_DAMAGE_DONE:                                // Demonic Pact
         case SPELL_AURA_HASTE_ALL:                                      // Imp. Moonkin Aur / Swift Retribution
-        case SPELL_AURA_MOD_MELEE_HASTE:                                // Improved Icy Talons
+        case SPELL_AURA_MOD_MELEE_HASTE:                                // (Improved) Icy Talons / Windfury Totem
+        case SPELL_AURA_MOD_MELEE_RANGED_HASTE:
         case SPELL_AURA_MOD_ATTACK_POWER_PCT:                           // Abomination's Might / Unleashed Rage
         case SPELL_AURA_MOD_RANGED_ATTACK_POWER_PCT:
         case SPELL_AURA_MOD_ATTACK_POWER:                               // (Greater) Blessing of Might / Battle Shout
@@ -1072,6 +1073,9 @@ bool Aura::IsEffectStacking()
         case SPELL_AURA_MOD_POWER_REGEN:                                // (Greater) Blessing of Wisdom
         case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:                       // Glyph of Salvation / Pain Suppression / Safeguard ? 
             if (GetSpellProto()->AttributesEx6 & SPELL_ATTR_EX6_UNK26)
+                return false;
+            // (Improved) Icy Talons check
+            else if (GetSpellProto()->SpellIconID == 3785)
                 return false;
             break;
         case SPELL_AURA_MOD_STAT:
