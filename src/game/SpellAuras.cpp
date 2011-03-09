@@ -6844,7 +6844,6 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             MasterShaperSpellId = 48420;
             break;
         case FORM_TREE:
-            spellId1 = 5420;
             spellId2 = 34123;
             MasterShaperSpellId = 48422;
             break;
@@ -7072,10 +7071,6 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 if ((spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) && spellInfo->StancesNot & (1<<(form-1)))
                     target->CastSpell(target, itr->first, true, NULL, this);
             }
-            // Tree of Life exception - should work in all forms so recast
-            // removing and applying again is implemented because of not wanted stacking possibility of the aura
-            if (spellId1 == 5420)
-                target->CastSpell(target, spellId1, true, NULL, this);
         }
 
         Unit::SpellAuraHolderMap& tAuras = target->GetSpellAuraHolderMap();
