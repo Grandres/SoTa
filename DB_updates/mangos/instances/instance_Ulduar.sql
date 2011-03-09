@@ -1,5 +1,5 @@
 -- Instance Ulduar
--- Instance last changes: a531
+-- Instance last changes: a549
 
 -- teleporter
 UPDATE gameobject_template SET ScriptName = "go_ulduar_teleporter" WHERE entry = 194569;
@@ -107,7 +107,7 @@ INSERT INTO `creature_loot_template` VALUES
 (33190, 45624, 100, 0, 1, 1, 0, 0, 0),
 (33190, 1, 100, 1, -33191, 4, 0, 0, 0),
 (33190, 45087, 19, 2, 1, 1, 0, 0, 0), -- Runed Orb
-(33190, 2, 100, 6, -33117, 1, 0, 0, 0); -- random pattern
+(33190, 2, 10, 6, -33117, 1, 0, 0, 0); -- random pattern
 
 DELETE FROM `reference_loot_template` WHERE `entry` IN (33119, 33191);
 INSERT INTO `reference_loot_template` VALUES
@@ -230,11 +230,13 @@ INSERT INTO `creature_loot_template` VALUES
 (33293, 45869, 0, 2, 1, 1, 18, 603, 38),
 (33293, 45870, 0, 2, 1, 1, 18, 603, 38),
 (33293, 45871, 0, 2, 1, 1, 18, 603, 38),
+(33293, 45087, 17, 3, 1, 1, 0, 0, 0), -- Runed Orb
+(33293, 3, 8, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- 25 man normal
 (33885, 45624, 100, 0, 1, 1, 0, 0, 0),
 (33885, 1, 100, 1, -33886, 4, 0, 0, 0),
 (33885, 45087, 17, 2, 1, 1, 0, 0, 0), -- Runed Orb
-(33885, 3, 100, 6, -33117, 1, 0, 0, 0), -- random pattern
+(33885, 3, 8, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- 25 man hard mode
 (33885, 45445, 0, 2, 1, 1, 18, 603, 38),
 (33885, 45443, 0, 2, 1, 1, 18, 603, 38),
@@ -336,6 +338,8 @@ INSERT INTO `reference_loot_template` VALUES
 (32867, 45448, 0, 3, 1, 1, 0, 0, 0),
 (32867, 45449, 0, 3, 1, 1, 0, 0, 0),
 (32867, 45447, 0, 3, 1, 1, 0, 0, 0),
+(32867, 45087, 17, 4, 1, 1, 0, 0, 0), -- Runed Orb
+(32867, 3, 8, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- 25man
 (33694, 45226, 0, 1, 1, 1, 0, 0, 0),
 (33694, 45224, 0, 1, 1, 1, 0, 0, 0),
@@ -352,7 +356,7 @@ INSERT INTO `reference_loot_template` VALUES
 (33694, 45225, 0, 1, 1, 1, 0, 0, 0),
 (33694, 45233, 0, 1, 1, 1, 0, 0, 0),
 (33694, 45236, 0, 1, 1, 1, 0, 0, 0),
-(33694, 1, 100, 6, -33117, 1, 0, 0, 0), -- random pattern
+(33694, 1, 10, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- hard mode
 (33693, 45241, 0, 3, 1, 1, 0, 0, 0),
 (33693, 45245, 0, 3, 1, 1, 0, 0, 0),
@@ -399,7 +403,7 @@ INSERT INTO gameobject_loot_template VALUES
 (26929, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
 (26929, 45261, 100, 1, -26929, 4, 0, 0, 0), -- 4 items
 (26929, 45087, 13, 2, 1, 1, 0, 0, 0), -- Runed Orb
-(26929, 1, 100, 6, -33117, 1, 0, 0, 0); -- random pattern
+(26929, 1, 7, 6, -33117, 1, 0, 0, 0); -- random pattern
 DELETE FROM reference_loot_template WHERE entry = 26929;
 INSERT INTO reference_loot_template VALUES
 (26929, 45261, 0, 1, 1, 1, 0, 0, 0),
@@ -441,7 +445,7 @@ INSERT INTO creature_loot_template VALUES
 (34175, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
 (34175, 1, 100, 1, -34175, 4, 0, 0, 0),
 (34175, 45087, 18, 2, 1, 1, 0, 0, 0), -- Runed Orb
-(34175, 2, 100, 6, -33117, 1, 0, 0, 0); -- random pattern
+(34175, 2, 9, 6, -33117, 1, 0, 0, 0); -- random pattern
 
 DELETE FROM `reference_loot_template` WHERE `entry` IN (33515, 34175);
 INSERT INTO `reference_loot_template` VALUES
