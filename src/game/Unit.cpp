@@ -3225,6 +3225,10 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell)
     int32 deflect_chance = pVictim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS)*100;
     tmp+=deflect_chance;
 
+    // Chaos Bolt cannot be deflected
+    if (spell->SpellFamilyName == SPELLFAMILY_WARLOCK && spell->SpellIconID == 3178)
+        return SPELL_MISS_NONE;
+
     if (rand < tmp)
         return SPELL_MISS_DEFLECT;
     else
