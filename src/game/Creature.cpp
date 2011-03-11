@@ -1238,7 +1238,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
 
     if (!IsPositionValid())
     {
-        sLog.outError("Creature (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)", GetGUIDLow(), GetEntry(), GetPositionX(), GetPositionY());
+        sLog.outError("Creature (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, data->id, data->posX, data->posY);
         return false;
     }
 
