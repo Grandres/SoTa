@@ -1,5 +1,5 @@
 -- Instance Ulduar
--- Instance last changes: a549
+-- Instance last changes: a570/a571
 
 -- teleporter
 UPDATE gameobject_template SET ScriptName = "go_ulduar_teleporter" WHERE entry = 194569;

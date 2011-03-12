@@ -77,11 +77,11 @@ CanCastResult CreatureAI::DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32
 {
     Unit* pCaster = m_creature;
 
-	if (!pTarget)
-	{
-		sLog.outError("DoCastSpellIfCan by creature entry %u attempt to cast spell but target is NULL.", m_creature->GetEntry());
-		MANGOS_ASSERT(!pTarget);
-	}
+    if (!pTarget)
+    {
+        sLog.outError("DoCastSpellIfCan by creature entry %u attempt to cast spell but target is NULL.", m_creature->GetEntry());
+        MANGOS_ASSERT(!pTarget);
+    }
 
     if (uiCastFlags & CAST_FORCE_TARGET_SELF)
         pCaster = pTarget;
