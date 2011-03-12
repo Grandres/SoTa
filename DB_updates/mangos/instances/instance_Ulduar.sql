@@ -1,5 +1,5 @@
 -- Instance Ulduar
--- Instance last changes: a572
+-- Instance last changes: a573
 
 -- teleporter
 UPDATE gameobject_template SET ScriptName = "go_ulduar_teleporter" WHERE entry = 194569;
@@ -28,7 +28,7 @@ INSERT INTO reference_loot_template VALUES
 UPDATE `creature_template` SET `lootid` = 33115 WHERE `entry` IN (34183, 34197, 34133, 34193, 33354, 33755, 33754, 33431, 34085, 33430, 34190, 34198, 33526, 34199, 34086, 33525, 33355, 34069, 33527, 34267, 34196, 33699, 33722, 34191, 33818, 33819, 33822, 33824, 34134, 34135, 34273, 34271, 34269);
 -- 25man
 UPDATE `creature_template` SET `lootid` = 33116 WHERE `entry` IN (33700,33723,34186,34214,34217,34220,34268,34270,34272,34274, 33729,33737,33732,33731,33735,33734,33741,33757,33758,33827,33829,33828,33831,34185,34201,34139,34141,34142,34229,34245,34226,34236,34237);
-DELETE FROM `creature_loot_template` WHERE `entry` = 33116;
+DELETE FROM `creature_loot_template` WHERE `entry` IN (33115, 33116);
 INSERT INTO `creature_loot_template` (`entry`,`item`,`ChanceOrQuestChance`,`groupid`,`mincountOrRef`,`maxcount`,`lootcondition`,`condition_value1`,`condition_value2`) VALUES
 (33115, 1, 1, 1, -33115, 1, 0, 0, 0), -- epic item 10man
 (33116, 1, 1, 1, -33116, 1, 0, 0, 0); -- epic item 25man
@@ -372,7 +372,7 @@ INSERT INTO creature (id, map, spawnMask, phaseMask, modelid, equipment_id, posi
 (32933, 603, 3, 65535, 0, 0, 1797.15, -24.4027, 448.741, 3.14747, 604800, 0, 0, 543855, 0, 0, 0);
 INSERT INTO creature (id, map, spawnMask, phaseMask, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint, curhealth, curmana, DeathState, MovementType) VALUES
 (32934, 603, 3, 65535, 0, 0, 1797.15, -24.4027, 448.741, 3.14747, 604800, 0, 0, 543855, 0, 0, 0);
-UPDATE creature SET position_x = 1797.15, position_y = -24.4027, position_z = 448.741 WHERE id = 32930;
+UPDATE creature SET position_x = 1797.15, position_y = -26.4027, position_z = 448.741 WHERE id = 32930;
 UPDATE creature_model_info SET bounding_radius = 40, combat_reach = 40 WHERE modelid IN (28638, 28822, 28821);
 UPDATE creature_template SET scriptname='boss_kologarn' WHERE entry = 32930;
 UPDATE creature_template SET scriptname='boss_right_arm' WHERE entry=32934;

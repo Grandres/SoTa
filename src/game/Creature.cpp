@@ -1463,6 +1463,11 @@ bool Creature::FallGround()
     if (getDeathState() != JUST_DIED)
         return false;
 
+    // some creatures should stay levitating
+    // Kologarn (Ulduar)
+    if (GetEntry() == 32930)
+        return false;
+
     // use larger distance for vmap height search than in most other cases
     float tz = GetTerrain()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ(), true, MAX_FALL_DISTANCE);
 

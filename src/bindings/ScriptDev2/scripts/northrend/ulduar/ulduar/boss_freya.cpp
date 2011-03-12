@@ -233,33 +233,26 @@ struct MANGOS_DLL_DECL mob_iron_rootsAI : public ScriptedAI
 
     void KilledUnit(Unit* pVictim)
     {
-        if (pVictim)
-        {
-            switch(m_uiCreatureEntry)
-            {
-            case NPC_IRON_ROOTS:
-                pVictim->RemoveAurasDueToSpell(m_bIsRegularMode ? SPELL_IRON_ROOTS : SPELL_IRON_ROOTS_H);
-                break;
-            case NPC_STRENGHENED_IRON_ROOTS:
-                pVictim->RemoveAurasDueToSpell(m_bIsRegularMode ? SPELL_IRON_ROOTS_FREYA : SPELL_IRON_ROOTS_FREYA_H);
-                break;
-            }
-        }
+        m_creature->ForcedDespawn(500);
     }
 
-    void JustDied(Unit* Killer)
+    void DamageTaken(Unit *pDoneBy, uint32 &uiDamage)
     {
-        if (Unit* pVictim = m_creature->GetMap()->GetUnit(m_uiVictimGUID))
+        if (uiDamage > m_creature->GetHealth())
         {
-            switch(m_uiCreatureEntry)
+            if (Unit* pVictim = m_creature->GetMap()->GetUnit(m_uiVictimGUID))
             {
-            case NPC_IRON_ROOTS:
-                pVictim->RemoveAurasDueToSpell(m_bIsRegularMode ? SPELL_IRON_ROOTS : SPELL_IRON_ROOTS_H);
-                break;
-            case NPC_STRENGHENED_IRON_ROOTS:
-                pVictim->RemoveAurasDueToSpell(m_bIsRegularMode ? SPELL_IRON_ROOTS_FREYA : SPELL_IRON_ROOTS_FREYA_H);
-                break;
+                switch(m_uiCreatureEntry)
+                {
+                    case NPC_IRON_ROOTS:
+                        pVictim->RemoveAurasDueToSpell(m_bIsRegularMode ? SPELL_IRON_ROOTS : SPELL_IRON_ROOTS_H);
+                        break;
+                    case NPC_STRENGHENED_IRON_ROOTS:
+                        pVictim->RemoveAurasDueToSpell(m_bIsRegularMode ? SPELL_IRON_ROOTS_FREYA : SPELL_IRON_ROOTS_FREYA_H);
+                        break;
+                }
             }
+            m_creature->ForcedDespawn(500);
         }
     }
 
@@ -700,25 +693,12 @@ struct MANGOS_DLL_DECL boss_freyaAI : public ScriptedAI
         {
             m_pInstance->SetData(TYPE_FREYA_HARD, 0);
 
-            // hacky way to complete achievements; use only if you have this function
             if(m_uiAchievProgress == 1)
-            {
-                // m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? ACHIEV_KNOCK_WOOD : ACHIEV_KNOCK_WOOD_H);
                 m_pInstance->SetData(TYPE_FREYA_HARD, 1);
-            }
             else if (m_uiAchievProgress == 2)
-            {
-                //m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? ACHIEV_KNOCK_KNOCK_WOOD : ACHIEV_KNOCK_KNOCK_WOOD_H);
                 m_pInstance->SetData(TYPE_FREYA_HARD, 2);
-            }
             else if (m_uiAchievProgress == 3)
-            {
-                //m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? ACHIEV_KNOCK_KNOCK_KNOCK_WOOD : ACHIEV_KNOCK_KNOCK_KNOCK_WOOD_H);
                 m_pInstance->SetData(TYPE_FREYA_HARD, 3);
-            }
-
-            //if (m_bNature)
-                //m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? ACHIEV_BACK_TO_NATURE : ACHIEV_BACK_TO_NATURE_H);
 
             m_pInstance->SetData(TYPE_FREYA, DONE);
         }
@@ -1023,10 +1003,12 @@ struct MANGOS_DLL_DECL boss_freyaAI : public ScriptedAI
 
             if(m_uiLifebindersGiftTimer < uiDiff)
             {
-                DoScriptText(EMOTE_LIFEBINDER, m_creature);
                 if(Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                {
                     DoCast(pTarget, SPELL_LIFEBINDERS_GIFT_SUMMON);
-                m_uiLifebindersGiftTimer = 30000;
+                    DoScriptText(EMOTE_LIFEBINDER, m_creature);
+                    m_uiLifebindersGiftTimer = 30000;
+                }
             }
             else m_uiLifebindersGiftTimer -= uiDiff;
 
@@ -1375,7 +1357,6 @@ struct MANGOS_DLL_DECL mob_freya_spawnedAI : public ScriptedAI
 
         if (m_bDetonatingLasher)
         {
-            //DoCast(Killer, m_bIsRegularMode ? SPELL_DETONATE : SPELL_DETONATE_H, true);
             if (Creature* pFreya = m_creature->GetMap()->GetCreature( m_pInstance->GetData64(NPC_FREYA)))
             {
                 if(SpellAuraHolder* natureAura = pFreya->GetSpellAuraHolder(SPELL_ATTUNED_TO_NATURE))
@@ -1391,6 +1372,7 @@ struct MANGOS_DLL_DECL mob_freya_spawnedAI : public ScriptedAI
     {
         if (uiDamage > m_creature->GetHealth() && !m_bHasExploded)
         {
+            uiDamage = 0;
             m_bHasExploded = true;
             DoCast(m_creature, m_bIsRegularMode ? SPELL_DETONATE : SPELL_DETONATE_H, true);
             m_creature->ForcedDespawn(700);
