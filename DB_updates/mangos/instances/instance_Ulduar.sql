@@ -372,7 +372,7 @@ INSERT INTO creature (id, map, spawnMask, phaseMask, modelid, equipment_id, posi
 (32933, 603, 3, 65535, 0, 0, 1797.15, -24.4027, 448.741, 3.14747, 604800, 0, 0, 543855, 0, 0, 0);
 INSERT INTO creature (id, map, spawnMask, phaseMask, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint, curhealth, curmana, DeathState, MovementType) VALUES
 (32934, 603, 3, 65535, 0, 0, 1797.15, -24.4027, 448.741, 3.14747, 604800, 0, 0, 543855, 0, 0, 0);
-UPDATE creature SET position_x = 1797.15, position_y = -26.4027, position_z = 448.741 WHERE id = 32930;
+UPDATE creature SET position_x = 1797.15, position_y = -24.4027, position_z = 448.741 WHERE id = 32930;
 UPDATE creature_model_info SET bounding_radius = 40, combat_reach = 40 WHERE modelid IN (28638, 28822, 28821);
 UPDATE creature_template SET scriptname='boss_kologarn' WHERE entry = 32930;
 UPDATE creature_template SET scriptname='boss_right_arm' WHERE entry=32934;
