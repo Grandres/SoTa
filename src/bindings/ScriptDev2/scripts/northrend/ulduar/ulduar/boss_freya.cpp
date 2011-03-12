@@ -81,7 +81,7 @@ enum
     NPC_STRENGHENED_IRON_ROOTS      = 33168,
     SPELL_IRON_ROOTS_FREYA          = 62438,
     SPELL_IRON_ROOTS_FREYA_H        = 62861,
-    SPELL_IRONBRANCH_ESSENCE        = 62713, //62387,
+    SPELL_IRONBRANCH_ESSENCE        = 62387,
     SPELL_EFFECT_IRONBRANCH         = 63292,
     // stonebark
     SPELL_GROUND_TREMOR_FREYA       = 62437,
@@ -129,8 +129,8 @@ enum
 
     NPC_SNAPLASHER              = 32916,
     // spells
-    SPELL_HARDENED_BARK         = 62663,
-    SPELL_HARDENED_BARK_H       = 64190,
+    SPELL_HARDENED_BARK         = 62664,
+    SPELL_HARDENED_BARK_H       = 64191,
 
     // nature bomb
     NPC_NATURE_BOMB             = 34129,
@@ -210,13 +210,15 @@ enum
     ACHIEV_KNOCK_KNOCK_KNOCK_WOOD_H = 3187,
  };
  
-// Iron roots & stranghned iron roots
+// Iron roots & strengthened iron roots
 struct MANGOS_DLL_DECL mob_iron_rootsAI : public ScriptedAI
 {
     mob_iron_rootsAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        m_uiVictimGUID = m_creature->GetCreatorGuid().GetRawValue();
+        m_uiCreatureEntry = m_creature->GetEntry();
         SetCombatMovement(false);
         Reset();
     }
@@ -227,33 +229,7 @@ struct MANGOS_DLL_DECL mob_iron_rootsAI : public ScriptedAI
     uint64 m_uiVictimGUID;
     uint32 m_uiCreatureEntry;
 
-    void Reset()
-    {
-        m_uiVictimGUID = 0;
-        m_uiCreatureEntry = m_creature->GetEntry();
-    }
-
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
-    {
-        if (uiDamage > m_creature->GetHealth())
-        {
-            if (m_uiVictimGUID)
-            {
-                if (Unit* pVictim = m_creature->GetMap()->GetUnit(m_uiVictimGUID))
-                {
-                    switch(m_uiCreatureEntry)
-                    {
-                    case NPC_IRON_ROOTS:
-                        pVictim->RemoveAurasDueToSpell(m_bIsRegularMode ? SPELL_IRON_ROOTS : SPELL_IRON_ROOTS_H);
-                        break;
-                    case NPC_STRENGHENED_IRON_ROOTS:
-                        pVictim->RemoveAurasDueToSpell(m_bIsRegularMode ? SPELL_IRON_ROOTS_FREYA : SPELL_IRON_ROOTS_FREYA_H);
-                        break;
-                    }
-                }
-            }
-        }
-    }
+    void Reset(){}
 
     void KilledUnit(Unit* pVictim)
     {
@@ -287,11 +263,7 @@ struct MANGOS_DLL_DECL mob_iron_rootsAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiuiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-    }
+    void UpdateAI(const uint32 uiuiDiff){}
 };
 
 // Elder Brightleaf
@@ -456,7 +428,7 @@ struct MANGOS_DLL_DECL boss_elder_ironbranchAI : public ScriptedAI
         if(m_uiIronrootsTimer < uiDiff)
         {
             if(Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                DoCast(target, m_bIsRegularMode ? SPELL_IRON_ROOTS : SPELL_IRON_ROOTS_H);
+                target->CastSpell(target, m_bIsRegularMode ? SPELL_IRON_ROOTS : SPELL_IRON_ROOTS_H, true);
             m_uiIronrootsTimer = 20000 + urand (1000, 7000);
         }
         else m_uiIronrootsTimer -= uiDiff;
@@ -683,8 +655,9 @@ struct MANGOS_DLL_DECL boss_freyaAI : public ScriptedAI
             {
                 if (pIronbranch->isAlive())
                 {
-                    pIronbranch->CastSpell(pIronbranch, SPELL_DRAINED_OF_POWER, false);
-                    pIronbranch->CastSpell(m_creature, SPELL_EFFECT_IRONBRANCH, false);
+                    pIronbranch->CastSpell(pIronbranch, SPELL_IRONBRANCH_ESSENCE, true);
+                    pIronbranch->CastSpell(m_creature, SPELL_EFFECT_IRONBRANCH, true);
+                    pIronbranch->CastSpell(pIronbranch, SPELL_DRAINED_OF_POWER, true);
                     m_bIsIronbranchAlive = true;
                     m_uiAchievProgress += 1;
                 }
@@ -771,6 +744,12 @@ struct MANGOS_DLL_DECL boss_freyaAI : public ScriptedAI
             uiDamage = 0;
             m_bIsOutro = true;
         }
+    }
+
+    void SpellHit(Unit *pCaster, const SpellEntry *spellProto)
+    {
+        if (spellProto->Id == SPELL_IRONBRANCH_ESSENCE)
+            m_creature->RemoveAurasDueToSpell(SPELL_IRONBRANCH_ESSENCE);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -964,15 +943,12 @@ struct MANGOS_DLL_DECL boss_freyaAI : public ScriptedAI
 
             if(m_bIsIronbranchAlive)
             {
-                if(!m_creature->HasAura(SPELL_IRONBRANCH_ESSENCE, EFFECT_INDEX_0))
-                    DoCast(m_creature, SPELL_IRONBRANCH_ESSENCE);
-
                 if(m_uiStrenghtenIronRootsTimer < uiDiff)
                 {
                     if(Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
                     {
                         DoScriptText(EMOTE_IRON_ROOTS, m_creature, target);
-                        DoCast(target, m_bIsRegularMode ? SPELL_IRON_ROOTS_FREYA : SPELL_IRON_ROOTS_FREYA_H);
+                        target->CastSpell(target, m_bIsRegularMode ? SPELL_IRON_ROOTS_FREYA : SPELL_IRON_ROOTS_FREYA_H, true);
                     }
                     m_uiStrenghtenIronRootsTimer = 50000 + urand(10000, 20000);
                 }
@@ -1336,7 +1312,6 @@ struct MANGOS_DLL_DECL mob_freya_spawnedAI : public ScriptedAI
     uint32 m_uiNaturesFury_Timer;
     uint32 m_uiWave3_DeathCountdown;
     uint32 m_uiRespawnSpores_Timer;
-    uint32 m_uiDieTimer;
     uint8 m_uiHealthMultiplier;
 
     void Reset()
@@ -1347,7 +1322,6 @@ struct MANGOS_DLL_DECL mob_freya_spawnedAI : public ScriptedAI
         m_bAncientConservator       = false;
         m_bDetonatingLasher         = false;
         m_bHasExploded              = false;
-        m_uiDieTimer                = 120000;
         m_uiDeathCountdown          = 10000;
         m_uiTidalWave_Timer         = urand(2000,4000);
         m_uiStormbolt_Timer         = 1000;
@@ -1380,7 +1354,7 @@ struct MANGOS_DLL_DECL mob_freya_spawnedAI : public ScriptedAI
             m_bStormLasher = true;
             break;
         }
-        m_creature->SetRespawnDelay(DAY);
+        m_creature->SetRespawnDelay(7*DAY*IN_MILLISECONDS);
     }
 
     void JustDied(Unit* Killer)
@@ -1401,6 +1375,7 @@ struct MANGOS_DLL_DECL mob_freya_spawnedAI : public ScriptedAI
 
         if (m_bDetonatingLasher)
         {
+            //DoCast(Killer, m_bIsRegularMode ? SPELL_DETONATE : SPELL_DETONATE_H, true);
             if (Creature* pFreya = m_creature->GetMap()->GetCreature( m_pInstance->GetData64(NPC_FREYA)))
             {
                 if(SpellAuraHolder* natureAura = pFreya->GetSpellAuraHolder(SPELL_ATTUNED_TO_NATURE))
@@ -1412,25 +1387,15 @@ struct MANGOS_DLL_DECL mob_freya_spawnedAI : public ScriptedAI
         }
     }
 
-    void DamageTaken(Unit *done_by, uint32 &uiDamage)
+    void DamageTaken(Unit *pDoneBy, uint32 &uiDamage)
     {
-        if (m_bDetonatingLasher && uiDamage > m_creature->GetHealth() && !m_bHasExploded)
+        if (uiDamage > m_creature->GetHealth() && !m_bHasExploded)
         {
-            DoCast(m_creature, m_bIsRegularMode ? SPELL_DETONATE : SPELL_DETONATE_H);
-            uiDamage        = 0;
-            m_bHasExploded  = true;
-            m_uiDieTimer  = 500;
+            m_bHasExploded = true;
+            DoCast(m_creature, m_bIsRegularMode ? SPELL_DETONATE : SPELL_DETONATE_H, true);
+            m_creature->ForcedDespawn(700);
         }
     }
-
-    /*void SpellHitTarget(Unit *pTarget, const SpellEntry *spellProto)
-    {
-        if (spellProto->Id == SPELL_CONSERVATORS_GRIP)
-        {
-            if (pTarget->HasAura(SPELL_PHEROMONES_BUFF, EFFECT_INDEX_0))
-                pTarget->RemoveAurasDueToSpell(SPELL_CONSERVATORS_GRIP);
-        }
-    }*/
 
     void DoSpores(int8 times)
     {
@@ -1447,7 +1412,7 @@ struct MANGOS_DLL_DECL mob_freya_spawnedAI : public ScriptedAI
         if (m_pInstance && m_pInstance->GetData(TYPE_FREYA) != IN_PROGRESS)
             m_creature->ForcedDespawn();
 
-        if(!m_creature->isAlive())
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
         // DETONATING LASHERS
@@ -1458,10 +1423,6 @@ struct MANGOS_DLL_DECL mob_freya_spawnedAI : public ScriptedAI
                 DoCast(m_creature->getVictim(), SPELL_FLAME_LASH);
                 m_uiFlameLash_Timer = urand(5000,10000);
             }else m_uiFlameLash_Timer -= uiDiff;
-
-            if(m_uiDieTimer < uiDiff)
-                m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_SHADOW, NULL, false);
-            else m_uiDieTimer -= uiDiff;
         }
 
         // CONSERVATOR
