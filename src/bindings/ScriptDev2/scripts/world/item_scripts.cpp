@@ -160,6 +160,33 @@ bool ItemUse_item_fishing_chair(Player* pPlayer, Item* _Item, SpellCastTargets c
     return true;
 }
 
+/*#####
+# item_Crystalline_Orb
+#####*/
+enum
+{
+    AURA_FORGOTTEN      = 48864,
+    SPELL_ORIKS_SONG    = 48866,
+
+    NPC_VALONFORTH      = 27476
+};
+
+bool ItemUse_item_Crystalline_Orb(Player* pPlayer, Item* _Item, SpellCastTargets const& targets)
+{
+    if(pPlayer->HasAura(AURA_FORGOTTEN))
+    {
+        Creature* pCreature = GetClosestCreatureWithEntry(pPlayer, NPC_VALONFORTH, 100.0f);
+        if(!pCreature)
+        {
+            pPlayer->CastSpell(pPlayer, SPELL_ORIKS_SONG, false);
+            return true;
+        }
+        return false;
+    }
+    pPlayer->CastSpell(pPlayer, AURA_FORGOTTEN, true);
+    return true;
+}
+
 void AddSC_item_scripts()
 {
     Script *newscript;
@@ -192,5 +219,10 @@ void AddSC_item_scripts()
     newscript = new Script;
     newscript->Name = "item_fishing_chair";
     newscript->pItemUse = &ItemUse_item_fishing_chair;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "Crystalline_Orb";
+    newscript->pItemUse = &ItemUse_item_Crystalline_Orb;
     newscript->RegisterSelf();
 }
