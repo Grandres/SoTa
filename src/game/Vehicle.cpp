@@ -20,10 +20,12 @@
 #include "Log.h"
 #include "Vehicle.h"
 #include "Unit.h"
+#include "CreatureAI.h"
 #include "Util.h"
 #include "WorldPacket.h"
 #include "Transports.h"
 #include "InstanceData.h"
+#include "CreatureAI.h"
 
 VehicleKit::VehicleKit(Unit* base, VehicleEntry const* vehicleInfo) : m_vehicleInfo(vehicleInfo), m_pBase(base), m_uiNumFreeSeats(0)
 {
@@ -34,6 +36,7 @@ VehicleKit::VehicleKit(Unit* base, VehicleEntry const* vehicleInfo) : m_vehicleI
         if (!seatId)
             continue;
 
+
         if(base)
         {
             if(m_vehicleInfo->m_flags & VEHICLE_FLAG_NO_STRAFE)
@@ -43,11 +46,11 @@ VehicleKit::VehicleKit(Unit* base, VehicleEntry const* vehicleInfo) : m_vehicleI
                 base->m_movementInfo.AddMovementFlag2(MOVEFLAG2_NO_JUMPING);
         }
 
-        if (VehicleSeatEntry const *veSeat = sVehicleSeatStore.LookupEntry(seatId))
+        if (VehicleSeatEntry const *seatInfo = sVehicleSeatStore.LookupEntry(seatId))
         {
-            m_Seats.insert(std::make_pair(i, VehicleSeat(veSeat)));
+            m_Seats.insert(std::make_pair(i, VehicleSeat(seatInfo)));
 
-            if (veSeat->IsUsable())
+            if (seatInfo->IsUsable())
                 ++m_uiNumFreeSeats;
         }
     }
@@ -179,8 +182,11 @@ bool VehicleKit::AddPassenger(Unit *unit, int8 seatId)
     unit->SendMonsterMoveTransport(m_pBase);
 
     if (m_pBase->GetTypeId() == TYPEID_UNIT)
+    {
+        if (((Creature*)m_pBase)->AI())
+            ((Creature*)m_pBase)->AI()->PassengerBoarded(unit, seat->first, true);
         RelocatePassengers(m_pBase->GetPositionX(), m_pBase->GetPositionY(), m_pBase->GetPositionZ(), m_pBase->GetOrientation());
-
+    }
     return true;
 }
 
@@ -225,6 +231,9 @@ void VehicleKit::RemovePassenger(Unit *unit)
         data << uint32(0);
         unit->SendMessageToSet(&data, true);
     }
+    if (m_pBase->GetTypeId() == TYPEID_UNIT)
+        if (((Creature*)m_pBase)->AI())
+            ((Creature*)m_pBase)->AI()->PassengerBoarded(unit, seat->first, true);
 }
 
 void VehicleKit::Reset()
