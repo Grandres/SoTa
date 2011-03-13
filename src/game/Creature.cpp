@@ -1239,7 +1239,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
 
     if (!IsPositionValid())
     {
-        sLog.outError("Creature (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)", GetGUIDLow(), GetEntry(), GetPositionX(), GetPositionY());
+        sLog.outError("Creature (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, data->id, data->posX, data->posY);
         return false;
     }
 
@@ -1464,6 +1464,11 @@ bool Creature::FallGround()
 {
     // Only if state is JUST_DIED. CORPSE_FALLING is set below and promoted to CORPSE later
     if (getDeathState() != JUST_DIED)
+        return false;
+
+    // some creatures should stay levitating
+    // Kologarn (Ulduar)
+    if (GetEntry() == 32930)
         return false;
 
     // use larger distance for vmap height search than in most other cases

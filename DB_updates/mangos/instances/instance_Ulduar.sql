@@ -1,5 +1,5 @@
 -- Instance Ulduar
--- Instance last changes: a531
+-- Instance last changes: a575
 
 -- teleporter
 UPDATE gameobject_template SET ScriptName = "go_ulduar_teleporter" WHERE entry = 194569;
@@ -28,7 +28,7 @@ INSERT INTO reference_loot_template VALUES
 UPDATE `creature_template` SET `lootid` = 33115 WHERE `entry` IN (34183, 34197, 34133, 34193, 33354, 33755, 33754, 33431, 34085, 33430, 34190, 34198, 33526, 34199, 34086, 33525, 33355, 34069, 33527, 34267, 34196, 33699, 33722, 34191, 33818, 33819, 33822, 33824, 34134, 34135, 34273, 34271, 34269);
 -- 25man
 UPDATE `creature_template` SET `lootid` = 33116 WHERE `entry` IN (33700,33723,34186,34214,34217,34220,34268,34270,34272,34274, 33729,33737,33732,33731,33735,33734,33741,33757,33758,33827,33829,33828,33831,34185,34201,34139,34141,34142,34229,34245,34226,34236,34237);
-DELETE FROM `creature_loot_template` WHERE `entry` = 33116;
+DELETE FROM `creature_loot_template` WHERE `entry` IN (33115, 33116);
 INSERT INTO `creature_loot_template` (`entry`,`item`,`ChanceOrQuestChance`,`groupid`,`mincountOrRef`,`maxcount`,`lootcondition`,`condition_value1`,`condition_value2`) VALUES
 (33115, 1, 1, 1, -33115, 1, 0, 0, 0), -- epic item 10man
 (33116, 1, 1, 1, -33116, 1, 0, 0, 0); -- epic item 25man
@@ -107,7 +107,7 @@ INSERT INTO `creature_loot_template` VALUES
 (33190, 45624, 100, 0, 1, 1, 0, 0, 0),
 (33190, 1, 100, 1, -33191, 4, 0, 0, 0),
 (33190, 45087, 19, 2, 1, 1, 0, 0, 0), -- Runed Orb
-(33190, 2, 100, 6, -33117, 1, 0, 0, 0); -- random pattern
+(33190, 2, 10, 6, -33117, 1, 0, 0, 0); -- random pattern
 
 DELETE FROM `reference_loot_template` WHERE `entry` IN (33119, 33191);
 INSERT INTO `reference_loot_template` VALUES
@@ -230,11 +230,13 @@ INSERT INTO `creature_loot_template` VALUES
 (33293, 45869, 0, 2, 1, 1, 18, 603, 38),
 (33293, 45870, 0, 2, 1, 1, 18, 603, 38),
 (33293, 45871, 0, 2, 1, 1, 18, 603, 38),
+(33293, 45087, 17, 3, 1, 1, 0, 0, 0), -- Runed Orb
+(33293, 3, 8, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- 25 man normal
 (33885, 45624, 100, 0, 1, 1, 0, 0, 0),
 (33885, 1, 100, 1, -33886, 4, 0, 0, 0),
 (33885, 45087, 17, 2, 1, 1, 0, 0, 0), -- Runed Orb
-(33885, 3, 100, 6, -33117, 1, 0, 0, 0), -- random pattern
+(33885, 3, 8, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- 25 man hard mode
 (33885, 45445, 0, 2, 1, 1, 18, 603, 38),
 (33885, 45443, 0, 2, 1, 1, 18, 603, 38),
@@ -336,6 +338,8 @@ INSERT INTO `reference_loot_template` VALUES
 (32867, 45448, 0, 3, 1, 1, 0, 0, 0),
 (32867, 45449, 0, 3, 1, 1, 0, 0, 0),
 (32867, 45447, 0, 3, 1, 1, 0, 0, 0),
+(32867, 45087, 17, 4, 1, 1, 0, 0, 0), -- Runed Orb
+(32867, 3, 8, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- 25man
 (33694, 45226, 0, 1, 1, 1, 0, 0, 0),
 (33694, 45224, 0, 1, 1, 1, 0, 0, 0),
@@ -352,7 +356,7 @@ INSERT INTO `reference_loot_template` VALUES
 (33694, 45225, 0, 1, 1, 1, 0, 0, 0),
 (33694, 45233, 0, 1, 1, 1, 0, 0, 0),
 (33694, 45236, 0, 1, 1, 1, 0, 0, 0),
-(33694, 1, 100, 6, -33117, 1, 0, 0, 0), -- random pattern
+(33694, 1, 10, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- hard mode
 (33693, 45241, 0, 3, 1, 1, 0, 0, 0),
 (33693, 45245, 0, 3, 1, 1, 0, 0, 0),
@@ -399,7 +403,7 @@ INSERT INTO gameobject_loot_template VALUES
 (26929, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
 (26929, 45261, 100, 1, -26929, 4, 0, 0, 0), -- 4 items
 (26929, 45087, 13, 2, 1, 1, 0, 0, 0), -- Runed Orb
-(26929, 1, 100, 6, -33117, 1, 0, 0, 0); -- random pattern
+(26929, 1, 7, 6, -33117, 1, 0, 0, 0); -- random pattern
 DELETE FROM reference_loot_template WHERE entry = 26929;
 INSERT INTO reference_loot_template VALUES
 (26929, 45261, 0, 1, 1, 1, 0, 0, 0),
@@ -441,7 +445,7 @@ INSERT INTO creature_loot_template VALUES
 (34175, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
 (34175, 1, 100, 1, -34175, 4, 0, 0, 0),
 (34175, 45087, 18, 2, 1, 1, 0, 0, 0), -- Runed Orb
-(34175, 2, 100, 6, -33117, 1, 0, 0, 0); -- random pattern
+(34175, 2, 9, 6, -33117, 1, 0, 0, 0); -- random pattern
 
 DELETE FROM `reference_loot_template` WHERE `entry` IN (33515, 34175);
 INSERT INTO `reference_loot_template` VALUES
@@ -484,15 +488,15 @@ UPDATE creature_template SET ScriptName = 'mob_freya_ground' WHERE entry IN (332
 UPDATE creature_template SET ScriptName = 'mob_freya_spawned' WHERE entry IN (32916, 32919, 33202, 33203, 32918);
 
 -- fill some missing data in creature_template (health, level etc.)
-UPDATE creature_template SET minhealth = 5856900, maxhealth = 5856900 WHERE entry = 33391; -- Brightleaf 25man
-UPDATE creature_template SET minlevel = 80, maxlevel = 80, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 18270, maxhealth = 18270 WHERE entry = 33168; -- Strengthened Iron Roots 10man
-UPDATE creature_template SET minlevel = 80, maxlevel = 80, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 54432, maxhealth = 54432 WHERE entry = 33397; -- Strengthened Iron Roots 25man
-UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 104264, maxhealth = 104264 WHERE entry = 33385; -- Eonar's Gift 25man
-UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 1563960, maxhealth = 1563960 WHERE entry = 33400; -- Snaplasher 25man
-UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 1251168, maxhealth = 1251168, minmana = 8162, maxmana = 8162 WHERE entry = 33401; -- Storm Lasher 25man
-UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 834080, maxhealth = 834080, minmana = 17958, maxmana = 17958 WHERE entry = 33398; -- Ancient Water Spirit 25man
-UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 3544976, maxhealth = 3544976 WHERE entry = 33376; -- Ancient Conservator 25man
-UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 375350, maxhealth = 375350 WHERE entry = 33399; -- Detonating Lasher 25man
+-- UPDATE creature_template SET minhealth = 5856900, maxhealth = 5856900 WHERE entry = 33391; -- Brightleaf 25man
+-- UPDATE creature_template SET minlevel = 80, maxlevel = 80, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 18270, maxhealth = 18270 WHERE entry = 33168; -- Strengthened Iron Roots 10man
+-- UPDATE creature_template SET minlevel = 80, maxlevel = 80, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 54432, maxhealth = 54432 WHERE entry = 33397; -- Strengthened Iron Roots 25man
+-- UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 104264, maxhealth = 104264 WHERE entry = 33385; -- Eonar's Gift 25man
+-- UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 1563960, maxhealth = 1563960 WHERE entry = 33400; -- Snaplasher 25man
+-- UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 1251168, maxhealth = 1251168, minmana = 8162, maxmana = 8162 WHERE entry = 33401; -- Storm Lasher 25man
+-- UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 834080, maxhealth = 834080, minmana = 17958, maxmana = 17958 WHERE entry = 33398; -- Ancient Water Spirit 25man
+-- UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 3544976, maxhealth = 3544976 WHERE entry = 33376; -- Ancient Conservator 25man
+-- UPDATE creature_template SET minlevel = 81, maxlevel = 81, faction_A = 14, faction_H = 14, armor = 10673, minhealth = 375350, maxhealth = 375350 WHERE entry = 33399; -- Detonating Lasher 25man
 
 -- some aura fixes, this may be wrong
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('62525', '1', '32906');
@@ -501,6 +505,12 @@ REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('625
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('62385', '1', '32906');
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('62387', '1', '32906');
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('62386', '1', '32906');
+REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('62584', '1', '32906');
+
+DELETE FROM spell_proc_event WHERE entry IN (62664, 64191);
+INSERT INTO spell_proc_event VALUES
+(62664, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8|32|128|512|8192|131072, 0, 0, 0, 0),
+(64191, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8|32|128|512|8192|131072, 0, 0, 0, 0);
 
 -- Added hack for Freya's gift
 -- DELETE FROM `gameobject` WHERE `id` IN (194324, 194325,194326,194327,194328,194329,194330,194331);

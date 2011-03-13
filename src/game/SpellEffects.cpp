@@ -1371,6 +1371,27 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 42793:                                 // Burn Body
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT || m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    Creature* pCreature = (Creature*)unitTarget;
+
+                    // Spell can be used in combat and may affect different target than the expected.
+                    // If target is not the expected we need to prevent this effect.
+                    if (pCreature->HasLootRecipient() || pCreature->isInCombat())
+                        return;
+
+                    // set loot recipient, prevent re-use same target
+                    pCreature->SetLootRecipient(m_caster);
+
+                    pCreature->ForcedDespawn(GetSpellDuration(m_spellInfo));
+
+                    // EFFECT_INDEX_2 has 0 miscvalue for effect 134, doing the killcredit here instead (only one known case exist where 0)
+                    ((Player*)m_caster)->KilledMonster(pCreature->GetCreatureInfo(), pCreature->GetObjectGuid());
+                    return;
+                }
                 case 43014:                                 // Despawn Self
                 {                                           // used by ACID event to run away and despawn
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
@@ -1381,7 +1402,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     unitTarget->GetClosePoint(x, y, z, unitTarget->GetObjectBoundingRadius(), 10.0f, unitTarget->GetOrientation());
                     unitTarget->SendMonsterMove(x, y, z, SPLINETYPE_NORMAL, SPLINEFLAG_WALKMODE, 2000);
                     return;
-                }  
+                }
                 case 43036:                                 // Dismembering Corpse
                 {
                     if (!unitTarget || m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -1762,6 +1783,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         }
                     }
 
+                    return;
+                }
+                case 49859:                                 // Rune of Command
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    // Captive Stone Giant Kill Credit
+                    unitTarget->CastSpell(m_caster, 43564, true);
+                    // Is it supposed to despawn?
+                    ((Creature*)unitTarget)->ForcedDespawn();
                     return;
                 }
                 case 50133:                                 // Scourging Crystal Controller
@@ -3825,6 +3857,32 @@ void Spell::EffectPowerBurn(SpellEffectIndex eff_idx)
 
     new_damage = int32(new_damage * multiplier);
     m_damage += new_damage;
+
+    // "Mana Burn now causes Fear, Hex and Psychic Scream to break early when used."
+    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST)
+    {
+        // Hex
+        if (SpellAuraHolder *holder = unitTarget->GetSpellAuraHolder(51514))
+            unitTarget->RemoveSpellAuraHolder(holder, AURA_REMOVE_BY_CANCEL);
+
+        Unit::AuraList const& fearAuras = unitTarget->GetAurasByType(SPELL_AURA_MOD_FEAR);
+        for (Unit::AuraList::const_iterator itr = fearAuras.begin(); itr != fearAuras.end();)
+        {
+            if (*itr)
+            {
+                SpellEntry const *spellInfo = (*itr)->GetSpellProto();
+                if ((spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && spellInfo->SpellIconID == 98) || // Fear
+                    (spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST &&                                   // Psychic Scream
+                    (spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000010000))))
+                {
+                    ++itr;
+                    unitTarget->RemoveAurasDueToSpell(spellInfo->Id, 0, AURA_REMOVE_BY_CANCEL);
+                    continue;
+                }
+            }
+            ++itr;
+        }
+    }
 }
 
 void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
@@ -5189,7 +5247,8 @@ void Spell::DoSummonWild(SpellEffectIndex eff_idx, uint32 forceFaction)
 
             // UNIT_FIELD_CREATEDBY are not set for these kind of spells.
             // Does exceptions exist? If so, what are they?
-            // summon->SetCreatorGuid(m_caster->GetObjectGuid());
+            // do use it until some complete research done
+            summon->SetCreatorGuid(m_caster->GetObjectGuid());
 
             if(forceFaction)
                 summon->setFaction(forceFaction);
@@ -8718,6 +8777,25 @@ void Spell::EffectQuestComplete(SpellEffectIndex eff_idx)
 {
     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
+
+    // A few spells has additional value from basepoints, check condition here.
+    switch(m_spellInfo->Id)
+    {
+        case 43458:                                         // Secrets of Nifflevar
+        {
+            if (!unitTarget->HasAura(m_spellInfo->CalculateSimpleValue(eff_idx)))
+                return;
+
+            break;
+        }
+        // TODO: implement these!
+        // "this spell awards credit for the entire raid (all spell targets as this is area target) if just ONE member has both auras (yes, both effect's basepoints)"
+        //case 72155:                                         // Harvest Blight Specimen
+        //case 72162:                                         // Harvest Blight Specimen
+            //break;
+        default:
+            break;
+    }
 
     uint32 quest_id = m_spellInfo->EffectMiscValue[eff_idx];
     ((Player*)unitTarget)->AreaExploredOrEventHappens(quest_id);

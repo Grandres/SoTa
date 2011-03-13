@@ -1064,7 +1064,8 @@ bool Aura::IsEffectStacking()
         case SPELL_AURA_MOD_HEALING_DONE:                               // Demonic Pact
         case SPELL_AURA_MOD_DAMAGE_DONE:                                // Demonic Pact
         case SPELL_AURA_HASTE_ALL:                                      // Imp. Moonkin Aur / Swift Retribution
-        case SPELL_AURA_MOD_MELEE_HASTE:                                // Improved Icy Talons
+        case SPELL_AURA_MOD_MELEE_HASTE:                                // (Improved) Icy Talons / Windfury Totem
+        case SPELL_AURA_MOD_MELEE_RANGED_HASTE:
         case SPELL_AURA_MOD_ATTACK_POWER_PCT:                           // Abomination's Might / Unleashed Rage
         case SPELL_AURA_MOD_RANGED_ATTACK_POWER_PCT:
         case SPELL_AURA_MOD_ATTACK_POWER:                               // (Greater) Blessing of Might / Battle Shout
@@ -1072,6 +1073,9 @@ bool Aura::IsEffectStacking()
         case SPELL_AURA_MOD_POWER_REGEN:                                // (Greater) Blessing of Wisdom
         case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:                       // Glyph of Salvation / Pain Suppression / Safeguard ? 
             if (GetSpellProto()->AttributesEx6 & SPELL_ATTR_EX6_UNK26)
+                return false;
+            // (Improved) Icy Talons check
+            else if (GetSpellProto()->SpellIconID == 3785)
                 return false;
             break;
         case SPELL_AURA_MOD_STAT:
@@ -2618,6 +2622,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                 if (pSummon && pCaster)
                     pSummon->GetMotionMaster()->MovePoint(0, pCaster->GetPositionX(), pCaster->GetPositionY(), pCaster->GetPositionZ());
+
+                return;
+            }
+            case 43969:                                     // Feathered Charm
+            {
+                // Steelfeather Quest Credit, Are there any requirements for this, like area?
+                if (m_removeMode == AURA_REMOVE_BY_EXPIRE)
+                    target->CastSpell(target, 43984, true);
 
                 return;
             }
@@ -5200,6 +5212,20 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
     // Heroic Fury (Intercept cooldown remove)
     else if (apply && GetSpellProto()->Id == 60970 && target->GetTypeId() == TYPEID_PLAYER)
         ((Player*)target)->RemoveSpellCooldown(20252, true);
+    // Potent Pheromones (Freya encounter)
+    else if (GetId() == 64321 || GetId() == 62619)
+    {
+        if (apply)
+            HandleAuraModPacifyAndSilence(false, true);
+        else
+        {
+            if (GetId() == 64321 && m_removeMode == AURA_REMOVE_BY_EXPIRE || GetId() == 62619)
+            {
+                if (GetTarget()->HasAura(62532, EFFECT_INDEX_0))
+                    HandleAuraModPacifyAndSilence(true, true);
+            }
+        }
+    }
 }
 
 void Aura::HandleModMechanicImmunityMask(bool apply, bool /*Real*/)
@@ -6845,7 +6871,6 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             MasterShaperSpellId = 48420;
             break;
         case FORM_TREE:
-            spellId1 = 5420;
             spellId2 = 34123;
             MasterShaperSpellId = 48422;
             break;
@@ -7073,10 +7098,6 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 if ((spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) && spellInfo->StancesNot & (1<<(form-1)))
                     target->CastSpell(target, itr->first, true, NULL, this);
             }
-            // Tree of Life exception - should work in all forms so recast
-            // removing and applying again is implemented because of not wanted stacking possibility of the aura
-            if (spellId1 == 5420)
-                target->CastSpell(target, spellId1, true, NULL, this);
         }
 
         Unit::SpellAuraHolderMap& tAuras = target->GetSpellAuraHolderMap();
@@ -7121,6 +7142,13 @@ void Aura::HandleAuraModPacify(bool apply, bool /*Real*/)
 
 void Aura::HandleAuraModPacifyAndSilence(bool apply, bool Real)
 {
+    // Conservator's Grip (Freya)
+    if (GetId() == 62532)
+    {
+        if (GetTarget()->HasAura(64321, EFFECT_INDEX_0) || GetTarget()->HasAura(62619, EFFECT_INDEX_0))
+            return;
+    }
+
     HandleAuraModPacify(apply, Real);
     HandleAuraModSilence(apply, Real);
 }
