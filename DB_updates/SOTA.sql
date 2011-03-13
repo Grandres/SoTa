@@ -1,18 +1,18 @@
 -- Strand of the Ancients
-DELETE FROM gameobject_template WHERE entry = 300000;
-INSERT INTO gameobject_template (entry, type, displayId, name, IconName, castBarCaption, unk1, faction, flags, size, questItem1, questItem2, questItem3, questItem4, questItem5, questItem6, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12, data13, data14, data15, data16, data17, data18, data19, data20, data21, data22, data23, ScriptName) VALUES
-(300000, 0, 7203, 'Forcefield 000', '', '', '', 1375, 32, 0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+-- DELETE FROM gameobject_template WHERE entry = 300000;
+-- INSERT INTO gameobject_template (entry, type, displayId, name, IconName, castBarCaption, unk1, faction, flags, size, questItem1, questItem2, questItem3, questItem4, questItem5, questItem6, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12, data13, data14, data15, data16, data17, data18, data19, data20, data21, data22, data23, ScriptName) VALUES
+-- (300000, 0, 7203, 'Forcefield 000', '', '', '', 1375, 32, 0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 -- Rigger Sparklight
 UPDATE creature_template SET npcflag = 1 WHERE entry IN (29260, 29262);
 -- Seaforium source
-DELETE FROM creature_template WHERE entry = 50000;
-INSERT INTO creature_template (entry, difficulty_entry_1, difficulty_entry_2, difficulty_entry_3, KillCredit1, KillCredit2, modelid_1, modelid_2, modelid_3, modelid_4, name, subname, IconName, gossip_menu_id, minlevel, maxlevel, minhealth, maxhealth, minmana, maxmana, armor, faction_A, faction_H, npcflag, speed_walk, speed_run, scale, rank, mindmg, maxdmg, dmgschool, attackpower, dmg_multiplier, baseattacktime, rangeattacktime, unit_class, unit_flags, dynamicflags, family, trainer_type, trainer_spell, trainer_class, trainer_race, minrangedmg, maxrangedmg, rangedattackpower, type, type_flags, lootid, pickpocketloot, skinloot, resistance1, resistance2, resistance3, resistance4, resistance5, resistance6, spell1, spell2, spell3, spell4, PetSpellDataId, VehicleEntry, mingold, maxgold, AIName, MovementType, InhabitType, unk16, unk17, RacialLeader, questItem1, questItem2, questItem3, questItem4, questItem5, questItem6, movementId, RegenHealth, equipment_id, trainer_id, vendor_id, mechanic_immune_mask, flags_extra, ScriptName) VALUES
-(50000, 0, 0, 0, 0, 0, 27462, 0, 27462, 0, 'Seaforium Charge', NULL, NULL, 0, 80, 80, 5000, 5000, 0, 0, 9730, 7, 7, 0, 1, 1, 0.5, 0, 420, 630, 0, 157, 1, 2000, 2000, 1, 0, 0, 0, 0, 0, 0, 0, 336, 504, 126, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 3, 1, 1, 0, 0, 0, 0, 0, 0, 0, 94, 1, 0, 0, 0, 0, 0, '');
+-- DELETE FROM creature_template WHERE entry = 50000;
+-- INSERT INTO creature_template (entry, difficulty_entry_1, difficulty_entry_2, difficulty_entry_3, KillCredit1, KillCredit2, modelid_1, modelid_2, modelid_3, modelid_4, name, subname, IconName, gossip_menu_id, minlevel, maxlevel, minhealth, maxhealth, minmana, maxmana, armor, faction_A, faction_H, npcflag, speed_walk, speed_run, scale, rank, mindmg, maxdmg, dmgschool, attackpower, dmg_multiplier, baseattacktime, rangeattacktime, unit_class, unit_flags, dynamicflags, family, trainer_type, trainer_spell, trainer_class, trainer_race, minrangedmg, maxrangedmg, rangedattackpower, type, type_flags, lootid, pickpocketloot, skinloot, resistance1, resistance2, resistance3, resistance4, resistance5, resistance6, spell1, spell2, spell3, spell4, PetSpellDataId, VehicleEntry, mingold, maxgold, AIName, MovementType, InhabitType, unk16, unk17, RacialLeader, questItem1, questItem2, questItem3, questItem4, questItem5, questItem6, movementId, RegenHealth, equipment_id, trainer_id, vendor_id, mechanic_immune_mask, flags_extra, ScriptName) VALUES
+-- (50000, 0, 0, 0, 0, 0, 27462, 0, 27462, 0, 'Seaforium Charge', NULL, NULL, 0, 80, 80, 5000, 5000, 0, 0, 9730, 7, 7, 0, 1, 1, 0.5, 0, 420, 630, 0, 157, 1, 2000, 2000, 1, 0, 0, 0, 0, 0, 0, 0, 336, 504, 126, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 3, 1, 1, 0, 0, 0, 0, 0, 0, 0, 94, 1, 0, 0, 0, 0, 0, '');
 -- Seaforium barrels
-DELETE FROM gameobject_template WHERE entry IN (190753, 194086);
-INSERT INTO gameobject_template (entry, type, displayId, name, IconName, castBarCaption, unk1, faction, flags, size, questItem1, questItem2, questItem3, questItem4, questItem5, questItem6, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12, data13, data14, data15, data16, data17, data18, data19, data20, data21, data22, data23, ScriptName) VALUES
-(190753, 22, 8582, 'Seaforium Bomb', '', '', '', 12, 0, 2, 0, 0, 0, 0, 0, 0, 52415, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(194086, 22, 8582, 'Seaforium Bomb', '', '', '', 29, 0, 2, 0, 0, 0, 0, 0, 0, 52415, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+-- DELETE FROM gameobject_template WHERE entry IN (190753, 194086);
+-- INSERT INTO gameobject_template (entry, type, displayId, name, IconName, castBarCaption, unk1, faction, flags, size, questItem1, questItem2, questItem3, questItem4, questItem5, questItem6, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12, data13, data14, data15, data16, data17, data18, data19, data20, data21, data22, data23, ScriptName) VALUES
+-- (190753, 22, 8582, 'Seaforium Bomb', '', '', '', 12, 0, 2, 0, 0, 0, 0, 0, 0, 52415, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+-- (194086, 22, 8582, 'Seaforium Bomb', '', '', '', 29, 0, 2, 0, 0, 0, 0, 0, 0, 52415, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 -- Doors
 UPDATE gameobject_template SET faction = 14 WHERE entry IN (192549, 190727, 190726, 190723, 190724, 190722);
 -- make Titan Relic clickable (hack, must be done via core, when door to Chamber of Ancient Relics is destroyed)
@@ -22,15 +22,15 @@ UPDATE gameobject_template SET faction=0 WHERE entry = 191575;
 
 -- Vehicles support
 -- Battleground Demolisher
-UPDATE creature_template SET npcflag = 1, minlevel = 70, maxlevel = 70, minhealth = 89820, maxhealth = 89820, spell1 = 52338, spell2 = 60206 WHERE entry = 28781;
-UPDATE creature_template SET npcflag = 1, minlevel = 80, maxlevel = 80, minhealth = 126000, maxhealth = 126000, spell1 = 52338, spell2 = 60206 WHERE entry = 32796;
-DELETE FROM npc_spellclick_spells WHERE npc_entry = 28781;
-INSERT INTO npc_spellclick_spells VALUES (28781, 60968, 0, 0, 0, 0);
+-- UPDATE creature_template SET npcflag = 0, minlevel = 70, maxlevel = 70, minhealth = 89820, maxhealth = 89820, spell1 = 52338, spell2 = 60206 WHERE entry = 28781;
+-- UPDATE creature_template SET npcflag = 0, minlevel = 80, maxlevel = 80, minhealth = 126000, maxhealth = 126000, spell1 = 52338, spell2 = 60206 WHERE entry = 32796;
+-- DELETE FROM npc_spellclick_spells WHERE npc_entry = 28781;
+-- INSERT INTO npc_spellclick_spells VALUES (28781, 65403, 0, 0, 0, 1);
 -- Antipersonnel Cannon
-UPDATE creature_template SET npcflag = 1, minlevel = 70, maxlevel = 70, unit_flags=4, minhealth = 44910, maxhealth = 44910, faction_A = 35, faction_H = 35, spell1 = 49872 WHERE entry = 27894;
-UPDATE creature_template SET npcflag = 1, minlevel = 80, maxlevel = 80, unit_flags=4, minhealth = 63000, maxhealth = 63000, faction_A = 35, faction_H = 35, spell1 = 49872 WHERE entry = 32795;
-DELETE FROM npc_spellclick_spells WHERE npc_entry = 27894;
-INSERT INTO npc_spellclick_spells VALUES (27894, 60968, 0, 0, 0, 0);
+-- UPDATE creature_template SET npcflag = 0, minlevel = 70, maxlevel = 70, unit_flags=4, minhealth = 44910, maxhealth = 44910, faction_A = 35, faction_H = 35, spell1 = 49872 WHERE entry = 27894;
+-- UPDATE creature_template SET npcflag = 0, minlevel = 80, maxlevel = 80, unit_flags=4, minhealth = 63000, maxhealth = 63000, faction_A = 35, faction_H = 35, spell1 = 49872 WHERE entry = 32795;
+-- DELETE FROM npc_spellclick_spells WHERE npc_entry = 27894;
+-- INSERT INTO npc_spellclick_spells VALUES (27894, 65403, 0, 0, 0, 1);
 -- Titan Relic
 DELETE FROM gameobject WHERE guid IN (200001, 200002, 200003, 200004, 200005, 200006, 200007);
 INSERT INTO gameobject VALUES
