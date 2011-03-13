@@ -317,6 +317,104 @@ CreatureAI* GetAI_mob_overseer(Creature* pCreature)
     return new mob_overseerAI(pCreature);
 }
 
+enum SmokeEmOut
+{
+    SAY_SEO1                                     = -1603535,
+    SAY_SEO2                                     = -1603536,
+    SAY_SEO3                                     = -1603537,
+    SAY_SEO4                                     = -1603538,
+    QUEST_SMOKE_EM_OUT_A                         = 12323,
+    QUEST_SMOKE_EM_OUT_H                         = 12324,
+    SPELL_SMOKE_BOMB                             = 49075,
+    SPELL_CHOP                                   = 43410,
+    NPC_VENTURE_CO_STABLES_KC                    = 27568
+};
+
+
+struct MANGOS_DLL_DECL npc_venture_co_stragglerAI : public ScriptedAI
+{
+    npc_venture_co_stragglerAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+        
+
+        uint64 uiPlayerGUID;
+        uint32 uiRunAwayTimer;
+        uint32 uiTimer;
+        uint32 uiChopTimer;
+
+        void Reset()
+        {
+            uiPlayerGUID = 0;
+            uiTimer = 0;
+            uiChopTimer = urand(10000,12500);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE);
+           
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if (uiRunAwayTimer <= uiDiff)
+            {
+                if (Player *pPlayer = m_creature->GetMap()->GetPlayer(uiPlayerGUID))
+                {
+                    switch (uiTimer)
+                    {
+                        case 0:
+                            if (pPlayer->GetQuestStatus(QUEST_SMOKE_EM_OUT_A) == QUEST_STATUS_INCOMPLETE ||
+                                pPlayer->GetQuestStatus(QUEST_SMOKE_EM_OUT_H) == QUEST_STATUS_INCOMPLETE)
+                                pPlayer->KilledMonsterCredit(NPC_VENTURE_CO_STABLES_KC);
+                            m_creature->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX()-7, m_creature->GetPositionY()+7, m_creature->GetPositionZ());
+                            uiRunAwayTimer = 2500;
+                            ++uiTimer;
+                            break;
+                        case 1:
+                            DoScriptText((SAY_SEO1, SAY_SEO2, SAY_SEO3, SAY_SEO4), m_creature);
+                            m_creature->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX()-7, m_creature->GetPositionY()-5, m_creature->GetPositionZ());
+                            uiRunAwayTimer = 2500;
+                            ++uiTimer;
+                            break;
+                        case 2:
+                            m_creature->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX()-5, m_creature->GetPositionY()-5, m_creature->GetPositionZ());
+                            uiRunAwayTimer = 2500;
+                            ++uiTimer;
+                            break;
+                        
+                    }
+                }
+            }
+            else
+                uiRunAwayTimer -= uiDiff;
+
+            
+            if (uiChopTimer <= uiDiff)
+            {
+                DoCast(m_creature->getVictim(), SPELL_CHOP);
+                uiChopTimer = urand(10000,12000);
+            }
+            else
+                uiChopTimer -= uiDiff;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void SpellHit(Unit *pCaster, const SpellEntry *pSpell)
+        {
+            if (pCaster && pCaster->GetTypeId() == TYPEID_PLAYER && pSpell->Id == SPELL_SMOKE_BOMB)
+            {
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE);
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                m_creature->CombatStop(false);
+                uiPlayerGUID = pCaster->GetGUID();
+                uiRunAwayTimer = 3500;
+		        m_creature->ForcedDespawn(7000);
+            }
+        }
+    };
+
+CreatureAI* GetAI_npc_venture_co_straggler(Creature* pCreature)
+{
+    return new npc_venture_co_stragglerAI(pCreature);
+}
+
 void AddSC_grizzly_hills()
 {
     Script* pNewScript;
@@ -330,5 +428,10 @@ void AddSC_grizzly_hills()
     pNewScript = new Script;
     pNewScript->Name = "mob_overseer";
     pNewScript->GetAI = &GetAI_mob_overseer;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "npc_venture_co_straggler";
+    pNewScript->GetAI = &GetAI_npc_venture_co_straggler;
     pNewScript->RegisterSelf();
 }

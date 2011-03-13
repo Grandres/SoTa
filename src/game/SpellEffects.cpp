@@ -1553,6 +1553,14 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 47701:                             // Bang Gongs
+                {
+                    Unit* caster = GetCaster();
+
+                    caster->CastSpell(caster, 47730, true);
+                    caster->CastSpell(caster, 47744, true);
+                    return;
+                }
                 case 46167:                                 // Planning for the Future: Create Snowfall Glade Pup Cover
                 case 50918:                                 // Gluttonous Lurkers: Create Basilisk Crystals Cover
                 case 50926:                                 // Gluttonous Lurkers: Create Zul'Drak Rat Cover
@@ -7593,6 +7601,28 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (uint32 discoveredSpell = GetExplicitDiscoverySpell(m_spellInfo->Id, (Player*)m_caster))
                         ((Player*)m_caster)->learnSpell(discoveredSpell, false);
 
+                    return;
+                }
+                case 62217:                                 // Unstable Energy (Ulduar: Freya's elder)
+                {
+                    uint32 spellId = m_spellInfo->CalculateSimpleValue(eff_idx);
+                    if (unitTarget && unitTarget->HasAura(spellId))
+                        unitTarget->RemoveAurasDueToSpell(spellId);
+                    return;
+                }
+                case 62262:                                 // Brightleaf Flux (Ulduar: Freya's elder)
+                {
+                    uint32 buffId = roll_chance_i(50) ? 62251 : 62252;
+
+                    m_caster->CastSpell(m_caster, buffId, true);
+                    if (buffId == 62252)
+                    {
+                        if (SpellAuraHolder *holder = m_caster->GetSpellAuraHolder(62239))
+                            if (holder->ModStackAmount(-1))
+                                m_caster->RemoveSpellAuraHolder(holder);
+                    }
+                    else
+                        m_caster->CastSpell(m_caster, 62239, true);
                     return;
                 }
                 case 62707:                                 // Grab (Ulduar: Ignis)

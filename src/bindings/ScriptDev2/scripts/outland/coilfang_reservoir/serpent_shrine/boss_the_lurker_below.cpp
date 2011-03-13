@@ -26,14 +26,15 @@ EndScriptData */
 
 enum
 {
-    SPELL_WHIRL          = 37660,   // 37363 original   // 37660 
-    SPELL_GEYSER         = 37478,   // 
-    SPELL_SPOUT          = 37433,   // 42835 without  mechanic 360*
-    SPELL_WATER_BOLT     = 37138,   // working correctly
+    SPELL_LURKER_SPAWN_TRIGGER      = 54587,
+    SPELL_WHIRL                     = 37660,   // 37363 original   // 37660 
+    SPELL_GEYSER                    = 37478,   // 
+    SPELL_SPOUT                     = 37433,   // 42835 without  mechanic 360*
+    SPELL_WATER_BOLT                = 37138,   // working correctly
 
-    MOBID_COILFANG_GUARDIAN = 21873,
-    MOBID_COILFANG_AMBUSHER = 21865,
-    MOBID_COILFANG_FRENZY = 21508,
+    MOBID_COILFANG_GUARDIAN         = 21873,
+    MOBID_COILFANG_AMBUSHER         = 21865,
+    MOBID_COILFANG_FRENZY           = 21508,
 };
 
 float AddPos[9][3] = 
@@ -275,11 +276,33 @@ CreatureAI* GetAI_boss_the_lurker_below(Creature *_Creature)
     return new boss_the_lurker_belowAI (_Creature);
 }
 
+bool GOUse_go_strange_pool(Player* pPlayer, GameObject* pGo)
+{
+    if (urand(0,99) < 5)
+    {
+        if (ScriptedInstance* pInstance = (ScriptedInstance*)pGo->GetInstanceData())
+        {
+            if (pInstance->GetData(TYPE_THELURKER_EVENT) == NOT_STARTED)
+            {
+                pPlayer->CastSpell(pPlayer, SPELL_LURKER_SPAWN_TRIGGER, true);
+                pInstance->SetData(TYPE_THELURKER_EVENT, IN_PROGRESS);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void AddSC_boss_the_lurker_below()
 {
     Script *newscript;
     newscript = new Script;
     newscript->Name = "boss_the_lurker_below";
     newscript->GetAI = &GetAI_boss_the_lurker_below;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_strange_pool";
+    newscript->pGOUse = &GOUse_go_strange_pool;
     newscript->RegisterSelf();
 }

@@ -591,6 +591,18 @@ void BattleGround::PlaySoundToTeam(uint32 SoundID, Team teamId)
     }
 }
 
+bool BattleGround::GetPlayerWithSpell(uint32 SpellID)
+{
+    for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    {
+        if (Player *plr = sObjectMgr.GetPlayer(itr->first))
+        {
+            if(plr->HasAura(SpellID))
+                return true;
+        }
+    }
+    return false;
+}
 void BattleGround::CastSpellOnTeam(uint32 SpellID, Team teamId)
 {
     for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)

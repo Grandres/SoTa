@@ -480,25 +480,25 @@ struct MANGOS_DLL_DECL mob_cannon_chanellerAI : public Scripted_NoMovementAI
         if(m_uiLaunchTimer <= diff)
         {
             Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPLAYERGUID);
-            if(Test)
+            if(Test && pPlayer)
             {
                 pPlayer->SetOrientation(5.10f);
                 pPlayer->CastSpell(pPlayer, SPELL_ZEPHYRIUM, true);
             }
 
-            if(Ridge)
+            if(Ridge && pPlayer)
             {
                 pPlayer->SetOrientation(1.91f);
                 pPlayer->CastSpell(pPlayer, SPELL_RIDGE, true);
             }
 
-            if(Razzan)
+            if(Razzan && pPlayer)
             {
                 pPlayer->SetOrientation(2.52f);
                 pPlayer->CastSpell(pPlayer, SPELL_RAZZAN, true);
             }
 
-            if(Ruuan)
+            if(Ruuan && pPlayer)
             {
                 pPlayer->SetOrientation(3.02f);
                 pPlayer->CastSpell(pPlayer, SPELL_RUUAN, true);
@@ -649,6 +649,7 @@ struct MANGOS_DLL_DECL npc_AetherRayAI : public ScriptedAI
                 m_creature->DeleteThreatList();
                 m_creature->CombatStop(true);
                 m_bCanBeWrangled = false;
+                m_creature->ForcedDespawn(140000);
                 m_uiWrangleTimer = 5000;
             } else m_uiWrangleTimer -= uiDiff;
         }

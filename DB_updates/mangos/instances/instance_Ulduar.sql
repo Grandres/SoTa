@@ -1,5 +1,5 @@
 -- Instance Ulduar
--- Instance last changes: a575
+-- Instance last changes: a592
 
 -- teleporter
 UPDATE gameobject_template SET ScriptName = "go_ulduar_teleporter" WHERE entry = 194569;
@@ -17,7 +17,9 @@ INSERT INTO creature_loot_template VALUES
 
 DELETE FROM gameobject_loot_template WHERE item = 45038;
 INSERT INTO gameobject_loot_template VALUES
-(26929, 45038, 10, 2, 1, 1, 0, 0, 0); -- Kologarn %
+(26929, 45038, 10, 2, 1, 1, 0, 0, 0), -- Kologarn %
+(27079, 45038, 18, 7, 1, 1, 0, 0, 0), -- Freya normal
+(26962, 45038, 25, 7, 1, 1, 0, 0, 0); -- Freya hard
 
 DELETE FROM reference_loot_template WHERE item = 45038;
 INSERT INTO reference_loot_template VALUES
@@ -106,7 +108,7 @@ INSERT INTO `creature_loot_template` VALUES
 -- 25 man
 (33190, 45624, 100, 0, 1, 1, 0, 0, 0),
 (33190, 1, 100, 1, -33191, 4, 0, 0, 0),
-(33190, 45087, 19, 2, 1, 1, 0, 0, 0), -- Runed Orb
+(33190, 45087, 47, 2, 1, 1, 0, 0, 0), -- Runed Orb
 (33190, 2, 10, 6, -33117, 1, 0, 0, 0); -- random pattern
 
 DELETE FROM `reference_loot_template` WHERE `entry` IN (33119, 33191);
@@ -171,7 +173,7 @@ INSERT INTO `creature_loot_template` VALUES
 -- 25 man
 (33724, 45624, 100, 0, 1, 1, 0, 0, 0),
 (33724, 1, 100, 1, -33725, 4, 0, 0, 0),
-(33724, 45087, 19, 2, 1, 1, 0, 0, 0); -- Runed Orb
+(33724, 45087, 54, 2, 1, 1, 0, 0, 0); -- Runed Orb
 
 DELETE FROM `reference_loot_template` WHERE `entry` IN (33187, 33725);
 INSERT INTO `reference_loot_template` VALUES
@@ -230,13 +232,13 @@ INSERT INTO `creature_loot_template` VALUES
 (33293, 45869, 0, 2, 1, 1, 18, 603, 38),
 (33293, 45870, 0, 2, 1, 1, 18, 603, 38),
 (33293, 45871, 0, 2, 1, 1, 18, 603, 38),
-(33293, 45087, 17, 3, 1, 1, 0, 0, 0), -- Runed Orb
-(33293, 3, 8, 6, -33117, 1, 0, 0, 0), -- random pattern
+(33293, 45087, 50, 3, 1, 1, 0, 0, 0), -- Runed Orb
+(33293, 3, 10, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- 25 man normal
 (33885, 45624, 100, 0, 1, 1, 0, 0, 0),
 (33885, 1, 100, 1, -33886, 4, 0, 0, 0),
-(33885, 45087, 17, 2, 1, 1, 0, 0, 0), -- Runed Orb
-(33885, 3, 8, 6, -33117, 1, 0, 0, 0), -- random pattern
+(33885, 45087, 50, 2, 1, 1, 0, 0, 0), -- Runed Orb
+(33885, 3, 10, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- 25 man hard mode
 (33885, 45445, 0, 2, 1, 1, 18, 603, 38),
 (33885, 45443, 0, 2, 1, 1, 18, 603, 38),
@@ -305,18 +307,18 @@ INSERT INTO creature_loot_template VALUES
 -- Brundir
 (33694, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
 (33694, 1, 100, 1, -33694, 4, 0, 0, 0),
-(33694, 45087, 17, 4, 1, 1, 0, 0, 0), -- Runed Orb
+(33694, 45087, 50, 4, 1, 1, 0, 0, 0), -- Runed Orb
 -- Molgeim
 (33692, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
 (33692, 1, 100, 1, -33694, 4, 0, 0, 0),
 (33692, 45857, 50, 2, 1, 1, 0, 0, 0), -- Data Disk qitem
-(33692, 45087, 39, 4, 1, 1, 0, 0, 0), -- Runed Orb
+(33692, 45087, 100, 4, 2, 3, 0, 0, 0), -- Runed Orb
 -- Steelbreaker
 (33693, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
 (33693, 1, 100, 1, -33694, 4, 0, 0, 0),
 (33693, 45857, 50, 2, 1, 1, 0, 0, 0), -- Data Disk qitem
 (33693, 2, 100, 3, -33693, 1, 0, 0, 0), -- hard mode loot
-(33693, 45087, 40, 4, 1, 1, 0, 0, 0); -- Runed Orb
+(33693, 45087, 100, 4, 1, 3, 0, 0, 0); -- Runed Orb
 
 DELETE FROM `reference_loot_template` WHERE `entry` IN (32857, 33694, 32867, 33693);
 INSERT INTO `reference_loot_template` VALUES
@@ -338,8 +340,8 @@ INSERT INTO `reference_loot_template` VALUES
 (32867, 45448, 0, 3, 1, 1, 0, 0, 0),
 (32867, 45449, 0, 3, 1, 1, 0, 0, 0),
 (32867, 45447, 0, 3, 1, 1, 0, 0, 0),
-(32867, 45087, 17, 4, 1, 1, 0, 0, 0), -- Runed Orb
-(32867, 3, 8, 6, -33117, 1, 0, 0, 0), -- random pattern
+(32867, 45087, 100, 4, 1, 1, 0, 0, 0), -- Runed Orb
+(32867, 3, 30, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- 25man
 (33694, 45226, 0, 1, 1, 1, 0, 0, 0),
 (33694, 45224, 0, 1, 1, 1, 0, 0, 0),
@@ -356,7 +358,7 @@ INSERT INTO `reference_loot_template` VALUES
 (33694, 45225, 0, 1, 1, 1, 0, 0, 0),
 (33694, 45233, 0, 1, 1, 1, 0, 0, 0),
 (33694, 45236, 0, 1, 1, 1, 0, 0, 0),
-(33694, 1, 10, 6, -33117, 1, 0, 0, 0), -- random pattern
+(33694, 1, 15, 6, -33117, 1, 0, 0, 0), -- random pattern
 -- hard mode
 (33693, 45241, 0, 3, 1, 1, 0, 0, 0),
 (33693, 45245, 0, 3, 1, 1, 0, 0, 0),
@@ -402,8 +404,8 @@ DELETE FROM gameobject_loot_template WHERE entry = 26929;
 INSERT INTO gameobject_loot_template VALUES
 (26929, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
 (26929, 45261, 100, 1, -26929, 4, 0, 0, 0), -- 4 items
-(26929, 45087, 13, 2, 1, 1, 0, 0, 0), -- Runed Orb
-(26929, 1, 7, 6, -33117, 1, 0, 0, 0); -- random pattern
+(26929, 45087, 50, 2, 1, 1, 0, 0, 0), -- Runed Orb
+(26929, 1, 10, 6, -33117, 1, 0, 0, 0); -- random pattern
 DELETE FROM reference_loot_template WHERE entry = 26929;
 INSERT INTO reference_loot_template VALUES
 (26929, 45261, 0, 1, 1, 1, 0, 0, 0),
@@ -444,8 +446,8 @@ INSERT INTO creature_loot_template VALUES
 -- 25man
 (34175, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
 (34175, 1, 100, 1, -34175, 4, 0, 0, 0),
-(34175, 45087, 18, 2, 1, 1, 0, 0, 0), -- Runed Orb
-(34175, 2, 9, 6, -33117, 1, 0, 0, 0); -- random pattern
+(34175, 45087, 50, 2, 1, 1, 0, 0, 0), -- Runed Orb
+(34175, 2, 10, 6, -33117, 1, 0, 0, 0); -- random pattern
 
 DELETE FROM `reference_loot_template` WHERE `entry` IN (33515, 34175);
 INSERT INTO `reference_loot_template` VALUES
@@ -507,21 +509,92 @@ REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('623
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('62386', '1', '32906');
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('62584', '1', '32906');
 
-DELETE FROM spell_proc_event WHERE entry IN (62664, 64191);
+DELETE FROM spell_proc_event WHERE entry IN (62664, 64191, 62337);
 INSERT INTO spell_proc_event VALUES
 (62664, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8|32|128|512|8192|131072, 0, 0, 0, 0),
-(64191, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8|32|128|512|8192|131072, 0, 0, 0, 0);
+(64191, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8|32|128|512|8192|131072, 0, 0, 0, 0),
+(62337, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8|32, 0, 0, 0, 0);
 
--- Added hack for Freya's gift
--- DELETE FROM `gameobject` WHERE `id` IN (194324, 194325,194326,194327,194328,194329,194330,194331);
--- INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`) VALUES
--- (733324, 194324, 603, 1, 65535, 2374.876221, -78.512665, 425.073608, 3.260976, 0, 0, 0.706026, 0.708186, -604800, 100, 1),
--- (733325, 194325, 603, 1, 65535, 2374.876221, -78.512665, 425.073608, 3.260976, 0, 0, 0.706026, 0.708186, -604800, 100, 1),
--- (733326, 194326, 603, 1, 65535, 2374.876221, -78.512665, 425.073608, 3.260976, 0, 0, 0.706026, 0.708186, -604800, 100, 1),
--- (733327, 194327, 603, 1, 65535, 2374.876221, -78.512665, 425.073608, 3.260976, 0, 0, 0.706026, 0.708186, -604800, 100, 1),
--- (733328, 194328, 603, 2, 65535, 2374.876221, -78.512665, 425.073608, 3.260976, 0, 0, 0.706026, 0.708186, -604800, 100, 1),
--- (733329, 194329, 603, 2, 65535, 2374.876221, -78.512665, 425.073608, 3.260976, 0, 0, 0.706026, 0.708186, -604800, 100, 1),
--- (733330, 194330, 603, 2, 65535, 2374.876221, -78.512665, 425.073608, 3.260976, 0, 0, 0.706026, 0.708186, -604800, 100, 1),
--- (733331, 194331, 603, 2, 65535, 2374.876221, -78.512665, 425.073608, 3.260976, 0, 0, 0.706026, 0.708186, -604800, 100, 1);
+-- Freya's gift spawns
+DELETE FROM `gameobject` WHERE `id` IN (194324, 194327, 194328, 194331);
+INSERT INTO `gameobject` (`id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`) VALUES
+(194324, 603, 1, 65535, 2374.876221, -78.512665, 425.073608, 3.260976, 0, 0, 0.706026, 0.708186, -604800, 100, 1), -- 10man normal
+(194327, 603, 1, 65535, 2374.876221, -78.512665, 425.073608, 3.260976, 0, 0, 0.706026, 0.708186, -604800, 100, 1), -- 10man hard
+(194328, 603, 2, 65535, 2374.876221, -78.512665, 425.073608, 3.260976, 0, 0, 0.706026, 0.708186, -604800, 100, 1), -- 25man normal
+(194331, 603, 2, 65535, 2374.876221, -78.512665, 425.073608, 3.260976, 0, 0, 0.706026, 0.708186, -604800, 100, 1); -- 25man hard
+
+UPDATE gameobject_template SET data1 = 26962 WHERE entry = 194328;
+
+-- loot conditions dont work for gameobjects! must find other way
+-- Freya Loot
+DELETE FROM gameobject_loot_template WHERE entry IN (26962, 27078, 27079, 27081);
+INSERT INTO gameobject_loot_template VALUES
+-- 10man normal mode
+(27078, 40753, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Valor
+-- (27078, 1, 100, 1, -27078, 1, 0, 0, 0), -- 1 random item
+-- (27078, 45644, 0, 2, 1, 1, 0, 0, 0), -- 1 out of 3 tokens
+-- (27078, 45645, 0, 2, 1, 1, 0, 0, 0),
+-- (27078, 45646, 0, 2, 1, 1, 0, 0, 0),
+-- (27078, 2, 100, 3, -27084, 1, 18, 603, 35), -- 1 elder up
+-- (27078, 3, 100, 4, -27085, 1, 18, 603, 36), -- 2 elders up
+-- 10man hard mode
+(27081, 40753, 100, 0, 4, 4, 0, 0, 0), -- 4 Emblems of Valor
+-- (27081, 1, 100, 1, -27078, 1, 0, 0, 0), -- 1 random item
+-- (27081, 45644, 0, 2, 1, 1, 0, 0, 0), -- 1 out of 3 tokens
+-- (27081, 45645, 0, 2, 1, 1, 0, 0, 0),
+-- (27081, 45646, 0, 2, 1, 1, 0, 0, 0),
+(27081, 45087, 100, 4, 1, 1, 0, 0, 0), -- Runed Orb
+-- (27081, 2, 100,  3, -27081, 1, 0, 0, 0), -- item hard mode
+-- 25man normal mode
+(27079, 45624, 100, 0, 1, 1, 0, 0, 0), -- Emblem of Conquest
+-- (27079, 1, 100, 1, -27083, 2, 0, 0, 0), -- 2 random items
+-- (27079, 3, 100, 3, -27079, 2, 0, 0, 0), -- 2 tokens
+(27079, 45087, 75, 2, 1, 1, 0, 0, 0), -- Runed Orb
+(27079, 2, 10, 6, -33117, 1, 0, 0, 0), -- random pattern
+(27079, 4, 100, 4, -27086, 1, 18, 603, 35), -- 1 elder up
+(27079, 5, 100, 5, -27087, 1, 18, 603, 36), -- 2 elders up
+-- 25man hard mode
+(26962, 45624, 100, 0, 4, 4, 0, 0, 0), -- 4 Emblems of Conquest
+-- (26962, 1, 100, 1, -27083, 2, 0, 0, 0), -- 2 random items
+-- (26962, 3, 100, 3, -27079, 2, 0, 0, 0), -- 2 tokens
+(26962, 45087, 90, 2, 1, 4, 0, 0, 0), -- up to 4 Runed Orbs
+(26962, 2, 10, 6, -33117, 1, 0, 0, 0), -- random pattern
+-- (26962, 4, 100, 4, -27083, 1, 0, 0, 0); -- item hard mode
+
+DELETE FROM reference_loot_template WHERE entry IN (27078, 27079, 27081, 27082, 27083, 27084, 27085, 27086, 27087);
+INSERT INTO reference_loot_template VALUES
+(27079, 45653, 0, 3, 1, 1, 0, 0, 0), -- tokens 25man
+(27079, 45654, 0, 3, 1, 1, 0, 0, 0),
+(27079, 45655, 0, 3, 1, 1, 0, 0, 0),
+(27078, 45941, 0, 1, 1, 1, 0, 0, 0), -- items 10man normal
+(27078, 45935, 0, 1, 1, 1, 0, 0, 0),
+(27078, 45936, 0, 1, 1, 1, 0, 0, 0),
+(27078, 45940, 0, 1, 1, 1, 0, 0, 0),
+(27078, 45934, 0, 1, 1, 1, 0, 0, 0),
+(27081, 45946, 0, 3, 1, 1, 0, 0, 0), -- 10man hard mode
+(27081, 45943, 0, 3, 1, 1, 0, 0, 0),
+(27081, 45945, 0, 3, 1, 1, 0, 0, 0),
+(27081, 45947, 0, 3, 1, 1, 0, 0, 0),
+(27081, 45294, 0, 3, 1, 1, 0, 0, 0),
+(27082, 45455, 0, 1, 1, 1, 0, 0, 0), -- items 25man normal
+(27082, 45483, 0, 1, 1, 1, 0, 0, 0),
+(27082, 45481, 0, 1, 1, 1, 0, 0, 0),
+(27082, 45482, 0, 1, 1, 1, 0, 0, 0),
+(27082, 45480, 0, 1, 1, 1, 0, 0, 0),
+(27082, 45479, 0, 1, 1, 1, 0, 0, 0),
+(27083, 45484, 0, 1, 1, 1, 0, 0, 0), -- items 25man hard mode
+(27083, 45485, 0, 1, 1, 1, 0, 0, 0),
+(27083, 45486, 0, 1, 1, 1, 0, 0, 0),
+(27083, 45613, 0, 1, 1, 1, 0, 0, 0),
+(27083, 45487, 0, 1, 1, 1, 0, 0, 0),
+(27083, 45488, 0, 1, 1, 1, 0, 0, 0),
+(27084, 40753, 0, 3, 1, 1, 18, 603, 35), -- valor for 1 elder up
+(27085, 40753, 0, 4, 1, 1, 18, 603, 36), -- valor for 2 elders up
+(27086, 45624, 0, 4, 1, 1, 18, 603, 35), -- conquest for 1 elder up
+(27086, 45087, 0, 4, 1, 1, 18, 603, 35), -- Runed Orb for 1 elder up
+(27087, 45624, 0, 5, 1, 1, 18, 603, 36), -- conquest for 2 elders up
+(27087, 45087, 0, 5, 1, 1, 18, 603, 36); -- Runed Orb for 2 elders up
+
+
 -- Delete bugged spell from mobs
 -- DELETE FROM `creature_ai_scripts` WHERE `creature_id` IN (33430,33732) AND `action1_param1` = 63007;

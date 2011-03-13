@@ -283,7 +283,12 @@ enum
 
     // quest 12659, item 38731
     SPELL_AHUNAES_KNIFE                 = 52090,
-    NPC_SCALPS_KILL_CREDIT_BUNNY        = 28622
+    NPC_SCALPS_KILL_CREDIT_BUNNY        = 28622,
+
+    NPC_WARMONGER                       = 26811,
+    NPC_SOOTHSAYER                      = 26812,
+    SPELL_BLOW_SNOW                     = 47778,
+    SPELL_FROZEN                        = 47795
 };
 
 bool EffectAuraDummy_spell_aura_dummy_npc(const Aura* pAura, bool bApply)
@@ -431,6 +436,22 @@ bool EffectAuraDummy_spell_aura_dummy_npc(const Aura* pAura, bool bApply)
             }
 
             return false;
+        }
+        case SPELL_BLOW_SNOW:
+        {
+            Creature* pCreatureTarget = (Creature*)pAura->GetTarget();
+
+            if(pCreatureTarget && (pCreatureTarget->GetEntry() == NPC_WARMONGER) || (pCreatureTarget->GetEntry() == NPC_SOOTHSAYER))
+            {
+                if (Unit* pCaster = pAura->GetCaster())
+                {
+                    if(pCaster->HasInArc(M_PI_F/2, pCreatureTarget))
+                    {
+                        pCreatureTarget->CastSpell(pCreatureTarget, SPELL_FROZEN, true);
+                        return true;
+                    }
+                }
+            }
         }
     }
 

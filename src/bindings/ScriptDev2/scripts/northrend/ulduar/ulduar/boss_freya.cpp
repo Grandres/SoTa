@@ -147,8 +147,9 @@ enum
     SPELL_BRIGHTLEAF_FLUX       = 62262,
     SPELL_SOLAR_FLARE           = 62240,
     SPELL_SOLAR_FLARE_H         = 62920,
-    SPELL_UNSTABLE_SUN_BEAM     = 62211,
-    SPELL_UNSTABLE_SUN_BEAM_A   = 62243,
+    SPELL_UNSTABLE_SUN_BEAM     = 62221,
+    SPELL_UNSTABLE_SUN_BEAM_A   = 62211,
+    SPELL_UNSTABLE_SUN_BEAM_BUFF= 62243,
     SPELL_UNSTABLE_ENERGY       = 62217,    // cancels sun bean
     SPELL_UNSTABLE_ENERGY_H     = 62922,
     SPELL_PHOTOSYNTHESIS        = 62209,
@@ -159,8 +160,8 @@ enum
     SPELL_IRON_ROOTS            = 62283,
     SPELL_IRON_ROOTS_H          = 62930,
     NPC_IRON_ROOTS              = 33088,
-    SPELL_THORM_SWARM           = 62285,
-    SPELL_THORM_SWARM_H         = 62931,
+    SPELL_THORN_SWARM           = 62285,
+    SPELL_THORN_SWARM_H         = 62931,
 
     // stonebark spells
     SPELL_FIST_OF_STONE         = 62344,
@@ -273,7 +274,6 @@ struct MANGOS_DLL_DECL boss_elder_brightleafAI : public ScriptedAI
     uint32 m_uiSolarFlareTimer;
     uint32 m_uiUnstableSunBeanTimer;
     uint32 m_uiUnstabelEnergyTimer;
-    uint32 m_uiSunbeamStacks;
     uint32 m_uiHealTimer;
     bool m_bHasSunbeam;
 
@@ -283,7 +283,6 @@ struct MANGOS_DLL_DECL boss_elder_brightleafAI : public ScriptedAI
         m_uiSolarFlareTimer         = 10000 + urand(1000, 5000);
         m_uiUnstableSunBeanTimer    = 15000;
         m_uiUnstabelEnergyTimer     = 30000;
-        m_uiSunbeamStacks           = 1;
         m_bHasSunbeam               = false;
     }
 
@@ -307,7 +306,6 @@ struct MANGOS_DLL_DECL boss_elder_brightleafAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        // this needs core suport
         if(m_uiBrightleafFluxTimer < uiDiff)
         {
             DoCast(m_creature, SPELL_BRIGHTLEAF_FLUX);
@@ -317,41 +315,17 @@ struct MANGOS_DLL_DECL boss_elder_brightleafAI : public ScriptedAI
 
         if(m_uiSolarFlareTimer < uiDiff)
         {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                DoCast(pTarget, m_bIsRegularMode ? SPELL_SOLAR_FLARE : SPELL_SOLAR_FLARE_H);
+            DoCast(m_creature, m_bIsRegularMode ? SPELL_SOLAR_FLARE : SPELL_SOLAR_FLARE_H);
             m_uiSolarFlareTimer = 10000 + urand(1000, 5000);
         }
         else m_uiSolarFlareTimer -= uiDiff;
 
-        // also the following spells need some core support -> hacky way of use
-        // PLEASE FIX FOR REVISION!
         if(m_uiUnstableSunBeanTimer < uiDiff)
         {
             DoCast(m_creature, SPELL_UNSTABLE_SUN_BEAM);
-            m_bHasSunbeam = true;
-            m_uiHealTimer = 1000;
             m_uiUnstableSunBeanTimer = urand(7000, 12000);
         }
         else m_uiUnstableSunBeanTimer -= uiDiff;
-
-        // cast after the unstable sun bean
-        if (m_uiHealTimer < uiDiff && m_bHasSunbeam)
-        {
-            DoCast(m_creature, SPELL_PHOTOSYNTHESIS);
-            m_bHasSunbeam = false;
-        }
-        else m_uiHealTimer -= uiDiff;
-
-        // removes photosynthesis when standing inside
-        if(m_uiUnstabelEnergyTimer < uiDiff)
-        {
-            DoCast(m_creature, m_bIsRegularMode ? SPELL_UNSTABLE_ENERGY: SPELL_UNSTABLE_ENERGY_H);
-            m_creature->RemoveAurasDueToSpell(SPELL_UNSTABLE_SUN_BEAM_A);
-            m_creature->RemoveAurasDueToSpell(SPELL_PHOTOSYNTHESIS);
-            m_uiSunbeamStacks = 1;
-            m_uiUnstabelEnergyTimer = urand(20000, 30000);
-        }
-        else m_uiUnstabelEnergyTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
@@ -409,7 +383,7 @@ struct MANGOS_DLL_DECL boss_elder_ironbranchAI : public ScriptedAI
 
         if(m_uiImpaleTimer < uiDiff)
         {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            if (Unit* pTarget = m_creature->SelectRandomUnfriendlyTarget(m_creature->getVictim()))
                 DoCast(pTarget, m_bIsRegularMode ? SPELL_IMPALE : SPELL_IMPALE_H);
             m_uiImpaleTimer = 10000 + urand (1000, 5000);
         }
@@ -426,7 +400,7 @@ struct MANGOS_DLL_DECL boss_elder_ironbranchAI : public ScriptedAI
         if(m_uiThornSwarmTimer < uiDiff)
         {
             if(Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                DoCast(target, m_bIsRegularMode ? SPELL_THORM_SWARM : SPELL_THORM_SWARM_H);
+                DoCast(target, m_bIsRegularMode ? SPELL_THORN_SWARM : SPELL_THORN_SWARM_H);
             m_uiThornSwarmTimer = 30000;
         }
         else m_uiThornSwarmTimer -= uiDiff;
@@ -580,7 +554,6 @@ struct MANGOS_DLL_DECL boss_freyaAI : public ScriptedAI
         m_uiGroundTremorTimer           = 20000;
         m_uiNatureBombTimer             = 7000;
         m_uiThreeWaveCheckTimer         = 1000;
-        m_uiAchievProgress              = 10000;
         m_bWaveCheck                    = false;
         m_bThreeWaveCheckTimerStarted   = false;
         m_uiThreeWaveRespawnTimer       = 12000;
@@ -690,12 +663,12 @@ struct MANGOS_DLL_DECL boss_freyaAI : public ScriptedAI
         {
             m_pInstance->SetData(TYPE_FREYA_HARD, 0);
 
-            if(m_uiAchievProgress == 1)
-                m_pInstance->SetData(TYPE_FREYA_HARD, 1);
-            else if (m_uiAchievProgress == 2)
-                m_pInstance->SetData(TYPE_FREYA_HARD, 2);
-            else if (m_uiAchievProgress == 3)
-                m_pInstance->SetData(TYPE_FREYA_HARD, 3);
+            if(m_uiAchievProgress >= 1)
+                m_pInstance->SetData(TYPE_FREYA_1, DONE);
+            if (m_uiAchievProgress >= 2)
+                m_pInstance->SetData(TYPE_FREYA_2, DONE);
+            if (m_uiAchievProgress == 3)
+                m_pInstance->SetData(TYPE_FREYA_HARD, DONE);
 
             m_pInstance->SetData(TYPE_FREYA, DONE);
         }
@@ -1089,7 +1062,6 @@ struct MANGOS_DLL_DECL mob_freya_groundAI : public ScriptedAI
     uint32 m_uiEonarsGift_Timer;
     uint32 m_uiNonSelectable_Timer;
     uint32 m_uiGrow_Timer;
-    uint32 m_uiSunBeamDespawn_Timer;
     uint32 m_uiUnstableEnergy_Timer;
     uint32 m_uiHealthyGrow_Timer;
     uint64 m_uiNatureBombGUID;
@@ -1109,9 +1081,8 @@ struct MANGOS_DLL_DECL mob_freya_groundAI : public ScriptedAI
         m_uiDieTimer                = 60000;
         m_uiEonarsGift_Timer        = urand(11000,13000);
         m_uiNonSelectable_Timer     = 5000;
-        m_uiUnstableEnergy_Timer    = 1000;
+        m_uiUnstableEnergy_Timer    = 10500;
         m_uiGrow_Timer              = 0;
-        m_uiSunBeamDespawn_Timer    = urand(10000,11000);
         m_bHasGrow                  = true;
         m_uiHealthyGrow_Timer       = urand(3000,12000);
         m_bNpcNatureBomb            = false;
@@ -1146,17 +1117,24 @@ struct MANGOS_DLL_DECL mob_freya_groundAI : public ScriptedAI
                 m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 break;
             case NPC_SUN_BEAM:
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 m_bNpcSunBeamFreya = true;
                 m_creature->SetDisplayId(25865);     // invisible
-                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 DoCast(m_creature, SPELL_LIFEBINDERS_VISUAL);
                 DoCast(m_creature, m_bIsRegularMode ? SPELL_UNSTABLE_ENERGY_FREYA : SPELL_UNSTABLE_ENERGY_FREYA_H);
+                DoCast(m_creature, SPELL_PHOTOSYNTHESIS);
+                m_creature->ForcedDespawn(11000);
                 break;
             case NPC_UNSTABLE_SUN_BEAM:
                 m_bNpcSunBeamBright = true;
                 m_creature->SetDisplayId(25865);     // invisible
-                DoCast(m_creature, SPELL_LIFEBINDERS_VISUAL);
-                //DoCast(m_creature, SPELL_PHOTOSYNTHESIS); // spell needs core fix, should be casted on Brighleaf!
+                DoCast(m_creature, SPELL_LIFEBINDERS_VISUAL, true);
+                DoCast(m_creature, SPELL_PHOTOSYNTHESIS, true);
+                DoCast(m_creature, SPELL_UNSTABLE_SUN_BEAM_A, true);
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                m_creature->ForcedDespawn(11000);
                 break;
         }
 
@@ -1176,7 +1154,7 @@ struct MANGOS_DLL_DECL mob_freya_groundAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (m_pInstance && m_pInstance->GetData(TYPE_FREYA) != IN_PROGRESS)
+        if (m_pInstance && m_pInstance->GetData(TYPE_FREYA) != IN_PROGRESS && !m_bNpcSunBeamBright)
             m_creature->ForcedDespawn();
 
         if(!m_creature->isAlive())
@@ -1249,15 +1227,8 @@ struct MANGOS_DLL_DECL mob_freya_groundAI : public ScriptedAI
             if(m_uiUnstableEnergy_Timer < uiDiff)
             {
                 DoCast(m_creature, m_bIsRegularMode ? SPELL_UNSTABLE_ENERGY : SPELL_UNSTABLE_ENERGY_H);
-                m_uiUnstableEnergy_Timer = 1000;
+                m_uiUnstableEnergy_Timer = 10000;
             }else m_uiUnstableEnergy_Timer -= uiDiff;
-        }
-
-        if(m_bNpcSunBeamFreya || m_bNpcSunBeamBright)
-        {
-            if(m_uiSunBeamDespawn_Timer < uiDiff)
-                m_creature->ForcedDespawn();
-            else m_uiSunBeamDespawn_Timer -= uiDiff;
         }
     }
 };
@@ -1313,7 +1284,6 @@ struct MANGOS_DLL_DECL mob_freya_spawnedAI : public ScriptedAI
 
         switch(m_creature->GetEntry())
         {
-            // The Conservator's Grip needs core fix. It should be canceled by pheronomes!
         case NPC_ANCIENT_CONSERVATOR:
             m_bAncientConservator = true;
             DoCast(m_creature, SPELL_CONSERVATORS_GRIP);
