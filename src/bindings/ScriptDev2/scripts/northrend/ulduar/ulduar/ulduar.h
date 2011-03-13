@@ -10,6 +10,7 @@ enum
     MAX_ENCOUNTER               = 14,
     HARD_MODE_ENCOUNTER         = 9,
     KEEPER_ENCOUNTER            = 4,
+    FREYA_ELDERS_ENCOUNTER      = 3,
     TELEPORTER_ENCOUNTER        = 3,
 
     // boss types
@@ -28,6 +29,10 @@ enum
     TYPE_YOGGSARON              = 12,
     TYPE_ALGALON                = 13,
 
+    // Freya 1, 2 elders
+    TYPE_FREYA_1                = 35,
+    TYPE_FREYA_2                = 36,
+
     // hard mode bosses
     TYPE_LEVIATHAN_HARD         = 37,
     TYPE_XT002_HARD             = 38,
@@ -35,7 +40,7 @@ enum
     TYPE_MIMIRON_HARD           = 40,
     TYPE_HODIR_HARD             = 41,
     TYPE_THORIM_HARD            = 42,
-    TYPE_FREYA_HARD             = 43,
+    TYPE_FREYA_HARD             = 43, // this means 3 elders up
     TYPE_VEZAX_HARD             = 44,
     TYPE_YOGGSARON_HARD         = 45,
 
@@ -128,17 +133,13 @@ enum
     GO_GIFT_OF_OBSERVER_H       = 194821,
     GO_GIFT_OF_OBSERVER         = 194822,
     GO_GIFT_OF_OBSERVER_HH      = 194823,   // unk
-    // Freya -> each chest is for a mode = more elders alive = more items in chest
+    // Freya -> each chest is for a mode
     // 10 man
     GO_FREYA_GIFT               = 194324,//10 normal
-    GO_FREYA_GIFT_1             = 194325,//10 1 elder
-    GO_FREYA_GIFT_2             = 194326,//10 2 elders
-    GO_FREYA_GIFT_3             = 194327,//10 3 elders
+    GO_FREYA_GIFT_HARD          = 194327,//10 3 elders
     // 25 man
     GO_FREYA_GIFT_H             = 194328,//25 normal
-    GO_FREYA_GIFT_H_1           = 194329,//25 1 elder
-    GO_FREYA_GIFT_H_2           = 194330,//25 2 elder
-    GO_FREYA_GIFT_H_3           = 194331,//25 3 elders
+    GO_FREYA_GIFT_H_HARD        = 194331,//25 3 elders
     // Mimiron
     GO_CACHE_OF_INOV            = 194789,
     GO_CACHE_OF_INOV_H          = 194956,
@@ -256,6 +257,7 @@ class MANGOS_DLL_DECL instance_ulduar : public ScriptedInstance
     uint32 m_auiEncounter[MAX_ENCOUNTER];
     uint32 m_auiHardBoss[HARD_MODE_ENCOUNTER];
     uint32 m_auiUlduarKeepers[KEEPER_ENCOUNTER];
+    uint32 m_auiFreyaElders[FREYA_ELDERS_ENCOUNTER];
     uint32 m_auiUlduarTeleporters[3];
     uint32 m_auiMiniBoss[6];
 
@@ -350,9 +352,7 @@ class MANGOS_DLL_DECL instance_ulduar : public ScriptedInstance
     uint64 m_uiThorimLootGUID;
     uint64 m_uiThorimRareLootGUID;
     uint64 m_uiFreyaLootGUID;
-    uint64 m_uiFreyaLoot1GUID;
-    uint64 m_uiFreyaLoot2GUID;
-    uint64 m_uiFreyaLoot3GUID;
+    uint64 m_uiFreyaLootHardGUID;
     uint64 m_uiMimironLootGUID;
     uint64 m_uiMimironHardLootGUID;
     uint64 m_uiAlagonLootGUID;

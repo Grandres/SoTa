@@ -554,7 +554,6 @@ struct MANGOS_DLL_DECL boss_freyaAI : public ScriptedAI
         m_uiGroundTremorTimer           = 20000;
         m_uiNatureBombTimer             = 7000;
         m_uiThreeWaveCheckTimer         = 1000;
-        m_uiAchievProgress              = 10000;
         m_bWaveCheck                    = false;
         m_bThreeWaveCheckTimerStarted   = false;
         m_uiThreeWaveRespawnTimer       = 12000;
@@ -664,12 +663,12 @@ struct MANGOS_DLL_DECL boss_freyaAI : public ScriptedAI
         {
             m_pInstance->SetData(TYPE_FREYA_HARD, 0);
 
-            if(m_uiAchievProgress == 1)
-                m_pInstance->SetData(TYPE_FREYA_HARD, 1);
-            else if (m_uiAchievProgress == 2)
-                m_pInstance->SetData(TYPE_FREYA_HARD, 2);
-            else if (m_uiAchievProgress == 3)
-                m_pInstance->SetData(TYPE_FREYA_HARD, 3);
+            if(m_uiAchievProgress >= 1)
+                m_pInstance->SetData(TYPE_FREYA_1, DONE);
+            if (m_uiAchievProgress >= 2)
+                m_pInstance->SetData(TYPE_FREYA_2, DONE);
+            if (m_uiAchievProgress == 3)
+                m_pInstance->SetData(TYPE_FREYA_HARD, DONE);
 
             m_pInstance->SetData(TYPE_FREYA, DONE);
         }

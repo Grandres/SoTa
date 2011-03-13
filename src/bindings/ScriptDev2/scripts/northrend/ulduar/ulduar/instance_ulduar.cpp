@@ -85,9 +85,7 @@ void instance_ulduar::Initialize()
     m_uiThorimLootGUID      = 0;
     m_uiThorimRareLootGUID  = 0;
     m_uiFreyaLootGUID       = 0;
-    m_uiFreyaLoot1GUID      = 0;
-    m_uiFreyaLoot2GUID      = 0;
-    m_uiFreyaLoot3GUID      = 0;
+    m_uiFreyaLootHardGUID   = 0;
     m_uiMimironLootGUID     = 0;
     m_uiMimironHardLootGUID = 0;
     m_uiAlagonLootGUID      = 0;
@@ -491,24 +489,12 @@ void instance_ulduar::OnObjectCreate(GameObject *pGo)
     case GO_FREYA_GIFT_H:
         m_uiFreyaLootGUID = pGo->GetGUID();
         break;
-        // Freya rare
-    case GO_FREYA_GIFT_1:
-        m_uiFreyaLoot1GUID = pGo->GetGUID();
+        // Freya hard modes
+    case GO_FREYA_GIFT_HARD:
+        m_uiFreyaLootHardGUID = pGo->GetGUID();
         break;
-    case GO_FREYA_GIFT_H_1:
-        m_uiFreyaLoot1GUID = pGo->GetGUID();
-        break;
-    case GO_FREYA_GIFT_2:
-        m_uiFreyaLoot2GUID = pGo->GetGUID();
-        break;
-    case GO_FREYA_GIFT_H_2:
-        m_uiFreyaLoot2GUID = pGo->GetGUID();
-        break;
-    case GO_FREYA_GIFT_3:
-        m_uiFreyaLoot3GUID = pGo->GetGUID();
-        break;
-    case GO_FREYA_GIFT_H_3:
-        m_uiFreyaLoot3GUID = pGo->GetGUID();
+    case GO_FREYA_GIFT_H_HARD:
+        m_uiFreyaLootHardGUID = pGo->GetGUID();
         break;
 
         // Thorim
@@ -686,20 +672,27 @@ void instance_ulduar::SetData(uint32 uiType, uint32 uiData)
         if (uiData == DONE)
         {
             // do this in order to see how many elders were alive and spawn the correct chest
-            if(m_auiHardBoss[6] == 0)
+            // hard mode drop
+            if(m_auiHardBoss[6] == 3)
+                DoRespawnGameObject(m_uiFreyaLootHardGUID, 30*MINUTE);
+            // normal mode
+            else
                 DoRespawnGameObject(m_uiFreyaLootGUID, 30*MINUTE);
-            else if(m_auiHardBoss[6] == 1)
-                DoRespawnGameObject(m_uiFreyaLoot1GUID, 30*MINUTE);
-            else if(m_auiHardBoss[6] == 2)
-                DoRespawnGameObject(m_uiFreyaLoot2GUID, 30*MINUTE);
-            else if(m_auiHardBoss[6] == 3)
-                DoRespawnGameObject(m_uiFreyaLoot3GUID, 30*MINUTE);
             // used to make the friendly keeper visible
             if(Creature* pImage = instance->GetCreature(m_uiFreyaImageGUID))
                 pImage->SetVisibility(VISIBILITY_ON);
             DoOpenMadnessDoorIfCan();
         }
         break;
+    // 1 elder up +1 emblem drops
+    case TYPE_FREYA_1:
+        m_auiFreyaElders[1] = uiData;
+        break;
+    // 2 elders up +2 emblems drop
+    case TYPE_FREYA_2:
+        m_auiFreyaElders[2] = uiData;
+        break;
+    // 3 elders up is TYPE_FREYA_HARD
 
         // Prison
     case TYPE_VEZAX:
@@ -976,6 +969,10 @@ uint32 instance_ulduar::GetData(uint32 uiType)
         return m_auiEncounter[9];
     case TYPE_FREYA:
         return m_auiEncounter[10];
+    case TYPE_FREYA_1:
+        return m_auiFreyaElders[1];
+    case TYPE_FREYA_2:
+        return m_auiFreyaElders[2];
     case TYPE_VEZAX:
         return m_auiEncounter[11];
     case TYPE_YOGGSARON:
