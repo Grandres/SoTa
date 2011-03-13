@@ -2656,6 +2656,17 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 target->CastSpell(target, 47287, true, NULL, this);
                 return;
             }
+            case 47744:                                     // Rage of Jin'arrak
+            {
+                if(m_removeMode == AURA_REMOVE_BY_EXPIRE)
+                {
+                    Unit* caster = GetCaster();
+
+                    caster->CastSpell(caster, 61611, true);
+                    ((Player*)caster)->KilledMonsterCredit(26902);
+                    return;
+                }
+            }
             case 51405:                                     // Digging for Treasure
             {
                 const uint32 spell_list[7] =

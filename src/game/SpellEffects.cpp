@@ -1551,6 +1551,14 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 47701:                             // Bang Gongs
+                {
+                    Unit* caster = GetCaster();
+
+                    caster->CastSpell(caster, 47730, true);
+                    caster->CastSpell(caster, 47744, true);
+                    return;
+                }
                 case 46167:                                 // Planning for the Future: Create Snowfall Glade Pup Cover
                 case 50918:                                 // Gluttonous Lurkers: Create Basilisk Crystals Cover
                 case 50926:                                 // Gluttonous Lurkers: Create Zul'Drak Rat Cover
