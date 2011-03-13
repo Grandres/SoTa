@@ -1852,7 +1852,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     {
                         case 204:					// WS, capture 3 flags without dying
                         {
-                            if(bg->GetPlayerScore(GetPlayer(),SCORE_DEATHS) != 0)
+                            if((bg->GetPlayerScore(GetPlayer(),SCORE_DEATHS) != 0) && (bg->GetPlayerScore(GetPlayer(), SCORE_FLAG_CAPTURES) < 3))
                                 continue;
                             break;
                         }
