@@ -1652,6 +1652,51 @@ CreatureAI* GetAI_npc_bonker_togglevolt(Creature* pCreature)
     return new npc_bonker_togglevoltAI(pCreature);
 }
 
+/*######
+## Quest 11608: Bury Those Cockroaches!
+######*/
+enum
+{
+    QUEST_BURY_THOSE_COCKROACHES            = 11608,
+    SPELL_SEAFORIUM_DEPTH_CHARGE_EXPLOSION  = 45502
+
+
+};
+struct npc_seaforium_depth_chargeAI : public ScriptedAI
+{
+    npc_seaforium_depth_chargeAI(Creature *pCreature) : ScriptedAI(pCreature) {}
+
+    uint32 uiExplosionTimer;
+    void Reset()
+    {
+        uiExplosionTimer = urand(5000,10000);
+    }
+    void UpdateAI(const uint32 diff)
+    {
+        if (uiExplosionTimer < diff)
+        {
+            DoCast(SPELL_SEAFORIUM_DEPTH_CHARGE_EXPLOSION);          
+            for(uint8 i = 0; i < 4; ++i)
+            {
+                if(Creature* cCredit = m_creature->FindNearestCreature(25402 + i, 10.0f))//25402-25405 credit markers
+                {
+                    if(Player *pPlayer = m_creature->GetMap()->GetPlayer(m_creature->GetCreatorGuid()))
+                    {
+                        if(pPlayer->GetQuestStatus(QUEST_BURY_THOSE_COCKROACHES) == QUEST_STATUS_INCOMPLETE)
+                            pPlayer->KilledMonsterCredit(cCredit->GetEntry(),cCredit->GetGUID());
+                    }                    
+                }
+            }
+            m_creature->ForcedDespawn(1000);
+        } else uiExplosionTimer -= diff;
+    }
+};
+
+CreatureAI* GetAI_npc_seaforium_depth_charge(Creature* pCreature)
+{
+    return new npc_seaforium_depth_chargeAI(pCreature);
+}
+
 void AddSC_borean_tundra()
 {
     Script *newscript;
@@ -1764,6 +1809,11 @@ void AddSC_borean_tundra()
     newscript->Name = "npc_bonker_togglevolt";
     newscript->GetAI = &GetAI_npc_bonker_togglevolt;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_bonker_togglevolt;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_seaforium_depth_charge";
+    newscript->GetAI = &GetAI_npc_seaforium_depth_charge;
     newscript->RegisterSelf();
 
 }
