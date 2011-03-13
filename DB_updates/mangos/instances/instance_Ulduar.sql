@@ -1,5 +1,5 @@
 -- Instance Ulduar
--- Instance last changes: a575
+-- Instance last changes: a589
 
 -- teleporter
 UPDATE gameobject_template SET ScriptName = "go_ulduar_teleporter" WHERE entry = 194569;
@@ -507,10 +507,11 @@ REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('623
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('62386', '1', '32906');
 REPLACE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('62584', '1', '32906');
 
-DELETE FROM spell_proc_event WHERE entry IN (62664, 64191);
+DELETE FROM spell_proc_event WHERE entry IN (62664, 64191, 62337);
 INSERT INTO spell_proc_event VALUES
 (62664, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8|32|128|512|8192|131072, 0, 0, 0, 0),
-(64191, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8|32|128|512|8192|131072, 0, 0, 0, 0);
+(64191, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8|32|128|512|8192|131072, 0, 0, 0, 0),
+(62337, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8|32, 0, 0, 0, 0);
 
 -- Added hack for Freya's gift
 -- DELETE FROM `gameobject` WHERE `id` IN (194324, 194325,194326,194327,194328,194329,194330,194331);
