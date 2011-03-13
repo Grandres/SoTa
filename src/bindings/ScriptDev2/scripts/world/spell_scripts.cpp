@@ -439,12 +439,17 @@ bool EffectAuraDummy_spell_aura_dummy_npc(const Aura* pAura, bool bApply)
         }
         case SPELL_BLOW_SNOW:
         {
-            if((pCreatureTarget->GetEntry() == NPC_WARMONGER) || (pCreatureTarget->GetEntry() == NPC_SOOTHSAYER))
+            Creature* pCreatureTarget = (Creature*)pAura->GetTarget();
+
+            if(pCreatureTarget && (pCreatureTarget->GetEntry() == NPC_WARMONGER) || (pCreatureTarget->GetEntry() == NPC_SOOTHSAYER))
             {
-                if(pCaster->HasInArc(M_PI_F/2, pCreatureTarget))
+                if (Unit* pCaster = pAura->GetCaster())
                 {
-                    pCreatureTarget->CastSpell(pCreatureTarget, SPELL_FROZEN, true);
-                    return true;
+                    if(pCaster->HasInArc(M_PI_F/2, pCreatureTarget))
+                    {
+                        pCreatureTarget->CastSpell(pCreatureTarget, SPELL_FROZEN, true);
+                        return true;
+                    }
                 }
             }
         }
