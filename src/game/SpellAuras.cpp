@@ -4781,6 +4781,20 @@ void Aura::HandleInvisibility(bool apply, bool Real)
                     target->SetVisibility(VISIBILITY_ON);
             }
         }
+        switch(GetId())
+        {
+            case 49097:                         // Out of Body Experience
+            {
+                Unit* pCaster = GetCaster();
+
+                if(m_removeMode == AURA_REMOVE_BY_EXPIRE)
+                {
+                    pCaster->RemoveByteFlag(PLAYER_FIELD_BYTES2, 3, PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
+                    pCaster->CastSpell(pCaster, 49098, true);
+                }
+                return;
+            }
+        }
     }
 }
 
