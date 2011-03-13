@@ -217,7 +217,6 @@ struct MANGOS_DLL_DECL mob_iron_rootsAI : public ScriptedAI
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
-        m_uiVictimGUID = m_creature->GetCreatorGuid().GetRawValue();
         m_uiCreatureEntry = m_creature->GetEntry();
         SetCombatMovement(false);
         Reset();
@@ -225,8 +224,6 @@ struct MANGOS_DLL_DECL mob_iron_rootsAI : public ScriptedAI
 
     bool m_bIsRegularMode;
     ScriptedInstance* m_pInstance;
-
-    uint64 m_uiVictimGUID;
     uint32 m_uiCreatureEntry;
 
     void Reset(){}
@@ -236,24 +233,24 @@ struct MANGOS_DLL_DECL mob_iron_rootsAI : public ScriptedAI
         m_creature->ForcedDespawn(500);
     }
 
-    void DamageTaken(Unit *pDoneBy, uint32 &uiDamage)
+    void JustDied(Unit *pKiller)
     {
-        if (uiDamage > m_creature->GetHealth())
+        if (!m_pInstance)
+            return;
+
+        if (Unit* pVictim = m_pInstance->instance->GetUnit(m_creature->GetCreatorGuid()))
         {
-            if (Unit* pVictim = m_creature->GetMap()->GetUnit(m_uiVictimGUID))
+            switch(m_uiCreatureEntry)
             {
-                switch(m_uiCreatureEntry)
-                {
-                    case NPC_IRON_ROOTS:
-                        pVictim->RemoveAurasDueToSpell(m_bIsRegularMode ? SPELL_IRON_ROOTS : SPELL_IRON_ROOTS_H);
-                        break;
-                    case NPC_STRENGHENED_IRON_ROOTS:
-                        pVictim->RemoveAurasDueToSpell(m_bIsRegularMode ? SPELL_IRON_ROOTS_FREYA : SPELL_IRON_ROOTS_FREYA_H);
-                        break;
-                }
+                case NPC_IRON_ROOTS:
+                    pVictim->RemoveAurasDueToSpell(m_bIsRegularMode ? SPELL_IRON_ROOTS : SPELL_IRON_ROOTS_H);
+                    break;
+                case NPC_STRENGHENED_IRON_ROOTS:
+                    pVictim->RemoveAurasDueToSpell(m_bIsRegularMode ? SPELL_IRON_ROOTS_FREYA : SPELL_IRON_ROOTS_FREYA_H);
+                    break;
             }
-            m_creature->ForcedDespawn(500);
         }
+        m_creature->ForcedDespawn(500);
     }
 
     void UpdateAI(const uint32 uiuiDiff){}
@@ -951,7 +948,7 @@ struct MANGOS_DLL_DECL boss_freyaAI : public ScriptedAI
             }
 
             //Phase 1, waves of adds
-            if(m_uiWaveNumber < 6)
+            if(m_uiWaveNumber < 1)
             {
                 if(m_uiSummonTimer < uiDiff)
                 {
