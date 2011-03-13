@@ -434,6 +434,7 @@ class BattleGround
         void PlaySoundToTeam(uint32 SoundID, Team team);
         void PlaySoundToAll(uint32 SoundID);
         void CastSpellOnTeam(uint32 SpellID, Team team);
+        bool GetPlayerWithSpell(uint32 SpellID);
         void RewardHonorToTeam(uint32 Honor, Team team);
         void RewardReputationToTeam(uint32 faction_id, uint32 Reputation, Team team);
         void RewardMark(Player *plr,uint32 count);

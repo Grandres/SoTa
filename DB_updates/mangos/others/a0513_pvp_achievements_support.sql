@@ -20,3 +20,12 @@ DELETE FROM `achievement_criteria_requirement` WHERE (`criteria_id`='7020') AND 
 -- ironman
 UPDATE `achievement_criteria_requirement` SET `type`='0' WHERE (`criteria_id`='1824');
 
+-- Save The Day
+DELETE FROM `achievement_criteria_requirement` WHERE criteria_id IN (5606, 5605);
+INSERT INTO `achievement_criteria_requirement` (`criteria_id`, `type`, `value1`) VALUES
+('5605', '7', '23333'),
+('5605', '6', '4571'),
+('5605', '14', '469'),
+('5606', '7', '23335'),
+('5606', '6', '4572'),
+('5606', '14', '67'); 

@@ -1608,6 +1608,23 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
                 if (!data)
                     continue;
+               BattleGround* bg = GetPlayer()->GetBattleGround();
+
+                switch(achievementCriteria->ID)
+                {
+                    case 5605:                                  // Save The Day - Carrying Horde Flag
+                    {
+                        if(bg->GetPlayerWithSpell(23335))
+                            continue;
+                        break;
+                    }
+                    case 5606:                                  // Save The Day - Carrying Alliance Flag
+                    {
+                        if(bg->GetPlayerWithSpell(23333))
+                            continue;
+                        break;
+                    }
+                }
 
                 if (!data->Meets(GetPlayer(),unit))
                     continue;
